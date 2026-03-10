@@ -1,0 +1,214 @@
+@import url('home.css');
+
+.title {
+    font-size: 18px;
+    font-weight: 400;
+}
+
+.content > div {
+    width: 100%;
+    max-width: 800px;
+}
+
+.client-status-container {
+    gap: 8px;
+    align-items: center;
+}
+
+.client-badge {
+    background-color: var(--color-neutral-100);
+    color: var(--color-neutral-900);
+    font-weight: 600;
+    border-radius: 6px;
+    padding: 4px;
+    font-size: 11px;
+    height: fit-content;
+}
+
+.field-set {
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.field-group {
+    justify-content: end;
+    gap: 8px;
+}
+
+.field-group input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    filter: invert(0.8); 
+    transition: background-color 0.2s;
+}
+
+.content {
+    flex: 1;
+    align-items: center;
+}
+
+.container-header {
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.check-client-button, .clear-client-button {
+    font-size: 14px;
+    height: fit-content;
+}
+
+.banks-container {
+    justify-content: center;
+    margin-bottom: 32px;
+}
+
+.bank-table {
+    width: 100%;
+    font-family: inherit;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--color-neutral-600);
+}
+
+.bank-table thead {
+    background-color: var(--color-neutral-800);
+}
+
+.bank-table th, .bank-table td  {
+    padding: 0 10px;
+    height: 50px;
+    line-height: 50px;
+    font-weight: 400;
+}
+
+.bank-table td {
+    border: 1px solid var(--color-neutral-600);
+}
+
+.bank-table thead th:first-child {
+    border-top-left-radius: 8px;
+}
+
+.bank-table thead th:last-child {
+    border-top-right-radius: 8px;
+}
+
+.bank-table tbody tr:last-child td:first-child {
+    border-bottom-left-radius: 8px;
+}
+
+.bank-table tbody tr:last-child td:last-child {
+    border-bottom-right-radius: 8px;
+}
+
+.bank-select-cell {
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+.bank-select-cell:hover {
+    background-color: var(--color-neutral-900);
+}
+
+.bank-select {
+    cursor: pointer;
+}
+
+.bank-select-cell.selected {
+    color: var(--color-green-400);
+    font-weight: 600;
+}
+
+.row-disabled {
+    opacity: 0.6;
+}
+
+.row-disabled .bank-select-cell,
+.bank-select-cell.disabled {
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+.bank-select-cell.unavailable {
+    color: var(--color-red-400);
+    font-weight: 600;
+}
+
+.icon-svg {
+    width: 24px;
+    height: 24px;
+    vertical-align: middle;
+}
+
+.icon-check {
+    color: var(--color-green-400);
+}
+
+.icon-unavailable {
+    color: var(--color-red-400);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+.submit-button {
+    width: 200px;
+}
+
+.submit-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.submit-content {
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.submit-notes {
+    font-size: 14px;
+    color: var(--color-neutral-400);
+    font-style: italic;
+}
+
+.status-unavailable {
+    color: var(--color-red-400);
+}
+
+.status-available {
+    color: var(--color-green-400);
+}
+
+.check-client-error-card {
+    margin-top: 32px;
+}
+
+.store-client-error-card {
+    margin-bottom: 32px;
+}
+
+.client-details-input {
+    text-transform: uppercase;
+}
+
+@media (max-width: 900px) {
+    .form-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+

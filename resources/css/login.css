@@ -1,0 +1,89 @@
+@import url('root.css');
+
+.login-page {
+    height: 100%;
+    padding: 32px;
+}
+
+.login-page > .header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+}
+
+.login-page > .header > .logo {
+    height: 64px;
+    width: auto;
+    object-fit: contain;
+    margin-bottom: 18px;
+}
+
+.login-page > .header > .title {
+    font-size: 20px;
+    color: var(--color-amber-300);
+}
+
+.login-page > .header > .subtitle {
+    font-size: 16px;
+    color: var(--color-neutral-400);
+}
+
+.login-page > .form {
+    gap: 16px;
+    width: 400px;
+}
+
+.login-page > .form > .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.login-page > .form > .field-group > label {
+    font-size: 16px;
+}
+
+.login-page > .form > .field-group > .password-input {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-input input {
+    width: 100%;
+    padding-right: 2.75rem;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 0px;
+    background: none;
+    border: none;
+    cursor: pointer; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    width: 2.75rem;
+    height: 100%;
+}
+
+.password-toggle:hover {
+    background: none;
+}
+
+.password-toggle > span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.password-toggle > span > svg {
+    stroke: var(--color-neutral-500);
+}
+
+.login-button {
+    margin-top: 20px;
+}

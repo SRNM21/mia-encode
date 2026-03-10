@@ -1,0 +1,210 @@
+import { useAjax } from '../hooks/use-ajax.js'
+
+const toggleBtn = $('#toggle-btn');
+const sidebar = $('#sidebar');
+const logoutBtn = $('#logout-btn');
+
+const { post } = useAjax()
+
+// sidebar.on({
+//     mouseenter: () => sidebar.removeClass('collapsed'),
+//     mouseleave: () => sidebar.addClass('collapsed')
+// });
+
+export function closeModal(modalId) {
+    const modal = $('#' + modalId);
+
+    modal.removeClass('active').addClass('closing');
+
+    setTimeout(() => {
+        modal.removeClass('closing');
+    }, 250);
+}
+
+export function openModal(modalId) {
+    const modal = $('#' + modalId);
+    modal.addClass('active');
+}
+
+$('.modal-close-btn, .modal-cancel-btn').on('click', (e) => {
+    const modalId = $(e.currentTarget).data('modal');
+    closeModal(modalId);
+});
+
+toggleBtn.on('click', () => {
+    if (sidebar.hasClass('collapsed')) {
+        sidebar.removeClass('collapsed')
+    } else {
+        sidebar.addClass('collapsed')
+    }
+});
+
+logoutBtn.on('click', () => {
+    openModal('logout-confirm-modal');
+});
+
+$('.confirm-logout-btn').on('click', () => {
+    post({
+        url: 'logout',
+        success: (data) => {
+            closeModal('logout-confirm-modal');
+            window.location.href = data.data.redirect;
+        },
+        error: () => {
+            console.log('Error logging out');
+        }
+    })
+});
+
+export function scrollToBottom(selector) {
+    $(selector).scrollTop($(selector).height())
+}
+
+export function normalizedServerErrors(errors) {
+    return Object.entries(errors).flatMap(([field, messages]) =>
+        messages.map(message => ({
+            field,
+            message
+        }))
+    )
+}
+
+export function setErrorState(input, isError) {
+    if (isError) {
+        input.addClass('error')
+    } else {
+        input.removeClass('error')
+    }
+}
+
+export function href(url) {
+    window.location.href = url
+}
+
+export function getSearchParams(params) {
+    const url = new URL(window.location.href)
+    return params ? url.searchParams.get(params) : url.searchParams.getAll()
+}
+
+export function formatDate(dateString) {
+    const date = new Date(dateString.replace(' ', 'T'));
+
+    const options = {   
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric' 
+    };
+
+    return date.toLocaleDateString('en-US', options);
+}
+
+export function capitalizeWord(word) {
+  return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+}
+
+export function showNotification(title, message) {
+
+    const DURATION = 3000
+
+    /* create container if missing */
+    let container = $('#notification-container')
+
+    if (!container.length) {
+        $('body').append('<div id="notification-container"></div>')
+        container = $('#notification-container')
+    }
+
+    const notification = $(`
+        <div class="notification">
+            <div class="notification-progress"></div>
+
+            <div class="notification-header">
+                <div class="notification-title"></div>
+                <button class="notification-close">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x-icon lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+            </div>
+
+            <div class="notification-message"></div>
+        </div>
+    `)
+
+    notification.find('.notification-title').text(title)
+    notification.find('.notification-message').text(message)
+
+    /* prepare animation state */
+    notification.css({
+        height: 0,
+        opacity: 0,
+        overflow: 'hidden'
+    })
+
+    container.append(notification)
+
+    /* measure natural height */
+    const fullHeight = notification.get(0).scrollHeight
+
+    /* slide animation */
+    notification.animate(
+        {
+            height: fullHeight,
+            opacity: 1
+        },
+        200,
+        function () {
+            notification.css({
+                height: 'auto',
+                overflow: ''
+            })
+        }
+    )
+
+    const progress = notification.find('.notification-progress')
+
+    /* progress countdown */
+    progress.animate(
+        { width: "0%" },
+        {
+            duration: DURATION,
+            easing: "linear"
+        }
+    )
+
+    /* auto remove */
+    const timeout = setTimeout(removeNotification, DURATION)
+
+    function removeNotification() {
+
+        clearTimeout(timeout)
+
+        const height = notification.outerHeight()
+
+        notification.animate(
+            {
+                height: 0,
+                opacity: 0
+            },
+            200,
+            function () {
+                notification.remove()
+            }
+        )
+    }
+
+    /* close button */
+    notification.find('.notification-close').on('click', removeNotification)
+}
+
+export function debounce(fn, delay = 500) {
+    let timer = null
+
+    return function (...args) {
+        const context = this
+
+        clearTimeout(timer)
+
+        timer = setTimeout(() => {
+            fn.apply(context, args)
+        }, delay)
+    }
+}

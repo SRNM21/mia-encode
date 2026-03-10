@@ -1,0 +1,282 @@
+@import url('home.css');
+
+.title {
+    font-size: 18px;
+    font-weight: 400;
+}
+
+.content {
+    flex: 1;
+    height: calc(100dvh - 65px);
+    max-height: calc(100dvh - 65px);
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.content > div {
+    height: 100%;
+}
+
+.container-header {
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.search-container {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.applications-container {
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.table-wrapper {
+    width: 100%;
+    max-width: 100%;
+    overflow: auto;
+    box-sizing: border-box;
+    flex: 1;
+    min-height: 0;
+    max-height: 100%;
+    position: relative;
+    border: 1px solid var(--color-neutral-600);
+    border-radius: 8px;
+}
+
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 24px;
+}
+
+.pagination-left, .pagination-right {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.pagination-controls button:disabled,
+.outline:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.pagination-right label {
+    font-size: 12px;
+    color: var(--color-neutral-300);
+}
+
+.pagination-right select {
+    padding: 6px 8px;
+}
+
+.pagination-right .applications-page-info {
+    margin-left: 8px;
+    font-size: 12px;
+    color: var(--color-neutral-300);
+}
+
+.applications-table {
+    width: 100%;
+    font-family: inherit;
+    border-collapse: separate;
+    border-spacing: 0;
+    box-sizing: border-box;
+}
+
+.applications-table th, .applications-table td  {
+    min-width: 200px;
+    border: none;
+    padding: 8px;
+    font-weight: 400;
+}
+
+.applications-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    text-align: left;
+    background-color: var(--color-neutral-800);
+    border-bottom: 1px solid var(--color-neutral-600);
+}
+
+.applications-table thead th.sortable {
+    cursor: pointer;
+}
+
+.applications-table thead th.sort-asc::after {
+    content: '▲';
+    font-size: 14px;
+    margin-left: 6px;
+    color: var(--color-neutral-300);
+}
+
+.applications-table thead th.sort-desc::after {
+    content: '▼';
+    font-size: 14px;
+    margin-left: 6px;
+    color: var(--color-neutral-300);
+}
+
+.bank-name {
+    min-width: 50px !important;
+    width: 50px !important;
+    text-align: center !important;
+}
+
+.applications-table thead th:first-child {
+    border-top-left-radius: 7px;
+}
+
+.applications-table thead th:last-child {
+    border-top-right-radius: 7px;
+}
+
+.applications-table tbody td {
+    border-top: none;
+    border: 1px solid var(--color-neutral-600);
+    padding: 8px;
+}
+
+.bank-check {
+    min-width: 50px !important;
+    width: fit-content !important;
+    text-align: center;
+    color: var(--color-green-400);
+}
+
+.highlight-exact {
+    background-color: rgba(255, 214, 10, 0.18);
+    box-shadow: inset 0 0 0 1px var(--color-neutral-600);
+    border-radius: 4px;
+}
+
+mark.highlight-text {
+    background-color: rgba(255, 214, 10, 0.35);
+    color: inherit;
+    border-radius: 2px;
+    padding: 0 1px;
+}
+
+.no-results td {
+    text-align: center;
+    color: var(--color-neutral-300);
+    padding: 12px;
+}
+
+.empty-application-row {
+    text-align: center;
+}
+
+.filter-container {
+    margin-bottom: 24px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.filter-input {
+    max-width: 180px;
+}
+
+.form-grid {
+    width: fit-content;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+}
+
+.filter-popover{
+    z-index: 1000;
+    position: absolute;
+    border-radius:6px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.4);
+}
+
+.filter-chip{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background-color: var(--color-neutral-900);
+    color: var(--color-neutral-100);
+    border: 1px solid var(--color-neutral-600);
+
+    border-radius: 100px;
+}
+
+.filter-chip button{
+    border:none;
+    background:none;
+    cursor:pointer;
+}
+
+.filter-chip-remove-btn {
+    border-radius: 100px;
+    padding: 4px;
+}
+
+.filter-actions > button {
+    flex: 1;
+}
+
+.filter-modal {
+    display: grid;
+    grid-template-columns: 2fr;
+}
+
+.date-range-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    margin-top: 32px;
+}
+
+.range-date-error-card {
+    margin-top: 18px;
+}
+
+.export-note {
+    margin-top: 18px;
+    color: var(--color-neutral-400);
+    font-style: italic;
+}
+
+.download-link {
+    color: var(--color-amber-400);
+}
+
+.export-excel {
+    background-color: var(--color-green-800) !important;
+    border: 1px solid var(--color-green-600) !important;
+}
+
+.export-excel:hover {
+    background-color: var(--color-green-900) !important;
+    border: 1px solid var(--color-green-700) !important;
+}
+
+@media (max-width: 900px) {
+    .form-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .form-grid {
+        grid-template-columns: 2fr;
+    }
+}

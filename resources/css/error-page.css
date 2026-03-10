@@ -1,0 +1,13 @@
+@import 'root.css';
+
+body
+{
+    height: 100dvh;
+    width: 100dvw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: black;
+    color: white;
+    font-size: 24px;
+}
