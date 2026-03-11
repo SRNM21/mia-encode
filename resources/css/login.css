@@ -71,7 +71,11 @@
 }
 
 .password-toggle:hover {
-    background: none;
+    background: none !important;
+
+    & span > svg {
+        stroke: var(--color-neutral-400) !important;
+    }
 }
 
 .password-toggle > span {

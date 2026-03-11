@@ -41,21 +41,24 @@ let clientTypeFilter = 'all'
 doc.ready(initDashboard)
 
 function initDashboard() {
+    // For today
     loadClientToday()
     loadBankToday()
 
+    // Client Series
     bindSelect(clientsTypeFilter, handleClientTypeFilter)
     bindSelect(clientsRangeSelect, handleClientScope)
     bindSelect(clientsYearSelect, loadClientSeries)
+    loadClientSeries()
 
+    // Banks Series
     bindSelect(banksTypeFilter, handleBankTypeFilter)
     bindSelect(banksRangeSelect, handleBankScope)
     bindSelect(banksYearSelect, loadBankSeries)
-
-    bindSelect($('#agent-leaderboards-select'), loadLeaderboards)
-
-    loadClientSeries()
     loadBankSeries()
+
+    // Leaderboards
+    bindSelect($('#agent-leaderboards-select'), loadLeaderboards)
     loadLeaderboards()
 }
 
@@ -67,6 +70,7 @@ function handleClientTypeFilter() {
 
 function handleClientScope() {
     currentClientScope = clientsRangeSelect.val()
+    clientsYearSelect.attr('disabled', currentClientScope === 'yearly')
     loadClientSeries()
 }
 
@@ -76,6 +80,7 @@ function handleBankTypeFilter() {
 
 function handleBankScope() {
     currentBankScope = banksRangeSelect.val()
+    banksYearSelect.attr('disabled', currentBankScope === 'yearly')
     loadBankSeries()
 }
 
@@ -83,7 +88,7 @@ function renderClientSeriesFromCache() {
     const items = clientSeriesCache[currentClientScope] || []
 
     if (!items.length) {
-        showEmpty(emptyClientsSeries,'No Clients Found')
+        showEmpty(emptyClientsSeries,'No Clients Found.')
         return
     }
 
@@ -119,11 +124,10 @@ function renderClientSeriesFromCache() {
 }
 
 function renderBankSeriesFromCache() {
-
     const series = bankSeriesCache[currentBankScope] || {}
 
     if (!series.labels?.length) {
-        showEmpty(emptyBanksSeries,'No Banks Found')
+        showEmpty(emptyBanksSeries,'No Banks Found.')
         return
     }
 
@@ -145,160 +149,171 @@ function renderBankSeriesFromCache() {
 }
 
 // Clients charts
-function loadClientToday() {
-    showLoading(emptyClientsToday)
+async function loadClientToday() {
+    showLoading(emptyClientsToday, clientTodayCanvas)
 
-    fetchClientTypesToday(
-        res => {
+    try {
+        const response = await fetchClientTypesToday()
 
-            const data = res.data || {}
+        const data = response.data || {}
 
-            if (!data.new && !data.old) {
-                showEmpty(emptyClientsToday, 'No Clients Found')
-                return
-            }
+        if (!data || (!data.new && !data.old)) {
+            showEmpty(emptyClientsToday, 'No Clients Found.')
+            return
+        }
 
-            showContent(emptyClientsToday)
+        showContent(emptyClientsToday, clientTodayCanvas)
 
-            renderClientTodayChart(
-                clientTodayCanvas,
-                data.new,
-                data.old
-            )
-        },
-        xhr => console.error(xhr.responseJSON)
-    )
+        renderClientTodayChart(
+            clientTodayCanvas,
+            data.new,
+            data.old
+        )
+    } catch (error) {
+        showEmpty(emptyClientsToday, 'Error Occured.')
+        console.error(error)
+    }
 }
 
-function loadClientSeries() {
-
+async function loadClientSeries() {
     showLoading(emptyClientsSeries, clientSeriesCanvas)
 
-    fetchClientTypeSeries(
-        {
+    try {
+        const response = await fetchClientTypeSeries({
             scope: currentClientScope,
             year: clientsYearSelect.val()
-        },
-        res => {
+        })
 
-            const data = res.data || {}
+        const data = response.data || {}
 
-            populateSelect(
-                clientsYearSelect,
-                data.years || [],
-                data.selected_year
-            )
+        populateSelect(
+            clientsYearSelect,
+            data.years || [],
+            data.selected_year
+        )
 
-            clientSeriesCache = data.series || {}
+        clientSeriesCache = data.series || {}
 
-            const items = clientSeriesCache[currentClientScope] || []
+        const items = clientSeriesCache[currentClientScope] || []
 
-            if (!items.length) {
-                showEmpty(emptyClientsSeries,'No Clients Found')
-                return
-            }
+        if (!items.length) {
+            showEmpty(emptyClientsSeries,'No Clients Found.')
+            return
+        }
 
-            showContent(emptyClientsSeries, clientSeriesCanvas)
+        showContent(emptyClientsSeries, clientSeriesCanvas)
 
-            renderClientSeriesFromCache()
-        },
-        xhr => console.error(xhr.responseJSON)
-    )
+        renderClientSeriesFromCache()
+    } catch (error) {
+        showEmpty(emptyClientsSeries, 'Error Occured.')
+        console.error(error)
+    }
 }
 
-function loadBankToday() {
-    showLoading(emptyBanksToday)
+async function loadBankToday() {
+    showLoading(emptyBanksToday, banksTodayCanvas)
 
-    fetchBankAppsToday(
-        res => {
-            const payload = res.data || {}
+    try {
+        const response = await fetchBankAppsToday()
 
-            if (!payload.labels?.length) {
-                showEmpty(emptyBanksToday, 'No Banks Found')
-                return
-            }
+        const payload = response.data || {}
 
-            showContent(emptyBanksToday)
+        if (!payload.labels?.length) {
+            showEmpty(emptyBanksToday, 'No Banks Found.')
+            return
+        }
 
-            renderBankTodayChart(
-                banksTodayCanvas,
-                payload.labels,
-                payload.counts
-            )
-        },
-        xhr => console.error(xhr.responseJSON)
-    )
+        showContent(emptyBanksToday, banksTodayCanvas)
+
+        renderBankTodayChart(
+            banksTodayCanvas,
+            payload.labels,
+            payload.counts
+        )
+    } catch (error) {
+        showEmpty(emptyBanksToday, 'Error Occured.')
+        console.error(error)
+    }
 }
 
-function loadBankSeries() {
+async function loadBankSeries() {
     showLoading(emptyBanksSeries, bankSeriesCanvas)
 
-    fetchBankAppsSeries(
-        {
+    try {
+        const response = await fetchBankAppsSeries({
             scope: currentBankScope,
             year: banksYearSelect.val()
-        },
-        res => {
+        })
 
-            const data = res.data || {}
+        const data = response.data || {}
+
+        populateSelect(
+            banksYearSelect,
+            data.years || [],
+            data.selected_year
+        )
+
+        bankSeriesCache = normalizeBankSeries(data.series || {})
+
+        const series = bankSeriesCache[currentBankScope] || {}
+
+        if (banksTypeFilter.children().length <= 1) {
+            const banks = (series.datasets || []).map(ds => ds.label)
+            banks.unshift('All Banks')
 
             populateSelect(
-                banksYearSelect,
-                data.years || [],
-                data.selected_year
+                banksTypeFilter,
+                banks,
+                'All Banks'
             )
+        }
 
-            bankSeriesCache = normalizeBankSeries(data.series || {})
+        if (!series.labels?.length) {
+            showEmpty(emptyBanksSeries,'No Banks Found.')
+            return
+        }
 
-            const series = bankSeriesCache[currentBankScope] || {}
+        showContent(emptyBanksSeries, bankSeriesCanvas)
 
-            if (banksTypeFilter.children().length <= 1) {
-                const banks = (series.datasets || []).map(ds => ds.label)
-                banks.unshift('All Banks')
-
-                populateSelect(
-                    banksTypeFilter,
-                    banks,
-                    'All Banks'
-                )
-            }
-
-            if (!series.labels?.length) {
-                showEmpty(emptyBanksSeries,'No Banks Found')
-                return
-            }
-
-            showContent(emptyBanksSeries, bankSeriesCanvas)
-
-            renderBankSeriesFromCache()
-        },
-        xhr => console.error(xhr.responseJSON)
-    )
+        renderBankSeriesFromCache()
+    } catch (error) {
+        showEmpty(emptyBanksToday, 'Error Occured.')
+        console.error(error)
+    }
 }
 
-function loadLeaderboards() {
+async function loadLeaderboards() {
 
     showLoading(emptyLeaderboards, leaderboardsContent)
 
     const scope = $('#agent-leaderboards-select').val() || 'today'
 
+    try {
+        const response = await fetchAgentLeaderboards({scope})
+
+        const rows = response.data || []
+
+        if (!rows.length) {
+            showEmpty(emptyLeaderboards,'No submissions as of now.')
+            return
+        }
+
+        showContent(emptyLeaderboards, leaderboardsContent)
+
+        renderLeaderboards(
+            leaderboardsContent,
+            rows
+        )
+    } catch (error) {
+        showEmpty(emptyBanksToday, 'Error Occured.')
+        console.error(error)
+    }
+
     fetchAgentLeaderboards(
         { scope },
         res => {
 
-            const rows = res.data || []
-
-            if (!rows.length) {
-                showEmpty(emptyLeaderboards,'No submissions as of now.')
-                return
-            }
-
-            showContent(emptyLeaderboards, leaderboardsContent)
-
-            renderLeaderboards(
-                leaderboardsContent,
-                rows
-            )
+           
         },
         xhr => console.error(xhr.responseJSON)
     )

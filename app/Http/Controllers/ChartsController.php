@@ -17,7 +17,6 @@ class ChartsController extends Controller
     public function clientTypeToday()
     {
         $data = $this->clientService->clientTypeToday();
-        
         $this->responseJson($data);
     }
 
@@ -34,7 +33,6 @@ class ChartsController extends Controller
     public function bankAppsToday()
     {
         $applications = $this->bankApplicationService->applicationsTodayByBank();
-
         $this->responseJson($applications);
     }
 

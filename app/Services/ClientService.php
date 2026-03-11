@@ -77,15 +77,15 @@ class ClientService
         }
         
         // TODO: BEFORE PROD
-        return [
-            'new' => 10,
-            'old' => 14,
-        ];
-
         // return [
-        //     'new' => $newCount,
-        //     'old' => $oldCount,
+        //     'new' => 10,
+        //     'old' => 14,
         // ];
+
+        return [
+            'new' => $newCount,
+            'old' => $oldCount,
+        ];
     }
 
     public function clientTypeSeries($scope, $year): array

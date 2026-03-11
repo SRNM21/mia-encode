@@ -12,7 +12,6 @@ const BANK_COLORS = [
 const bankColorRegistry = new Map()
 
 export function renderBankTodayChart(canvas, labels, counts) {
-
     const colors = generateColors(labels.length)
 
     new Chart(canvas[0].getContext('2d'), {
@@ -21,8 +20,8 @@ export function renderBankTodayChart(canvas, labels, counts) {
             labels,
             datasets: [{
                 data: counts,
-                backgroundColor: colors.background,
-                borderColor: colors.border,
+                backgroundColor: colors.map((c) => c.background),
+                borderColor: colors.map((c) => c.border),
                 borderWidth: 1
             }]
         },
@@ -34,6 +33,8 @@ export function renderBankTodayChart(canvas, labels, counts) {
             }
         }
     })
+
+    renderBankAppsLegend(labels, colors)
 }
 
 let bankSeriesChart
@@ -72,48 +73,17 @@ export function renderBankSeries(canvas, labels, datasets) {
     )
 }
 
-export function prepareBankDatasets(datasetsRaw) {
-    return datasetsRaw.map(ds => {
-        if (!bankColorMap[ds.label]) {
-            const index = Object.keys(bankColorMap).length % BANK_COLORS.length
-            bankColorMap[ds.label] = BANK_COLORS[index]
-        }
-
-        const color = bankColorMap[ds.label]
-
-        return {
-            ...ds,
-            borderColor: color,
-            backgroundColor: color.replace('rgb','rgba').replace(')',',0.2)'),
-            tension: 0.3
-        }
-    })
-}
-
-function getBankColor(label) {
-
-    if (!bankColorRegistry.has(label)) {
-        const index = bankColorRegistry.size % BANK_COLORS.length
-        bankColorRegistry.set(label, BANK_COLORS[index])
-    }
-
-    return bankColorRegistry.get(label)
-}
-
 export function normalizeBankSeries(series) {
-
     const normalized = {}
-
+    
     Object.entries(series).forEach(([scope, data]) => {
+        const color = generateColors(data.datasets.length)
 
-        const datasets = (data.datasets || []).map(ds => {
-
-            const color = getBankColor(ds.label)
-
+        const datasets = (data.datasets || []).map((ds, i) => {
             return {
                 ...ds,
-                borderColor: color,
-                backgroundColor: color.replace('rgb','rgba').replace(')',',0.2)'),
+                borderColor: color[i].border,
+                backgroundColor: color[i].background,
                 tension: 0.3
             }
         })
@@ -126,4 +96,40 @@ export function normalizeBankSeries(series) {
     })
 
     return normalized
+}
+
+function renderBankAppsLegend(labels, colors) {    
+    const legend = $('#bank-apps-type-legend')
+    if (!legend || legend.length === 0) return
+
+    legend.empty()
+    legend.css({ marginLeft: '24px' })
+
+    labels.forEach((label, i) => {
+        const item = $('<span>')
+            .addClass('legend-item')
+            .css({
+                fontSize: '14px',
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'flex-start',
+                flexWrap: 'nowrap'
+            })
+
+        const dot = $('<span>')
+            .addClass('dot')
+            .css({
+                display: 'inline-block',
+                width: '12px',
+                height: '12px',
+                borderRadius: '50%',
+                marginRight: '6px',
+                border: `1px solid ${colors[i].border}`,
+                backgroundColor: colors[i].background || 'rgba(200,200,200,0.6)'
+            })
+
+        item.append(dot).append(`<p>${label}</p>`)
+        legend.append(item)
+    })
 }

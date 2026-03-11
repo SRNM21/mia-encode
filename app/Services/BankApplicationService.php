@@ -23,17 +23,18 @@ class BankApplicationService
         $counts = array_column($applications, 'count');
         
         // TODO: BEFORE PROD
-        return [
-            'labels' => ['Alpha', 'Bravo', 'Charlie', 'Delta'],
-            'counts' => [2, 4, 6, 8],
-        ];
-
         // return [
-        //     'labels' => $labels,
-        //     'counts' => $counts,
+        //     'labels' => ['Alpha', 'Bravo', 'Charlie', 'Delta'],
+        //     'counts' => [2, 4, 6, 8],
         // ];
+
+        return [
+            'labels' => $labels,
+            'counts' => $counts,
+        ];
     }
 
+    // TODO: FIX ALGO
     public function bankApplicationsSeries(?string $scope, ?string $year): array
     {
         $rows = $this->bankApplicationRepository->getAllWithBankAndDate();

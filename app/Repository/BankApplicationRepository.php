@@ -20,9 +20,7 @@ class BankApplicationRepository
                 'bank_list_tbl.id',
                 'LEFT'
             )            
-            // TODO: Change to current date before prod
-            // ->where('date_submitted', '=', date('Y-m-d'))
-            ->where('date_submitted', '=', '2026-02-23')
+            ->where('date_submitted', '=', date('Y-m-d'))
             ->groupBy('bank_name')
             ->orderBy('bank_name', 'ASC')
             ->getArray();
