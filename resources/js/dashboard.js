@@ -88,7 +88,7 @@ function renderClientSeriesFromCache() {
     const items = clientSeriesCache[currentClientScope] || []
 
     if (!items.length) {
-        showEmpty(emptyClientsSeries,'No Clients Found.')
+        showEmpty(emptyClientsSeries,'No clients found.')
         return
     }
 
@@ -127,7 +127,7 @@ function renderBankSeriesFromCache() {
     const series = bankSeriesCache[currentBankScope] || {}
 
     if (!series.labels?.length) {
-        showEmpty(emptyBanksSeries,'No Banks Found.')
+        showEmpty(emptyBanksSeries,'No banks found.')
         return
     }
 
@@ -158,7 +158,7 @@ async function loadClientToday() {
         const data = response.data || {}
 
         if (!data || (!data.new && !data.old)) {
-            showEmpty(emptyClientsToday, 'No Clients Found.')
+            showEmpty(emptyClientsToday, 'No clients today.')
             return
         }
 
@@ -197,7 +197,7 @@ async function loadClientSeries() {
         const items = clientSeriesCache[currentClientScope] || []
 
         if (!items.length) {
-            showEmpty(emptyClientsSeries,'No Clients Found.')
+            showEmpty(emptyClientsSeries,'No clients found.')
             return
         }
 
@@ -219,7 +219,7 @@ async function loadBankToday() {
         const payload = response.data || {}
 
         if (!payload.labels?.length) {
-            showEmpty(emptyBanksToday, 'No Banks Found.')
+            showEmpty(emptyBanksToday, 'No bank applications today.')
             return
         }
 
@@ -269,7 +269,7 @@ async function loadBankSeries() {
         }
 
         if (!series.labels?.length) {
-            showEmpty(emptyBanksSeries,'No Banks Found.')
+            showEmpty(emptyBanksSeries,'No banks found.')
             return
         }
 
@@ -283,7 +283,6 @@ async function loadBankSeries() {
 }
 
 async function loadLeaderboards() {
-
     showLoading(emptyLeaderboards, leaderboardsContent)
 
     const scope = $('#agent-leaderboards-select').val() || 'today'
@@ -308,13 +307,4 @@ async function loadLeaderboards() {
         showEmpty(emptyBanksToday, 'Error Occured.')
         console.error(error)
     }
-
-    fetchAgentLeaderboards(
-        { scope },
-        res => {
-
-           
-        },
-        xhr => console.error(xhr.responseJSON)
-    )
 }

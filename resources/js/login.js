@@ -1,8 +1,7 @@
 import { useAjax } from './hooks/use-ajax.js'
+import { showLoading } from './utils/utils.js';
 
 const { post } = useAjax()
-
-var isLoggingIn = false;
 
 const passwordToggle = $('.password-toggle')
 const loginForm = $('#login-form')
@@ -20,36 +19,30 @@ passwordToggle.on('click', function () {
     $(this).find('.icon-eye-slash').toggleClass('hidden')
 })
 
-
 loginForm.on('submit', async (e) => {
     e.preventDefault()
 
-    const $form = $(this)
-    const url = $form.attr('action')
+    showLoading($(".login-button"), true)
 
-    $(".login-button").attr('disabled', true)
-
-    await post({
-        url: url,
-        data: {
-            username: $('#username').val().trim(),
-            password: $('#password').val().trim()
-        },
-        success: function (response) {
-            window.location.href = response.data.redirect
-        },
-        error: function (xhr) {
-            const error = xhr.responseJSON
-            console.log(error);
-            showError(error)
-        }
-    })
+    try {
+        const response = await post({
+            url: $(this).attr('action'),
+            data: {
+                username: $('#username').val().trim(),
+                password: $('#password').val().trim()
+            }
+        })
+        
+        window.location.href = response.data.redirect
+    } catch (error) {
+        showError(error.responseJSON.data)
+    }
     
-    $(".login-button").attr('disabled', false)
+    showLoading($(".login-button"), false)
 })
 
 function showError(error) {
     errorCard.removeClass('hidden')
-    errorTitle.text(error.data.title ?? 'Something Went Wrong')
-    errorMessage.text(error.data.message)
+    errorTitle.text(error.title ?? 'Something Went Wrong')
+    errorMessage.text(error.message)
 }

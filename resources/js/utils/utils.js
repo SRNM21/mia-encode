@@ -6,10 +6,9 @@ const logoutBtn = $('#logout-btn');
 
 const { post } = useAjax()
 
-// sidebar.on({
-//     mouseenter: () => sidebar.removeClass('collapsed'),
-//     mouseleave: () => sidebar.addClass('collapsed')
-// });
+// -----------------
+// Modal
+// -----------------
 
 export function closeModal(modalId) {
     const modal = $('#' + modalId);
@@ -30,6 +29,10 @@ $('.modal-close-btn, .modal-cancel-btn').on('click', (e) => {
     const modalId = $(e.currentTarget).data('modal');
     closeModal(modalId);
 });
+
+// -----------------
+// Sidebar
+// -----------------
 
 toggleBtn.on('click', () => {
     if (sidebar.hasClass('collapsed')) {
@@ -55,6 +58,18 @@ $('.confirm-logout-btn').on('click', () => {
         }
     })
 });
+
+// -----------------
+// Utilities
+// -----------------
+
+export function showLoading(button, show) {
+    const toRemove = show ? 'p' : '.loader'
+    const toShow = show ? '.loader' : 'p'
+    
+    button.find(toRemove).addClass('hidden')
+    button.find(toShow).removeClass('hidden')
+}
 
 export function scrollToBottom(selector) {
     $(selector).scrollTop($(selector).height())
