@@ -5,11 +5,12 @@ namespace App\Core\Facades;
 /**
  * 
  * @method static \App\Core\Auth\Authenticable user()
- * @method static \App\Core\Auth\Authenticable check()
- * @method static \App\Core\Auth\Authenticable login()
- * @method static \App\Core\Auth\Authenticable logout()
- * @method static \App\Core\Auth\Authenticable attempt(array $credentials)
- * @method static bool isConnected()
+ * @method static bool check()
+ * @method static bool isAdmin()
+ * @method static bool isEncoder()
+ * @method static void login()
+ * @method static void logout()
+ * @method static bool attempt(array $credentials)
  * 
  * @see \App\Core\Auth\Authenticable
  */

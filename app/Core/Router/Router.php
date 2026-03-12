@@ -19,11 +19,13 @@ class Router
     protected ?string $controller = null;
 
     /**
-     * Middleware instance.
+     * Middleware instances.
      *
-     * @var Middleware
+     * @var array
      */
-    protected ?Middleware $middleware = null;
+    protected array $middlewares = [];
+
+    protected array $pendingMiddlewares = [];
 
     /**
      * Container instance.
@@ -37,11 +39,9 @@ class Router
         $this->container = $container;
     }
 
-    /*
-    --------------------------------------------------------------------------
-        HTTP Methods
-    --------------------------------------------------------------------------
-    */
+    // ------------------------------------------------------------------------
+    //  HTTP Methods
+    // ------------------------------------------------------------------------
 
     /**
      * Handles GET request method.
@@ -156,11 +156,12 @@ class Router
 
     private function runMiddleware(Request $request): void
     {
-        if (!$this->middleware) {
-            return;
-        }
+        if (count($this->middlewares) <= 0) return;
 
-        $this->middleware->handle($request);
+        foreach ($this->middlewares as $middleware) 
+        {
+            $middleware->handle($request);
+        }
     }
 
     private function dispatch(array $callable, Request $request, array $data): void
@@ -173,11 +174,9 @@ class Router
         exit;
     }
 
-    /*
-    --------------------------------------------------------------------------
-        Controller Resolution
-    --------------------------------------------------------------------------
-    */
+    // ------------------------------------------------------------------------
+    //  Controller Resolution
+    // ------------------------------------------------------------------------
 
     /**
      * Seperates the callable from the controller.
@@ -214,11 +213,9 @@ class Router
         return false;
     }
 
-    /*
-    --------------------------------------------------------------------------
-        Validation
-    --------------------------------------------------------------------------
-    */
+    // ------------------------------------------------------------------------
+    //  Validation
+    // ------------------------------------------------------------------------
 
     /**
      * Returns true if the request is valid, false otherwise.
@@ -296,11 +293,9 @@ class Router
         return is_subclass_of($middleware, Middleware::class);
     }
 
-    /*
-    --------------------------------------------------------------------------
-        Route Groups
-    --------------------------------------------------------------------------
-    */
+    // ------------------------------------------------------------------------
+    //  Route Groups
+    // ------------------------------------------------------------------------
 
     /**
      * Sets a default controller for router.
@@ -328,12 +323,11 @@ class Router
      */
     public function middleware(Middleware|string $middleware)
     {
-        if (!$this->isMiddleware($middleware))
-        {
+        if (!$this->isMiddleware($middleware)) {
             throw new Exception("{$middleware} is not a valid middleware.");
         }
 
-        $this->middleware = $this->container->make($middleware);
+        $this->pendingMiddlewares[] = $this->container->make($middleware);
 
         return $this;
     }
@@ -345,20 +339,27 @@ class Router
      * @return void
      */
     public function group(callable $routes)
-    {   
-        if (!$this->controller && !$this->middleware)
-        {
-            return false;
-        }
+    {
+        $previousController = $this->controller;
+        $previousMiddlewares = $this->middlewares;
+
+        // apply pending middleware only for this group
+        $this->middlewares = array_merge(
+            $this->middlewares,
+            $this->pendingMiddlewares
+        );
+
+        $this->pendingMiddlewares = [];
 
         $routes();
+
+        $this->controller = $previousController;
+        $this->middlewares = $previousMiddlewares;
     }
 
-    /*
-    --------------------------------------------------------------------------
-        Redirects
-    --------------------------------------------------------------------------
-    */
+    // ------------------------------------------------------------------------
+    //  Redirects
+    // ------------------------------------------------------------------------
 
     /**
      * Redirect to the url.

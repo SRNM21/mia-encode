@@ -2,6 +2,8 @@
 
 namespace App\Core\Contracts\Middleware;
 
+use App\Http\Request\Request;
+
 interface Middleware
 {
     /**
@@ -10,5 +12,5 @@ interface Middleware
      * @param mixed $request
      * @return mixed
      */
-    public function handle($request);
+    public function handle(Request $request);
 }

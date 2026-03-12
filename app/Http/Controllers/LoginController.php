@@ -9,8 +9,24 @@ use Exception;
 
 class LoginController extends Controller
 {
-    public function show(Request $request)
+    public function redirectUser()
     {
+        if (Auth::isAdmin()) 
+        {
+            $this->redirect('/dashboard');
+        }
+
+        if (Auth::isEncoder()) 
+        {
+            $this->redirect('/encode');
+        }
+
+        $this->redirect('/login');
+    }
+
+    public function show()
+    {
+
         $this->view('auth.login');
     }
 

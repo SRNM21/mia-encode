@@ -52,6 +52,6 @@ abstract class Controller
 
     protected function redirect(string $url, int $status = 303, array $data = []): void
     {
-        Route::redirect($url, $data, $status);
+        Route::redirect($url, $status, $data);
     }
 }

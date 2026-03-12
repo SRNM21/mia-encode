@@ -4,10 +4,9 @@ namespace App\Http\Middlewares;
 
 use App\Core\Facades\Auth;
 use App\Core\Facades\Route;
-use App\Http\Request\Request;
 use App\Core\Contracts\Middleware\Middleware as MiddlewareContract;
 
-class GuestMiddleware implements MiddlewareContract
+class AdminMiddleware implements MiddlewareContract
 {
     /**
      * Handles incoming request before accessing controllers.
@@ -15,11 +14,11 @@ class GuestMiddleware implements MiddlewareContract
      * @param mixed $request
      * @return mixed
      */
-    public function handle(Request $request)
+    public function handle($request)
     {
-        if (Auth::check())
+        if (!Auth::isAdmin())
         {
-            Route::redirect('/dashboard');
+            Route::redirect('/encode');
         }
     }
 }

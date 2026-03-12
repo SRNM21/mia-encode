@@ -21,12 +21,6 @@ class BankApplicationService
 
         $labels = array_column($applications, 'bank_name');
         $counts = array_column($applications, 'count');
-        
-        // TODO: BEFORE PROD
-        // return [
-        //     'labels' => ['Alpha', 'Bravo', 'Charlie', 'Delta'],
-        //     'counts' => [2, 4, 6, 8],
-        // ];
 
         return [
             'labels' => $labels,

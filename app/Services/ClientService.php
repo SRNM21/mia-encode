@@ -75,13 +75,7 @@ class ClientService
             if ($isNewToday) $newCount++;
             else $oldCount++;
         }
-        
-        // TODO: BEFORE PROD
-        // return [
-        //     'new' => 10,
-        //     'old' => 14,
-        // ];
-
+       
         return [
             'new' => $newCount,
             'old' => $oldCount,

@@ -107,6 +107,32 @@ class Authenticable implements AuthAuthenticableContract
     }
 
     /**
+     * Return true if the user is an `ADMIN`
+     *
+     * @return boolean
+     */
+    public function isAdmin(): bool
+    {
+        $user = $this->user();
+        $role = $user->role;
+
+        return $role == 'ADMIN';
+    }
+
+    /**
+     * Return true if the user is an `ENCODER`
+     *
+     * @return boolean
+     */
+    public function isEncoder(): bool
+    {
+        $user = $this->user();
+        $role = $user->role;
+
+        return $role == 'ENCODER';
+    }
+
+    /**
      * Log in a user by storing their ID in session.
      *
      * - Regenerates session ID (prevents session fixation attacks).

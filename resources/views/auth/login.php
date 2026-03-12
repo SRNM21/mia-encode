@@ -48,7 +48,10 @@
                 </div>
 
                 <button type="submit" class="login-button">
-                    Login
+                    <p>Login</p>
+                    <?php get_component('loader', [
+                        'size' => 'sm',
+                    ]) ?>
                 </button>
 
                 <?php get_component('error-card', [
