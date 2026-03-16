@@ -291,9 +291,6 @@ abstract class Model
     /**
      * Update record(s) by primary key OR custom where conditions.
      *
-     * @param mixed $identifier  Primary key value OR associative where array
-     * @param array $data
-     * @return bool
      * @throws \Error
      */
     public static function update($identifier, array $data)
@@ -369,7 +366,27 @@ abstract class Model
 
         $stm->execute();
 
-        return $stm->rowCount() > 0;
+        if ($stm->rowCount() <= 0) 
+        {
+            return null;
+        }
+
+        /**
+         * Return updated records
+         */
+        if (is_associative($identifier))
+        {
+            $query = static::query();
+
+            foreach ($identifier as $column => $value)
+            {
+                $query->where($column, '=', $value);
+            }
+
+            return $query->get();
+        }
+
+        return static::get($identifier);
     }
 
     /**

@@ -390,6 +390,20 @@ class QueryBuilder
 
     protected function compileCount(): string
     {
+        // If GROUP BY exists, count grouped results using a subquery
+        if (!empty($this->groups)) 
+        {
+            $selectSql = $this->compileSelect();
+
+            // Remove ORDER / LIMIT / OFFSET because they break count queries
+            $selectSql = preg_replace('/ORDER BY.+$/i', '', $selectSql);
+            $selectSql = preg_replace('/LIMIT.+$/i', '', $selectSql);
+            $selectSql = preg_replace('/OFFSET.+$/i', '', $selectSql);
+
+            return "SELECT COUNT(*) FROM ({$selectSql}) AS sub";
+        }
+
+        // Normal count when no grouping
         $sql = "SELECT COUNT(*) FROM {$this->table}";
 
         foreach ($this->joins as $join) 
@@ -423,10 +437,119 @@ class QueryBuilder
 
     protected function validateColumn(string $column): void
     {
-        if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*)?$/', $column)) 
+        // normalize spaces
+        $column = preg_replace('/\s+/', ' ', $column);
+        $column = preg_replace('/\(\s+/', '(', $column);
+        $column = preg_replace('/\s+\)/', ')', $column);
+
+        $identifier = '[a-zA-Z_][a-zA-Z0-9_]*';
+        $columnPattern = "{$identifier}(?:\\.{$identifier})?";
+
+        $allowedFunctions = [
+            'YEAR',
+            'MONTH',
+            'DATE',
+            'YEARWEEK',
+            'TRIM',
+            'REGEXP_REPLACE',
+            'SUBSTRING_INDEX'
+        ];
+
+        // simple column
+        if (preg_match("/^{$columnPattern}$/", $column)) 
+        {
+            return;
+        }
+
+        // function parser
+        $this->validateFunctionColumn($column, $allowedFunctions, $columnPattern);
+    }
+
+    protected function validateFunctionColumn(string $column, array $allowedFunctions, string $columnPattern): void
+    {
+        $column = trim($column);
+
+        if (!preg_match('/^([A-Z_]+)\((.*)\)$/i', $column, $matches)) 
         {
             throw new InvalidArgumentException("Invalid column name: {$column}");
         }
+
+        $func = strtoupper($matches[1]);
+        $argsString = $matches[2];
+
+        if (!in_array($func, $allowedFunctions)) 
+        {
+            throw new InvalidArgumentException("Function not allowed: {$func}");
+        }
+
+        $args = $this->splitArgs($argsString);
+
+        foreach ($args as $arg) 
+        {
+            $arg = trim($arg);
+
+            // column
+            if (preg_match("/^{$columnPattern}$/", $arg)) 
+            {
+                continue;
+            }
+
+            // string literal
+            if (preg_match("/^'(?:[^'\\\\]|\\\\.)*'$/", $arg)) 
+            {
+                continue;
+            }
+
+            // numeric
+            if (preg_match('/^[0-9]+$/', $arg)) 
+            {
+                continue;
+            }
+
+            // nested function
+            $this->validateFunctionColumn($arg, $allowedFunctions, $columnPattern);
+        }
+    }
+
+    // split arguments safely: ignores commas inside parentheses or quotes
+    protected function splitArgs(string $argsString): array
+    {
+        $args = [];
+        $length = strlen($argsString);
+        $buffer = '';
+        $level = 0;
+        $inQuote = false;
+
+        for ($i = 0; $i < $length; $i++) 
+        {
+            $char = $argsString[$i];
+
+            if ($char === "'" && ($i === 0 || $argsString[$i - 1] !== '\\')) 
+            {
+                $inQuote = !$inQuote;
+            }
+
+            if (!$inQuote) 
+            {
+                if ($char === '(') $level++;
+                if ($char === ')') $level--;
+                if ($char === ',' && $level === 0) 
+                {
+                    $args[] = $buffer;
+                    $buffer = '';
+                    continue;
+                }
+            }
+
+            $buffer .= $char;
+        }
+
+        if (strlen(trim($buffer)) > 0) 
+        {
+            $args[] = $buffer;
+        }
+
+        return $args;
     }
 
     protected function cacheKey(string $sql): string
