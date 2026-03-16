@@ -25,7 +25,7 @@ export function renderLeaderboards(container, rows) {
 
         $('<td>').text(ranks[i]).appendTo(tr)
         $('<td>').text(row?.agent ?? '—').appendTo(tr)
-        $('<td>').text(row?.count ?? '—').appendTo(tr)
+        $('<td>').text(row?.submissions ?? '—').appendTo(tr)
 
         tbody.append(tr)
     }

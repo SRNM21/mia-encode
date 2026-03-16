@@ -104,8 +104,7 @@ class BankApplicationRepository
         array $filters = [],
         string $sort = 'date_submitted',
         string $order = 'desc'
-    ): array
-    {
+    ): array {
         $query = BankApplication::query()
             ->select(
                 'bank_application_tbl.*',

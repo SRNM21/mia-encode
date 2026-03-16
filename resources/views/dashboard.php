@@ -58,7 +58,7 @@
 
                         <div class="card chart-card leaderboards-card flex-col">
                             <div class="chart-control flex-row">
-                                <p class="chart-title">Agent Leaderboards</p>  
+                                <a href="leaderboards" class="chart-title anchor">Agent Leaderboards</a>  
                                 <select id="agent-leaderboards-select" class="size-sm">
                                     <option value="today">Today</option>
                                     <option value="week">This Week</option>

@@ -8,13 +8,19 @@
             </a>
         <?php endif ?>
 
+        <?php if ($role == 'ADMIN'): ?>
+            <a href='leaderboards'>
+                <span class='icon'><?= get_icon('chart-no-axes-column') ?></span>
+                <span class='label'>Leaderboards</span>
+            </a>
+        <?php endif ?>
+
         <?php if ($role == 'ENCODER'): ?>
             <a href='encode'>
                 <span class='icon'><?= get_icon('file-user') ?></span>
                 <span class='label'>Encode</span>
             </a>
         <?php endif ?>
-
 
         <a href='bank-applications'>
             <span class='icon'><?= get_icon('file-text') ?></span>
@@ -27,6 +33,11 @@
                 <span class='label'>Banks</span>
             </a>
         <?php endif ?>
+
+        <!-- <a href='settings'>
+            <span class='icon'><?= get_icon('settings') ?></span>
+            <span class='label'>Settings</span>
+        </a> -->
 
         <button id='logout-btn' class='ghost logout-btn'>
             <span class='icon'><?= get_icon('log-out') ?></span>

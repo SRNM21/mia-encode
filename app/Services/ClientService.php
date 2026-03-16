@@ -21,9 +21,25 @@ class ClientService
         return $this->clientRepository->getClient($request);
     }
 
+    public function create(array $data)
+    {
+        return $this->clientRepository->create($data);
+    }
+
     public function createClientFromRequest(Request $request)
     {
-        return $this->clientRepository->createClientFromRequest($request);
+        $date = $request->post('birthdate');
+        $date = date('Y-m-d', strtotime($date));
+
+        return $this->create([
+            'last_name' => $request->post('lastname'),
+            'middle_name' => $request->post('middlename'),
+            'first_name' => $request->post('firstname'),
+            'birthdate' => $date,
+            'mobile_num' => $request->post('mobile'),
+            'first_application' => date('Y-m-d'),
+            'latest_application' => date('Y-m-d'),
+        ]);
     }
 
     public function updateLatestApplicationDate(int $clientId)

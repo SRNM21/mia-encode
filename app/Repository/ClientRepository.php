@@ -20,25 +20,9 @@ class ClientRepository
             ->first();
     }
 
-    public function createClient(array $data) 
+    public function create(array $data) 
     {
         return Client::create($data);
-    }
-
-    public function createClientFromRequest(Request $request) 
-    {
-        $date = $request->post('birthdate');
-        $date = date('Y-m-d', strtotime($date));
-
-        return $this->createClient([
-            'last_name' => $request->post('lastname'),
-            'middle_name' => $request->post('middlename'),
-            'first_name' => $request->post('firstname'),
-            'birthdate' => $date,
-            'mobile_num' => $request->post('mobile'),
-            'first_application' => date('Y-m-d'),
-            'latest_application' => date('Y-m-d'),
-        ]);
     }
 
     public function updateLatestApplicationDate(int $id) 

@@ -6,10 +6,12 @@ use App\Core\Controllers\Controller;
 use App\Http\Request\Request;
 use App\Services\BankApplicationService;
 use App\Services\ClientService;
+use App\Services\LeaderboardService;
 
 class ChartsController extends Controller
 {
     public function __construct(
+        private LeaderboardService $leaderboardService,
         private BankApplicationService $bankApplicationService,
         private ClientService $clientService
     ) {}
@@ -47,9 +49,22 @@ class ChartsController extends Controller
     }
 
     public function agentsLeaderboards(Request $request)
-    {
-        $data = $this->bankApplicationService->getAgentsLeaderboards($request->post('scope'));
+    {   
+        $filter = $request->post('scope');
+        $leaderboard = $this->leaderboardService->getTopAgents($filter);
 
-        $this->responseJson($data);
+        $result = [];
+
+        foreach (['first', 'second', 'third'] as $place) 
+        {
+            if (!empty($leaderboard['podium'][$place])) 
+            {
+                $result[] = $leaderboard['podium'][$place];
+            }
+        }
+
+        $result = array_merge($result, $leaderboard['rankings'] ?? []);
+
+        $this->responseJson($result);
     }
 }

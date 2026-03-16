@@ -6,7 +6,7 @@
         <p>
             <?= $title ?? env('APP_NAME') ?? 'Mia Ventures OPC' ?>
         </p>
-        <p>
+        <p class='user-name'>
             <?= $user->username ?? 'Anonymous' ?> | <?= $user->role ?? 'Guest' ?>
         </p>
     </div>
