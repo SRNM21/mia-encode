@@ -1,4 +1,4 @@
-<div class="hidden status-card error-card flex-col <?= $class ?? '' ?>">
+<div class="hidden status-card info-card flex-col <?= $class ?? '' ?>">
     <div class="flex-row status-header">
         <?= get_icon('circle-alert') ?>
         <p class="status-title"></p>

@@ -1,11 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-
 *
 {
     padding: 0;
     margin: 0;
     box-sizing: border-box;
-    font-family: "Poppins", Arial, Helvetica, sans-serif;
+    font-family: "Geist", "Geist Fallback", Arial, Helvetica, sans-serif;
     scroll-behavior: smooth;
 }
 
@@ -318,7 +316,7 @@
 }
 
 .gap-4 {
-    gap: 4;
+    gap: 4px;
 }
 
 .gap-8 {
@@ -409,46 +407,55 @@ button.sm {
     border-radius: 6px;
 }
 
+button.sm > svg {
+    height: 14px;
+    width: 14px;
+}
+
 button > svg {
     height: 16px;
     width: 16px;
 }
 
-.error-card {
-    font-size: 14px;
+.status-card.error-card {
     color: var(--color-red-500);
     background-color: rgb(from var(--color-red-500) r g b / 10%);
+    border: 1px solid var(--color-red-500);
+}
+
+.status-card.info-card {
+    color: var(--color-blue-500);
+    background-color: rgb(from var(--color-blue-500) r g b / 10%);
+    border: 1px solid var(--color-blue-500);
+}
+
+.status-card {
+    font-size: 14px;
     padding: 16px;
     border-radius: 8px;
-    border: 1px solid var(--color-red-500);
     gap: 4px
 }
 
-.error-card .error-icon {
-    height: fit-content;
-    width: fit-content;
-}
-
-.error-card .error-header {
+.status-card .status-header {
     gap: 8px;
     align-items: center;
 }
 
-.error-card .error-title {
+.status-card .status-title {
     font-size: 14px;
     font-weight: 600;
 }
 
-.error-card .error-message {
+.status-card .status-message {
     margin-left: 28px;
 }
 
-.error-message p::before {
+.status-message p::before {
     content: '•';
     margin-right: 4px;
 }
 
-.error-card svg {
+.status-card svg{
     height: 20px;
     width: 20px;
 }
@@ -461,6 +468,8 @@ button > svg {
 }
 
 .loader {
+    width: 20px;
+    height: 20px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -470,6 +479,16 @@ button > svg {
 @keyframes rotate {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+    appearance: textfield;
 }
 
 /* 

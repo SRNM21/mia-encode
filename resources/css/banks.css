@@ -1,0 +1,229 @@
+@import url('home.css');
+
+.content {
+    flex: 1;
+    height: calc(100dvh - 65px);
+    max-height: calc(100dvh - 65px);
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.content > div {
+    height: 100%;
+}
+
+.container-header {
+    align-items: center;
+    justify-content: end;
+    margin-bottom: 24px;
+}
+
+.banks-container {
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.table-wrapper {
+    width: 100%;
+    max-width: 100%;
+    overflow: auto;
+    box-sizing: border-box;
+    flex: 1;
+    min-height: 0;
+    max-height: 100%;
+    position: relative;
+    border: 1px solid var(--color-neutral-600);
+    border-radius: 8px;
+}
+
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 24px;
+}
+
+.pagination-left, .pagination-right {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.pagination-controls button:disabled,
+.outline:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.pagination-right label {
+    font-size: 12px;
+    color: var(--color-neutral-300);
+}
+
+.pagination-right select {
+    padding: 6px 8px;
+}
+
+.pagination-right .banks-page-info {
+    margin-left: 8px;
+    font-size: 12px;
+    color: var(--color-neutral-300);
+}
+
+.banks-table {
+    width: 100%;
+    font-family: inherit;
+    border-collapse: separate;
+    border-spacing: 0;
+    box-sizing: border-box;
+}
+
+.banks-table th, .banks-table td  {
+    border: none;
+    padding: 8px;
+    font-weight: 400;
+}
+
+.banks-table td {
+    height: 50px;
+}
+
+.banks-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    text-align: left;
+    background-color: var(--color-neutral-800);
+    border-bottom: 1px solid var(--color-neutral-600);
+}
+
+.banks-table thead th.sortable {
+    cursor: pointer;
+}
+
+.banks-table thead th.sort-asc::after {
+    content: '▲';
+    font-size: 14px;
+    margin-left: 6px;
+    color: var(--color-neutral-300);
+}
+
+.banks-table thead th.sort-desc::after {
+    content: '▼';
+    font-size: 14px;
+    margin-left: 6px;
+    color: var(--color-neutral-300);
+}
+
+.banks-table thead th:first-child {
+    border-top-left-radius: 7px;
+}
+
+.banks-table thead th:last-child {
+    border-top-right-radius: 7px;
+}
+
+.banks-table tbody td {
+    border-top: none;
+    border: 1px solid var(--color-neutral-600);
+    padding: 8px;
+}
+
+.no-results td {
+    text-align: center;
+    color: var(--color-neutral-300);
+    padding: 12px;
+}
+
+.empty-banks-row {
+    text-align: center;
+}
+
+.edit-bank-btn {
+    background-color: var(--color-blue-800) !important;
+    border: 1px solid var(--color-blue-600) !important;
+}
+
+.edit-bank-btn:hover {
+    background-color: var(--color-blue-900) !important;
+    border: 1px solid var(--color-blue-700) !important;
+}
+
+.bank-name, .bank-short-name {
+    text-transform: uppercase;
+}
+
+.expiry-months-container {
+    width: 100%;
+}
+
+.number-input {
+    align-items: stretch;
+    border: 1px solid var(--color-neutral-600);
+    border-radius: 8px;
+    overflow: hidden;
+
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.number-input:focus-within {
+    box-shadow: 0 0 1px 2px var(--color-neutral-700);
+    border: 1px solid var(--color-neutral-500);
+}
+
+.number-input input {
+    width: 100%;
+    border: none;
+    text-align: center;
+    font-family: inherit;
+    outline: none;
+}
+
+.number-input input:focus-visible {
+    box-shadow: none;
+    border: none;
+}
+
+.number-input button {
+    width: 36px;
+    border-radius: 0 !important;
+    border: none;
+    background: var(--color-neutral-800);
+    color: white;
+    cursor: pointer;
+}
+
+.number-input button:hover {
+    background-color: var(--color-neutral-700);
+}
+
+.number-input button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.bank-error-card {
+    margin-top: 24px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.last-update-note-container {
+    margin-top: 18px;
+    color: var(--color-neutral-400);
+    font-style: italic;
+}
