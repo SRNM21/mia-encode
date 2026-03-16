@@ -238,11 +238,13 @@ if (!function_exists('is_associative'))
     /**
      * Returns true if the array is associative.
      *
-     * @param array $array
+     * @param mixed $array
      * @return boolean
      */
-    function is_associative(array $array)
-    {
+    function is_associative($array)
+    {   
+        if (!is_array($array)) return false;
+        
         return array_keys($array) !== range(0, count($array) - 1);    
     }
 }
@@ -427,7 +429,7 @@ if (!function_exists('format_date'))
      * @param string|null $dateString
      * @return string
      */
-    function formatDate(?string $dateString): string
+    function formatDate(?string $dateString, string $format = 'M j, Y'): string
     {
         try
         {
@@ -437,11 +439,26 @@ if (!function_exists('format_date'))
             }
 
             $date = new DateTime($dateString);
-            return $date->format('M j, Y');
+            return $date->format($format);
         } 
         catch (Exception $e) 
         {
             return '';
         }
+    }
+}
+
+if (!function_exists('dd'))
+{
+    /**
+     * var_dump and die.
+     *
+     * @param mixed $data
+     * @return boolean
+     */
+    function dd($data)
+    {   
+        var_dump($data);
+        die();
     }
 }

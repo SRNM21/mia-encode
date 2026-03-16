@@ -5,8 +5,8 @@ export function setErrorMessage(
     title = 'Invalid input'
 ) {
     errorContainer.removeClass('hidden')
-    const errorHeaderContainer = errorContainer.find('.error-title')
-    const errorMessageContainer = errorContainer.find('.error-message')
+    const errorHeaderContainer = errorContainer.find('.status-title')
+    const errorMessageContainer = errorContainer.find('.status-message')
     errorHeaderContainer.html('')
 
     if (!appendError) errorMessageContainer.html('')
@@ -126,6 +126,7 @@ export function validateStoreClientForm(errorContainer, input) {
 
     // Agent
     const agent = input.agent.val().trim().toUpperCase()
+    input.agent.removeClass('error')
     data.agent = agent
 
     if (!agent) {
@@ -157,35 +158,166 @@ export function validateStoreClientForm(errorContainer, input) {
 }
 
 
-export function validateExportDateForm(errorContainer, input) { 
-    const errors = []
-    const data = {}
+export function validateEditClientForm(errorContainer, input) { 
+    const [data, clientErrors] = validateCheckClientForm(errorContainer, input)
 
-    input.start_date.removeClass('error')
-    const startDate = input.start_date.val().trim()
-    data.startDate = startDate
+    const errors = [...clientErrors]
 
-    if (!startDate) {
+    // Agent
+    const agent = input.agent.val().trim().toUpperCase()
+    input.agent.removeClass('error')
+    data.agent = agent
+
+    if (!agent) {
         errors.push({
-            field: 'startDate',
-            el: input.start_date,
-            message: 'Start date is required.'
-        })
-    }
-
-    input.end_date.removeClass('error')
-    const endDate = input.end_date.val().trim()
-    data.endDate = endDate
-
-    if (!endDate) {
-        errors.push({
-            field: 'endDate',
-            el: input.end_date,
-            message: 'End date is required.'
+            field: 'agent',
+            el: input.agent,
+            message: 'Agent is required.'
         })
     }
 
     if (errors.length > 0) {
+        renderError(errorContainer, errors)
+    } else {
+        errorContainer.addClass('hidden')
+    }
+
+    return [data, errors]
+}
+
+function parseDate(dateStr) {
+    const [month, day, year] = dateStr.split('/').map(Number)
+    return new Date(year, month - 1, day)
+}
+
+export function validateExportDateForm(errorContainer, input) { 
+    const errors = []
+    const data = {}
+
+    const DATE_REGEX = /^\d{2}\/\d{2}\/\d{4}$/
+
+    const inpStartDate = input.start_date
+    inpStartDate.removeClass('error')
+
+    const startDate = inpStartDate.val().trim()
+    data.start_date = startDate
+
+    // Validate start date
+    if (!startDate) {
+        errors.push({
+            field: 'startDate',
+            el: inpStartDate,
+            message: 'Start date is required.'
+        })
+    } else if (!DATE_REGEX.test(startDate)) {
+        errors.push({
+            field: 'startDate',
+            el: inpStartDate,
+            message: 'Invalid start date format.'
+        })
+    }
+    
+    const inpEndDate = input.end_date
+    inpEndDate.removeClass('error')
+
+    const endDate = inpEndDate.val().trim()
+    data.end_date = endDate
+
+    // Validate end date
+    if (!endDate) {
+        errors.push({
+            field: 'endDate',
+            el: inpEndDate,
+            message: 'End date is required.'
+        })
+    } else if (!DATE_REGEX.test(endDate)) {
+        errors.push({
+            field: 'endDate',
+            el: inpEndDate,
+            message: 'Invalid end date format.'
+        })
+    }
+
+    const today = new Date()
+    today.setHours(0,0,0,0)
+
+    if (
+        DATE_REGEX.test(startDate) &&
+        DATE_REGEX.test(endDate)
+    ) {
+        const start = parseDate(startDate)
+        const end = parseDate(endDate)
+
+        if (start > today || end > today) {
+            errors.push({
+                el: inpEndDate,
+                message: 'Start and end date must be earlier than today.'
+            })
+        }
+
+        if (start > end) {
+            errors.push({
+                el: inpStartDate,
+                message: 'Start date must be earlier than end date.'
+            })
+        }
+    }
+
+    if (errors.length > 0) {
+        renderError(errorContainer, errors)
+    } else {
+        errorContainer.addClass('hidden')
+    }
+
+    return [data, errors]
+}
+
+export function validateBankDetails(errorContainer, input) {
+    const errors = []
+    const data = {}
+
+    const pushError = (el, message) => {
+        errors.push({ el, message })
+    }
+
+    const getValue = (el) => el.val()?.trim().toUpperCase() ?? ''
+
+    const validateRequired = (el, value, message) => {
+        el.removeClass('error')
+        if (!value) pushError(el, message)
+    }
+
+    const bankName = getValue(input.bank_name)
+    data.bank_name = bankName
+    validateRequired(input.bank_name, bankName, 'Bank name is required.')
+
+    const shortBankName = getValue(input.bank_short_name)
+    data.short_bank_name = shortBankName
+    validateRequired(input.bank_short_name, shortBankName, 'Short bank name is required.')
+
+    if (shortBankName.length > 5) {
+        pushError(input.bank_short_name, 'Short name must be less than 5 characters.')
+    }
+
+    const expiryContainer = input.expiry_months.container
+    const expiryInput = input.expiry_months.input
+
+    expiryContainer.removeClass('error')
+
+    const expiryMonths = Number(getValue(expiryInput))
+    data.expiry_months = expiryMonths
+
+    if (!expiryMonths) {
+        pushError(expiryContainer, 'Expiry months is required.')
+    } else if (expiryMonths <= 0 || expiryMonths > 60) {
+        pushError(expiryContainer, 'Expiry months must be between 1 and 60.')
+    }
+
+    const bankStatus = getValue(input.bank_status)
+    data.bank_status = bankStatus
+    validateRequired(input.bank_status, bankStatus, 'Bank status is required.')
+
+    if (errors.length) {
         renderError(errorContainer, errors)
     } else {
         errorContainer.addClass('hidden')

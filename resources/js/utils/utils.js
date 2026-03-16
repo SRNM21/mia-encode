@@ -102,15 +102,18 @@ export function getSearchParams(params) {
 }
 
 export function formatDate(dateString) {
-    const date = new Date(dateString.replace(' ', 'T'));
+    const date = new Date(dateString.replace(' ', 'T'))
 
-    const options = {   
-        year: 'numeric', 
-        month: 'short', 
-        day: 'numeric' 
-    };
+    const formatted = date.toLocaleString('en-US', {
+        month: 'short',
+        day: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+    })
 
-    return date.toLocaleDateString('en-US', options);
+    return formatted.replace(',', '')
 }
 
 export function capitalizeWord(word) {
@@ -119,9 +122,9 @@ export function capitalizeWord(word) {
 
 export function showNotification(title, message) {
 
-    const DURATION = 3000
+    const DURATION = 5000
 
-    /* create container if missing */
+    // create container if missing
     let container = $('#notification-container')
 
     if (!container.length) {
@@ -147,7 +150,7 @@ export function showNotification(title, message) {
     notification.find('.notification-title').text(title)
     notification.find('.notification-message').text(message)
 
-    /* prepare animation state */
+    // prepare animation state
     notification.css({
         height: 0,
         opacity: 0,
@@ -156,10 +159,10 @@ export function showNotification(title, message) {
 
     container.append(notification)
 
-    /* measure natural height */
+    // measure natural height
     const fullHeight = notification.get(0).scrollHeight
 
-    /* slide animation */
+    // slide animation
     notification.animate(
         {
             height: fullHeight,
@@ -176,7 +179,7 @@ export function showNotification(title, message) {
 
     const progress = notification.find('.notification-progress')
 
-    /* progress countdown */
+    // progress countdown
     progress.animate(
         { width: "0%" },
         {
@@ -185,14 +188,12 @@ export function showNotification(title, message) {
         }
     )
 
-    /* auto remove */
+    // auto remove
     const timeout = setTimeout(removeNotification, DURATION)
 
     function removeNotification() {
 
         clearTimeout(timeout)
-
-        const height = notification.outerHeight()
 
         notification.animate(
             {
@@ -206,7 +207,7 @@ export function showNotification(title, message) {
         )
     }
 
-    /* close button */
+    // close button
     notification.find('.notification-close').on('click', removeNotification)
 }
 
@@ -222,4 +223,25 @@ export function debounce(fn, delay = 500) {
             fn.apply(context, args)
         }, delay)
     }
+}
+
+export function objectsEqual(a, b) {
+    const keysA = Object.keys(a)
+    const keysB = Object.keys(b)
+
+    if (keysA.length !== keysB.length) {
+        return false
+    }
+
+    for (const key of keysA) {
+        if (!Object.prototype.hasOwnProperty.call(b, key)) {
+            return false
+        }
+
+        if (a[key] !== b[key]) {
+            return false
+        }
+    }
+
+    return true
 }
