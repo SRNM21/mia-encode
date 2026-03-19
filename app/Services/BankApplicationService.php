@@ -10,7 +10,7 @@ class BankApplicationService
         private BankApplicationRepository $bankApplicationRepository
     ) {}
 
-    public function getClientApplications(int $client_id): array
+    public function getClientApplications(int $client_id)
     {
         return $this->bankApplicationRepository->getClientApplications($client_id);
     }
@@ -28,7 +28,6 @@ class BankApplicationService
         ];
     }
 
-    // TODO: FIX ALGO
     public function bankApplicationsSeries(?string $scope, ?string $year): array
     {
         $rows = $this->bankApplicationRepository->getAllWithBankAndDate();

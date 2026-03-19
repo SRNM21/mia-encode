@@ -18,9 +18,4 @@ class Client extends Model
         'first_application',
         'latest_application'
     ];
-
-    public function checkPassword(string $password)
-    {
-        return password_verify($password, $this->getAttribute('pass'));
-    }
 }

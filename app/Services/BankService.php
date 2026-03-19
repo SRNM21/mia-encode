@@ -50,7 +50,40 @@ class BankService
         string $sort = 'name',
         string $order = 'desc'
     ) {
-        return $this->bankRepository->getBanksWithApplicationCount($page, $perPage, $sort, $order);
+        $banks = $this->bankRepository->getBanksWithApplicationCount($page, $perPage, $sort, $order);
+        $counts = $this->countBankApplications();
+
+        foreach ($banks['data'] as &$bank) 
+        {
+            $bank['total'] = $counts[$bank['id']] ?? 0;
+        }
+
+        return $banks;
+    }
+
+    public function countBankApplications(): array
+    {
+        $applications = $this->bankRepository->getBankApplicationBanks();
+        $counts = [];
+
+        foreach ($applications as $app) 
+        {
+            $banks = json_decode($app['bank_submitted_id'], true);
+
+            if (!is_array($banks))
+            {
+                continue;
+            }
+
+            foreach ($banks as $bankId) 
+            {
+                if (!isset($counts[$bankId])) $counts[$bankId] = 0;
+
+                $counts[$bankId]++;
+            }
+        }
+
+        return $counts;
     }
 
 }

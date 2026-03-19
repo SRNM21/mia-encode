@@ -39,80 +39,121 @@
                                     Export to Excel
                                 </button>
                             </div>
-                            <div id="filter-popover" class="filter-popover hidden">
-                                <div class="filter-modal card flex-col gap-16">
-                                    <select id="filter-column">
-                                        <option value="" disabled selected>Select column</option>
-                                        <option value="last_name">Lastname</option>
-                                        <option value="first_name">Firstname</option>
-                                        <option value="middle_name">Middlename</option> 
-                                        <option value="birthdate">Birthdate</option>
-                                        <option value="mobile_num">Mobile Number</option>
-                                        <option value="start_date">Start Date</option>
-                                        <option value="end_date">End Date</option>
-                                    </select>
-                                    <input id="filter-value" type="text" placeholder="Value">
-                                    <div class="flex-row filter-actions gap-16">
-                                        <button id="filter-cancel" class="ghost">Cancel</button>
-                                        <button id="filter-add" class="outline">Add</button>
-                                    </div>
-                                </div>
-                            </div>
                             <div id="filter-bar" class="hidden filter-container flex-row gap-8">
-                                
                             </div>
-                            <div class="applications-container field-set">
+                            <div 
+                                id='applications-container'
+                                class="applications-container"
+                                data-page='<?= $meta['page'] ?>'
+                                data-per-page='<?= $meta['per_page'] ?>'
+                                data-last-page='<?= $meta['last_page'] ?>'
+                                data-total='<?= $meta['total'] ?>'
+                            >
                                 <div class="table-wrapper">
-                                <table class="applications-table">
-                                    <thead>
-                                        <tr>
-                                            <th class="sortable" data-key="date_submitted">Date Submitted</th>
-                                            <th class="sortable" data-key="last_name">Lastname</th>
-                                            <th class="sortable" data-key="first_name">Firstname</th>
-                                            <th class="sortable" data-key="middle_name">Middlename</th>
-                                            <th class="sortable" data-key="birthdate">Birthdate</th>
+                                    <table class="applications-table">
+                                        <thead>
+                                            <tr>
+                                                <th class="sortable" data-key="date_submitted">Date Submitted</th>
+                                                <th class="sortable" data-key="last_name">Lastname</th>
+                                                <th class="sortable" data-key="first_name">Firstname</th>
+                                                <th class="sortable" data-key="middle_name">Middlename</th>
+                                                <th class="sortable" data-key="birthdate">Birthdate</th>
 
-                                            <?php foreach ($banks as $bank): ?>
-                                                <th class='bank-name'><?= $bank->short_name ?></th>
-                                            <?php endforeach; ?>
+                                                <?php foreach ($banks as $bank): ?>
+                                                    <th class='bank-name'><?= $bank->short_name ?></th>
+                                                <?php endforeach; ?>
 
-                                            <th>Mobile Number</th>
-                                            <th>Agent</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
+                                                <th>Mobile Number</th>
+                                                <th>Agent</th>
+                                                
+                                                <?php if ($user->role == 'ENCODER'): ?>
+                                                    <th>Action</th>
+                                                <?php endif ?>
+                                            </tr>
+                                        </thead>
 
-                                    <tbody id="application-table-body">
+                                        <tbody id="application-table-body">
                                         <?php if (count($applications) > 0): ?>
                                             <?php foreach ($applications as $application): ?>
-                                                <tr data-agent='<?= $application->agent_username ?>'>
-                                                    <td data-raw='<?= $application->date_submitted ?>'><?= formatDate($application->date_submitted) ?></td>
-                                                    <td class="lastname"><?= $application->lastname ?></td>
-                                                    <td class="firstname"><?= $application->firstname ?></td>
-                                                    <td class="middlename"><?= $application->middlename ?></td>
-                                                    <td data-raw='<?= $application->birthdate ?>'><?= formatDate($application->birthdate) ?></td>
-                                                    
-                                                    <?php foreach ($banks as $bank): ?>
+                                                <tr 
+                                                    data-id='<?= $application['id'] ?>'
+                                                    data-firstname='<?= $application['first_name'] ?>'
+                                                    data-middlename='<?= $application['middle_name'] ?>'
+                                                    data-lastname='<?= $application['last_name'] ?>'
+                                                    data-birthdate='<?= $application['birthdate'] ?>'
+                                                    data-mobile='<?= $application['mobile_num'] ?>'
+                                                    data-agent='<?= $application['agent'] ?>'
+
+                                                    <?php if (isset($application['request_edit_id'])): ?> 
+                                                        data-request-edit-id='<?= $application['request_edit_id'] ?>' 
+                                                        data-request-new-content='<?= $application['request_new_content'] ?>' 
+                                                        data-request-datetime='<?= $application['request_datetime'] ?>' 
+                                                    <?php endif ?>
+                                                >
+                                                    <td data-raw='<?= $application['date_submitted'] ?>'>
+                                                        <?= formatDate($application['date_submitted']) ?>
+                                                    </td>
+
+                                                    <td class="lastname"><?= $application['last_name'] ?></td>
+                                                    <td class="firstname"><?= $application['first_name'] ?></td>
+                                                    <td class="middlename"><?= $application['middle_name'] ?></td>
+
+                                                    <td data-raw='<?= $application['birthdate'] ?>'>
+                                                        <?= formatDate($application['birthdate']) ?>
+                                                    </td>
+
+                                                    <?php 
+                                                        $submittedBanks = array_flip($application['banks'] ?? []);
+                                                        foreach ($banks as $bank):
+                                                    ?>
                                                         <td class="bank-check" data-bank-id="<?= $bank->id ?>">
-                                                            <?= $application->bank_submitted_id == $bank->id ? get_icon('check') : '' ?>
+                                                            <?= isset($submittedBanks[$bank->id]) ? get_icon('check') : '' ?>
                                                         </td>
                                                     <?php endforeach; ?>
-                                                    <td><?= $application->mobile_num ?></td>
-                                                    <td><?= $application->agent ?></td>
-                                                    <td>
 
-                                                    </td>
+                                                    <td><?= $application['mobile_num'] ?></td>
+                                                    <td><?= $application['agent'] ?></td>
+
+                                                    <?php 
+                                                        $request_edit_status = $application['request_status'] ?? '';
+                                                        if ($user->role == 'ENCODER'):
+                                                    ?>
+                                                        <td>
+                                                            <?php if ($request_edit_status == 'pending'): ?>
+                                                                <div class="flex-row gap-8">
+                                                                    <button 
+                                                                        data-request-edit-id='<?= $application['request_edit_id'] ?>'
+                                                                        class="outline sm cancel-edit-application-btn"
+                                                                    >
+                                                                        <?php get_icon('x') ?>
+                                                                        Cancel Request
+                                                                    </button>
+
+                                                                    <button class="outline sm view-edit-application-btn">
+                                                                        <?php get_icon('eye') ?>
+                                                                        View
+                                                                    </button>
+                                                                </div>
+                                                            <?php else: ?>
+                                                                <button class="outline sm edit-application-btn">
+                                                                    <?php get_icon('pencil') ?>
+                                                                    Request Edit
+                                                                </button>
+                                                            <?php endif ?>
+                                                        </td>
+                                                    <?php endif ?>
                                                 </tr>
                                             <?php endforeach; ?>
                                         <?php else: ?>
                                             <tr>
-                                                <td colspan="100%" class="empty-application-row">No applications found.</td>
+                                                <td colspan="100%" class="empty-application-row">
+                                                    No applications found.
+                                                </td>
                                             </tr>
-                                        <?php endif?>
-                                    </tbody>
-                                </table>
+                                        <?php endif ?>
+                                        </tbody>
+                                    </table>
                                 </div>
-                                
                             </div>
                             <div class="pagination-controls gap-16">
                                 <div class="pagination-right gap-16">
@@ -142,6 +183,10 @@
             </main>
         </div>
         
+        <?= get_modal('view-edit-request') ?>
+        <?= get_modal('cancel-edit-request') ?>
+        <?= get_modal('edit-application') ?>
+        <?= get_modal('add-filter') ?>
         <?= get_modal('select-date-range-export') ?>
         <?= get_modal('export-loading') ?>
 

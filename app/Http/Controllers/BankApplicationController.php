@@ -7,6 +7,7 @@ use App\Http\Request\Request;
 use App\Models\Bank;
 use App\Services\BankApplicationService;
 use avadim\FastExcelWriter\Excel;
+use avadim\FastExcelWriter\Style\Style;
 
 class BankApplicationController extends Controller
 {
@@ -63,7 +64,7 @@ class BankApplicationController extends Controller
 
         $result = $this->bankApplicationService
             ->getClientsPage($page, $perPage, $filters, $sort, $order);
-            
+        
         $clientsApplications = $result['data'] ?? [];
         $meta = $result['meta'] ?? [
             'total' => 0,
@@ -71,6 +72,20 @@ class BankApplicationController extends Controller
             'per_page' => $perPage,
             'last_page' => 1
         ];
+
+        foreach ($clientsApplications as &$application) 
+        {
+            if (isset($application['banks']))
+            {
+                $application['banks'] = is_array($application['banks']) 
+                    ? $application['banks'] 
+                    : json_decode($application['banks'], true) ?? [];
+            } 
+            else 
+            {
+                $application['banks'] = [];
+            }
+        }
 
         $this->view('applications', [
             'banks' => $banks,
@@ -81,8 +96,8 @@ class BankApplicationController extends Controller
 
     public function preExport(Request $request) 
     {   
-        $startDate = $request->post('startDate');
-        $endDate = $request->post('endDate');
+        $startDate = $request->post('start_date');
+        $endDate = $request->post('end_date');
 
         $start = date('Y-m-d', strtotime($startDate));
         $end = date('Y-m-d', strtotime($endDate));
@@ -95,31 +110,69 @@ class BankApplicationController extends Controller
 
     public function export(Request $request)
     {
-        $startDate = $request->input('startDate');
-        $endDate = $request->input('endDate');
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
 
         $start = date('Y-m-d', strtotime($startDate));
         $end = date('Y-m-d', strtotime($endDate));
 
         set_time_limit(0);
-        
+
+        // Get banks and prepare header mapping
         $banks = model_list_to_array(Bank::class, Bank::getAll());
         $bank_list = sort_by($banks, 'name');
         $banks_short_name = array_map(fn($b) => $b['short_name'], $bank_list);
 
         $headers = array_merge(
-            ['Date Submitted', 'Last Name', 'First Name', 'Middle Name'],
+            ['DATE SUBMITTED', 'LAST NAME', 'FIRST NAME', 'MIDDLE NAME', 'BIRTHDATE'],
             $banks_short_name,
-            ['Mobile Number', 'Agent']
+            ['MOBILE NUMBER', 'AGENT']
         );
 
         $bankCount = count($banks_short_name);
-        $bankIndexMap = array_flip($banks_short_name);
         $bankTemplate = array_fill(0, $bankCount, '');
+        $bankIdMap = [];
+
+        foreach ($bank_list as $index => $bank) 
+        {
+            $bankIdMap[$bank['id']] = [
+                'short_name' => $bank['short_name'],
+                'index' => $index
+            ];
+        }
 
         $excel = Excel::create(['Sheet1']);
         $sheet = $excel->getSheet();
-        $sheet->writeRow($headers);
+
+        $headerStyle = (new Style())
+            ->setFontStyleBold()
+            ->setFontColor('#FFFFFF')
+            ->setBgColor('#000000')
+            ->setTextAlign('center', 'center');
+
+        $contentStyle = [
+            'border-style'   => 'thin',
+            'border-color'   => '#000000',
+            'text-align'     => 'center',
+            'vertical-align' => 'center',
+        ];
+
+        $sheet->writeRow($headers, $headerStyle);
+        $sheet->setRowHeight(1, 20);
+
+        $widths = [];
+        foreach ($headers as $i => $header) 
+        {
+            $widths[$i] = strlen($header) + 5;
+        }
+
+        $agent_col = (count($headers) - 1);
+        foreach ([1, 2, 3, $agent_col] as $col) 
+        {
+            $widths[$col] = 25;
+        }
+
+        $sheet->setColWidths($widths);
 
         $cursor = $this->bankApplicationService->getExportCursor($start, $end);
 
@@ -128,35 +181,58 @@ class BankApplicationController extends Controller
 
         foreach ($cursor as $row) 
         {
+            $submittedBanks = [];
+            if (!empty($row['bank_submitted_id'])) 
+            {
+                $bankSubmittedId = $row['bank_submitted_id'];
+
+                if (is_string($bankSubmittedId)) 
+                {
+                    $submittedBanks = json_decode($bankSubmittedId, true) ?: [];
+                } 
+                elseif (is_array($bankSubmittedId)) 
+                {
+                    $submittedBanks = $bankSubmittedId;
+                }
+            }
+
+            // Initialize row with blank bank columns
             $rowData = [
-                $row['date_submitted'],
+                formatDate($row['date_submitted'], 'm/d/Y'),
                 $row['lastname'],
                 $row['firstname'],
                 $row['middlename'],
+                formatDate($row['birthdate'], 'm/d/Y'),
                 ...$bankTemplate,
                 $row['mobile_num'],
                 $row['agent'] ?? ''
             ];
 
-            if (isset($bankIndexMap[$row['bank_short_name']])) 
+            // Fill bank columns with "X" if submitted
+            foreach ($submittedBanks as $bankId) 
             {
-                $rowData[4 + $bankIndexMap[$row['bank_short_name']]] = 'X';
+                if (isset($bankIdMap[$bankId])) 
+                {
+                    $colIndex = 5 + $bankIdMap[$bankId]['index']; // 5 = starting column for banks
+                    $rowData[$colIndex] = 'X';
+                }
             }
 
             $buffer[] = $rowData;
 
             if (count($buffer) >= $batchSize) 
             {
-                $sheet->writeRows($buffer);
+                $sheet->writeRows($buffer, $contentStyle);
                 $buffer = [];
             }
         }
 
         if (!empty($buffer)) 
         {
-            $sheet->writeRows($buffer);
+            $sheet->writeRows($buffer, $contentStyle);
         }
 
-        $excel->download('bank_applications_fast.xlsx');
+        $filename = "TRANSMITAL-{$start}-TO-{$end}.xlsx";
+        $excel->download($filename);
     }
 }

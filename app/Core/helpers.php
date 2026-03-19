@@ -462,3 +462,34 @@ if (!function_exists('dd'))
         die();
     }
 }
+
+if (!function_exists('timeAgo'))
+{
+    function timeAgo($datetime) 
+    {
+        $now = time();
+        $past = strtotime($datetime);
+
+        $seconds = $now - $past;
+
+        if ($seconds < 60) 
+        {
+            return $seconds . 's';
+        }
+
+        $minutes = floor($seconds / 60);
+        if ($minutes < 60) 
+        {
+            return $minutes . 'm';
+        }
+
+        $hours = floor($minutes / 60);
+        if ($hours < 24) 
+        {
+            return $hours . 'h';
+        }
+
+        $days = floor($hours / 24);
+        return $days . 'd';
+    }
+}

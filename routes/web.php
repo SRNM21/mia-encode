@@ -13,6 +13,7 @@ use App\Http\Controllers\BankApplicationController;
 use App\Http\Controllers\BankController;
 use App\Http\Controllers\Development\HealthController;
 use App\Http\Controllers\LeaderboardsController;
+use App\Http\Controllers\RequestEditController;
 use App\Http\Controllers\SettingsController;
 
 // ! DEVELOPMENT Routes
@@ -53,8 +54,12 @@ Route::middleware(AuthMiddleware::class)->group(function () {
         Route::post('/banks', [BankController::class, 'store']);
         Route::patch('/banks', [BankController::class, 'update']);
         
-        // TODO: ADD NOTIFICATION / REQUEST
-        // TODO: ADD ACCOUNT MANAGER
+        Route::get('/requests', [RequestEditController::class, 'show']);
+        Route::patch('/requests/read', [RequestEditController::class, 'read']);
+        Route::patch('/requests/reject', [RequestEditController::class, 'reject']);
+        Route::patch('/requests/approve', [RequestEditController::class, 'approve']);
+
+        // TODO: ADD ACCOUNT MANAGER0
 
         // TODO: SETTINGS [THEME, ACCOUNT]
         // Route::get('/settings', [SettingsController::class, 'show']);
@@ -68,9 +73,9 @@ Route::middleware(AuthMiddleware::class)->group(function () {
             Route::post('/encode-check', 'check');
         });
 
-        Route::patch('/bank-applications', [BankApplicationController::class, 'update']);
+        Route::post('/request-edit', [RequestEditController::class, 'store']);
+        Route::delete('/request-edit', [RequestEditController::class, 'destroy']);
 
-        // TODO: REQUEST CLIENT EDIT
         // TODO: REQUEST EDIT ACCOUNT
     });
 });

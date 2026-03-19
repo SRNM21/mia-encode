@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Models\Bank;
+use App\Models\BankApplication;
 
 class BankRepository
 {
@@ -36,6 +37,13 @@ class BankRepository
             )
             ->groupBy('bank_list_tbl.id')
             ->orderBy($sort, strtoupper($order))
-            ->paginate($page, $perPage);
+            ->paginate($page, $perPage, true);
+    }
+
+    public function getBankApplicationBanks(): array
+    {
+        return BankApplication::query()
+            ->select('bank_submitted_id')
+            ->getArray();
     }
 }

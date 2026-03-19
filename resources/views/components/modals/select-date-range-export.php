@@ -25,6 +25,10 @@
                 'class' => 'range-date-error-card',
             ]) ?>
 
+            <?php get_component('info-card', [
+                'class' => 'range-date-info-card',
+            ]) ?>
+
             <p class="export-note">Note: The export can not be cancelled once started.</p>
         </div>
         <hr>

@@ -34,6 +34,13 @@
             </a>
         <?php endif ?>
 
+        <?php if ($role == 'ADMIN'): ?>
+            <a href='requests'>
+                <span class='icon'><?= get_icon('file-pen-line') ?></span>
+                <span class='label'>Requests</span>
+            </a>
+        <?php endif ?>
+
         <!-- <a href='settings'>
             <span class='icon'><?= get_icon('settings') ?></span>
             <span class='label'>Settings</span>
