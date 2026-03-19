@@ -36,7 +36,6 @@
                                 </div>
                             </div>
                             <div class="field-set form-grid">
-
                                 <div class="flex-col field-group">
                                     <label for="firstname">Firstname</label>
                                     <input type="text" id="firstname" name="firstname" class="client-details-input" placeholder="e.g. Juan" required>

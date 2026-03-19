@@ -82,7 +82,7 @@ doc.ready(function () {
         }
     })
 
-    checkClientBtn.on('click', (e) => {
+    checkClientBtn.on('click', async (e) => {        
         e.preventDefault()
 
         const [data, errors] = validateCheckClientForm(checkClientErrorCard, {
@@ -94,32 +94,37 @@ doc.ready(function () {
         })
 
         if (errors.length > 0) {
+            hideApplicationDetails()
+            storeClientErrorCard.addClass('hidden')
             scrollToBottom('.content')
             return
         }
 
         client_id = null
         tbody.empty()
+        console.log(data);
+        
+        try {
+            const response = await post({
+                url: 'encode-check',
+                data: data,
+            })
+            
+            renderClientBankApplication(response.data)
+            scrollToBottom('.content')
+        } catch (error) {
+            const response = error.responseJSON
 
-        post({
-            url: 'encode-check',
-            data: data,
-            success: function (response) {
-                renderClientBankApplication(response.data)
-                scrollToBottom('.content')
-            },
-            error: function (xhr) {
-                const response = xhr.responseJSON
-
-                setErrorMessage(
-                    checkClientErrorCard,
-                    normalizedServerErrors(response.data.errors)
-                )
-            }
-        })
+            setErrorMessage(
+                checkClientErrorCard,
+                normalizedServerErrors(response.data.errors)
+            )
+        }
     })
 
-    submitBtn.on('click', (e) => {
+    submitBtn.on('click', async (e) => {
+        console.log('submit');
+        
         e.preventDefault()
 
         const selectedBanks = $('td.bank-select-cell.selected').map((_, cell) => $(cell).attr('data-bank-id')).get() || []
@@ -138,26 +143,25 @@ doc.ready(function () {
             scrollToBottom('.content')
             return
         }
-        
-        post({
-            url: 'encode',
-            data: {client_id, ...data},
-            success: function (response) {
-                console.log(response);
-                clear()
-                showNotification('Saved Successfully', 'Client\'s bank application successfully submitted.')
-            },
-            error: function (xhr) {
-                const reponse = xhr.responseJSON
 
-                setErrorMessage(
-                    storeClientErrorCard,
-                    normalizedServerErrors(reponse.data.errors)
-                )
+        try {
+            const response = await post({
+                url: 'encode',
+                data: {client_id, ...data},
+            })
+            
+            clear()
+            showNotification('Saved Successfully', 'Client\'s bank application successfully submitted.')
+        } catch (error) {
+            const response = error.responseJSON
 
-                scrollToBottom('.content')
-            }
-        })
+            setErrorMessage(
+                storeClientErrorCard,
+                normalizedServerErrors(response.data.errors)
+            )
+
+            scrollToBottom('.content')
+        }
     })
 })
 
@@ -170,9 +174,16 @@ function clear() {
     agent.val('');
     agent.removeClass('error');
 
+    hideErrors()
+    hideApplicationDetails()
+}
+
+function hideErrors() {
     checkClientErrorCard.addClass('hidden')
     storeClientErrorCard.addClass('hidden')
+}
 
+function hideApplicationDetails() {
     hideBadge()
     showBankApplicationsContent(false)
     showSubmitContent(false)
@@ -210,7 +221,7 @@ function isExpired(dateSubmitted, expirationMonths) {
 function renderClientBankApplication(data) {
     const client = data.client
     const banks = Array.isArray(data.banks) ? data.banks : []
-    const applications = Array.isArray(data.applications) ? data.applications : []
+    const applications = data.applications ? [data.applications] : [] // normalize to array
 
     const hasClient = client != null
 
@@ -228,35 +239,49 @@ function renderClientBankApplication(data) {
 
     if (hasClient) {
         applications.forEach(app => {
-            appsById[String(app.bank_submitted_id)] = {
-                date_submitted: app.date_submitted,
-                agent: app.agent,
+            let bankIds = []
+
+            try {
+                bankIds = JSON.parse(app.bank_submitted_id)
+            } catch (e) {
+                bankIds = []
             }
+
+            if (!Array.isArray(bankIds)) return
+
+            bankIds.forEach(id => {
+                appsById[String(id)] = {
+                    date_submitted: app.date_submitted,
+                    agent: app.agent,
+                }
+            })
         })
     }
 
     banks.forEach(bank => {
         if (!bank.is_active) return
 
-        const app = hasClient ? appsById[bank.id] : null
-        const isExpiredApplication = app ? isExpired(app.date_submitted, bank.expiry_months) : false
+        const app = hasClient ? appsById[String(bank.id)] : null
+        const isExpiredApplication = app 
+            ? isExpired(app.date_submitted, bank.expiry_months) 
+            : false
 
         const row = $('<tr></tr>')
 
-        // Data
         const date = app ? formatDate(app.date_submitted) : '—'
-        const statusText = app && !isExpiredApplication ? 'Unavailable' : 'Available' 
-        const statusClass = app && !isExpiredApplication ? 'status-unavailable' : 'status-available'
+        const statusText = app && !isExpiredApplication ? 'Unavailable' : 'Available'
+        const statusClass = app && !isExpiredApplication 
+            ? 'status-unavailable' 
+            : 'status-available'
         const agent = app ? app.agent : '—'
 
-        // Cells
         const bankCell = $('<td></td>').text(bank.name)
         const dateCell = $('<td></td>').text(date)
         const agentCell = $('<td></td>').text(agent)
         const statusCell = $('<td></td>')
             .addClass(statusClass)
             .text(capitalizeWord(statusText))
-            
+
         const actionCell = $('<td></td>')
             .addClass('bank-select-cell')
             .attr('data-bank-name', bank.name)

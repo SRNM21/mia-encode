@@ -24,15 +24,12 @@ class EncodeService
             $client_id = $client->id;
         }
 
-        $bank_applications = $request->post('banks');
+        $bank_applications = array_map('intval', $request->post('banks'));
 
-        foreach ($bank_applications as $bank)
-        {
-            BankApplication::create([
-                'client_id' => $client_id,
-                'bank_submitted_id' => $bank,
-                'agent' => $request->post('agent'),
-            ]);
-        }
+        BankApplication::create([
+            'client_id' => $client_id,
+            'bank_submitted_id' => json_encode($bank_applications),
+            'agent' => $request->post('agent'),
+        ]);
     }
 }

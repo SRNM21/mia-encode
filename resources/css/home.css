@@ -198,8 +198,12 @@ hr {
 }
 
 .confirm-logout-btn {
-    background-color: var(--color-red-500) !important;
+    background-color: var(--color-red-800) !important;
     color: var(--color-neutral-100) !important;
+}
+
+.confirm-logout-btn:hover {
+    background-color: var(--color-red-900) !important;
 }
 
 .modal-close-btn {
@@ -209,10 +213,6 @@ hr {
 .modal-close-btn:hover {
     color: var(--color-neutral-300) !important;
     background: none !important;
-}
-
-.confirm-logout-btn:hover {
-    background-color: var(--color-red-600) !important;
 }
 
 #notification-container {
@@ -236,13 +236,25 @@ hr {
     overflow: hidden;
 }
 
-.notification-progress {
+.notification-progress, .notification-progress.success {
     position: absolute;
     top: 0;
     left: 0;
     height: 4px;
     width: 100%;
-    background: #4caf50;
+    background: var(--color-green-500);
+}
+
+.notification-progress.error {
+    background: var(--color-red-500);
+}
+
+.notification-progress.warning {
+    background: var(--color-yellow-500);
+}
+
+.notification-progress.info {
+    background: var(--color-blue-500);
 }
 
 .notification-header {

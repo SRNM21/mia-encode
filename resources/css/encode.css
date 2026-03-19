@@ -35,12 +35,6 @@
     gap: 8px;
 }
 
-.field-group input[type="date"]::-webkit-calendar-picker-indicator {
-    cursor: pointer;
-    filter: invert(0.8); 
-    transition: background-color 0.2s;
-}
-
 .content {
     flex: 1;
     align-items: center;
@@ -79,7 +73,6 @@
 .bank-table th, .bank-table td  {
     padding: 0 10px;
     height: 50px;
-    line-height: 50px;
     font-weight: 400;
 }
 

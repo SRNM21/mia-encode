@@ -70,6 +70,26 @@ class QueryBuilder
         return $this;
     }
 
+    public function whereIn(string $column, array $values): self
+    {
+        $this->validateColumn($column);
+
+        if (empty($values)) {
+            $this->wheres[] = "1=0";
+            return $this;
+        }
+
+        $placeholders = implode(',', array_fill(0, count($values), '?'));
+
+        $this->wheres[] = "{$column} IN ({$placeholders})";
+
+        foreach ($values as $value) {
+            $this->bindings[] = $value;
+        }
+
+        return $this;
+    }
+
     /**
      * Get a generator to iterate over the results one by one.
      *
@@ -228,6 +248,17 @@ class QueryBuilder
 
         return $this;
     }
+
+    public function joinRaw(string $table, string $condition, string $type = 'INNER'): self
+    {
+        $this->joins[] = [
+            'type' => strtoupper($type),
+            'table' => $table,
+            'raw' => $condition
+        ];
+
+        return $this;
+    }
     
     /**
      * Add group by clause.
@@ -313,7 +344,7 @@ class QueryBuilder
     /**
      * Paginate results with meta.
      */
-    public function paginate(int $page = 1, int $perPage = 10): array
+    public function paginate(int $page = 1, int $perPage = 10, $toArray = false): array
     {
         if ($page < 1) $page = 1;
         if ($perPage < 1) $perPage = 10;
@@ -321,7 +352,7 @@ class QueryBuilder
         $total = $this->count();
 
         $this->limit($perPage)->offset(($page - 1) * $perPage);
-        $data = $this->get();
+        $data = $this->getRaw($toArray)['results'];
 
         return [
             'data' => $data,
@@ -355,7 +386,14 @@ class QueryBuilder
 
         foreach ($this->joins as $join) 
         {
-            $sql .= " {$join['type']} JOIN {$join['table']} ON {$join['first']} {$join['operator']} {$join['second']}";
+            if (isset($join['raw'])) 
+            {
+                $sql .= " {$join['type']} JOIN {$join['table']} ON {$join['raw']}";
+            } 
+            else 
+            {
+                $sql .= " {$join['type']} JOIN {$join['table']} ON {$join['first']} {$join['operator']} {$join['second']}";
+            }
         }
 
         if (!empty($this->wheres)) 

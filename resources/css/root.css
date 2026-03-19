@@ -376,10 +376,20 @@ button, button.primary {
     border: none;
     background-color: var(--foreground);
     color: var(--background);
+    
+    white-space: nowrap;
 
     &:hover {
         background-color: var(--color-neutral-300);
     }
+}
+
+/* Handle with loaders */
+button > p {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 button.outline {
@@ -407,12 +417,12 @@ button.sm {
     border-radius: 6px;
 }
 
-button.sm > svg {
+button.sm svg {
     height: 14px;
     width: 14px;
 }
 
-button > svg {
+button svg {
     height: 16px;
     width: 16px;
 }

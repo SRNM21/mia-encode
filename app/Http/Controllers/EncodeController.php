@@ -57,7 +57,7 @@ class EncodeController extends Controller
 
             return $this->responseJson([
                 'client' => true,
-                'applications' => $applications,
+                'applications' => $applications->toArray(),
                 'banks' => $bank_list,
             ]);
         }

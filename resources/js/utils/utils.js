@@ -108,21 +108,48 @@ export function formatDate(dateString) {
         month: 'short',
         day: '2-digit',
         year: 'numeric',
+    })
+
+    return formatted
+}
+
+export function formatDateTime(dateString) {    
+    const date = new Date(dateString.replace(' ', 'T'))
+
+    const formatted = date.toLocaleString('en-US', {
+        month: 'short',
+        day: '2-digit',
+        year: 'numeric',
         hour: '2-digit',
         minute: '2-digit',
         hour12: true
     })
 
-    return formatted.replace(',', '')
+    return formatted
+}
+
+export function getCurrentDateTime() {
+    const now = new Date()
+
+    const pad = (n) => String(n).padStart(2, '0')
+
+    return (
+        now.getFullYear() + '-' +
+        pad(now.getMonth() + 1) + '-' +
+        pad(now.getDate()) + ' ' +
+        pad(now.getHours()) + ':' +
+        pad(now.getMinutes()) + ':' +
+        pad(now.getSeconds())
+    )
 }
 
 export function capitalizeWord(word) {
   return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
 }
 
-export function showNotification(title, message) {
+export function showNotification(title, message, type = 'success') {
 
-    const DURATION = 5000
+    const DURATION = 3000
 
     // create container if missing
     let container = $('#notification-container')
@@ -134,7 +161,7 @@ export function showNotification(title, message) {
 
     const notification = $(`
         <div class="notification">
-            <div class="notification-progress"></div>
+            <div class="notification-progress ${type}"></div>
 
             <div class="notification-header">
                 <div class="notification-title"></div>
@@ -225,23 +252,15 @@ export function debounce(fn, delay = 500) {
     }
 }
 
-export function objectsEqual(a, b) {
-    const keysA = Object.keys(a)
-    const keysB = Object.keys(b)
+export function equalClientData(a, b) {
 
-    if (keysA.length !== keysB.length) {
-        return false
-    }
-
-    for (const key of keysA) {
-        if (!Object.prototype.hasOwnProperty.call(b, key)) {
-            return false
-        }
-
-        if (a[key] !== b[key]) {
-            return false
-        }
-    }
+    if (a.id !== b.id) return false
+    if (a.agent !== b.agent) return false
+    if (a.firstname !== b.firstname) return false
+    if (a.middlename !== b.middlename) return false
+    if (a.lastname !== b.lastname) return false
+    if (a.mobile !== b.mobile) return false
+    if (a.birthdate !== b.birthdate) return false
 
     return true
 }
