@@ -24,7 +24,7 @@
                         <div class="card leaderboard-card">
                             <!-- Header -->
                             <div class="leaderboard-header flex-row">
-                                <p>Top 100 Agents <?php echo($filter) ?></p>
+                                <p>Top 100 Agents</p>
                                 <select id="leaderboards-filter" class="size-sm">
                                     <option <?= $filter == 'today' ? 'selected' : '' ?> value="today">Today</option>
                                     <option <?= $filter == 'week' ? 'selected' : '' ?> value="week">Weekly</option>
@@ -80,7 +80,7 @@
                                 <?php endif ?>
                             </div>
 
-                            <?php if ($podium['first'] != null): ?>
+                            <?php if ($rankings != null): ?>
                                 <div class="leaderboard-table-wrapper">
                                     <div class="leaderboard-table-container">
                                         <table class="leaderboard-table">

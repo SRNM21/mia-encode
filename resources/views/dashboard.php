@@ -51,7 +51,7 @@
                                     <div class="chart-container">
                                         <canvas id="bank-apps-type-chart"></canvas>
                                     </div>
-                                    <div class="chart-legend flex-col" id="bank-apps-type-legend"></div>
+                                    <div class="chart-legend flex-col gap-4" id="bank-apps-type-legend"></div>
                                 </div>
                             </div>
                         </div>

@@ -1,16 +1,5 @@
 import { destroyChart, generateColors, getChartTheme } from "../utils/charts.js"
 
-const bankColorMap = {}
-const BANK_COLORS = [
-    'rgb(54,162,235)',
-    'rgb(255,99,132)',
-    'rgb(75,192,192)',
-    'rgb(255,206,86)',
-    'rgb(153,102,255)',
-    'rgb(255,159,64)'
-]
-const bankColorRegistry = new Map()
-
 export function renderBankTodayChart(canvas, labels, counts) {
     const colors = generateColors(labels.length)
 
@@ -40,7 +29,6 @@ export function renderBankTodayChart(canvas, labels, counts) {
 let bankSeriesChart
 
 export function renderBankSeries(canvas, labels, datasets) {
-
     const { axisText, gridColor } = getChartTheme()
 
     destroyChart(bankSeriesChart)
@@ -112,7 +100,7 @@ function renderBankAppsLegend(labels, colors) {
                 fontSize: '14px',
                 display: 'flex',
                 flexDirection: 'row',
-                alignItems: 'center',
+                alignItems: 'start',
                 justifyContent: 'flex-start',
                 flexWrap: 'nowrap'
             })
@@ -120,9 +108,11 @@ function renderBankAppsLegend(labels, colors) {
         const dot = $('<span>')
             .addClass('dot')
             .css({
-                display: 'inline-block',
                 width: '12px',
                 height: '12px',
+                minWidth: '12px',
+                minHeight: '12px',
+                flexShrink: 0,
                 borderRadius: '50%',
                 marginRight: '6px',
                 border: `1px solid ${colors[i].border}`,

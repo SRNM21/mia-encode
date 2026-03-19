@@ -5,9 +5,9 @@ const { post } = useAjax()
 
 const passwordToggle = $('.password-toggle')
 const loginForm = $('#login-form')
-const errorCard = $('.error-card')
-const errorTitle = $('.error-title')
-const errorMessage = $('.error-message')
+const errorCard = $('.status-card')
+const errorTitle = $('.status-title')
+const errorMessage = $('.status-message')
 
 passwordToggle.on('click', function () {
     const input = $('#password')
@@ -42,7 +42,9 @@ loginForm.on('submit', async (e) => {
 })
 
 function showError(error) {
-    errorCard.removeClass('hidden')
+    console.log(error);
+    
     errorTitle.text(error.title ?? 'Something Went Wrong')
     errorMessage.text(error.message)
+    errorCard.removeClass('hidden')
 }
