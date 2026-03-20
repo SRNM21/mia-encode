@@ -132,9 +132,37 @@ abstract class Model
     {
         if (!$this->current_data) return null;
 
-        return $attribute
-            ? $this->current_data->$attribute ?? null
-            : $this->toArray();
+        if (!$attribute) 
+        {
+            return $this->toArray();
+        }
+
+        $value = $this->current_data->$attribute ?? null;
+
+        // Apply cast if exists
+        if (isset($this->casts[$attribute]))
+        {
+            $castType = $this->casts[$attribute];
+
+            if (enum_exists($castType)) 
+            {
+                if (!is_string($value)) 
+                {
+                    return null;
+                }
+
+                $enum = $castType::tryFrom($value);
+
+                if ($enum === null) 
+                {
+                    $enum = $castType::tryFrom(strtolower($value));
+                }
+
+                return $enum;
+            }
+        }
+
+        return $value;
     }
 
     /**

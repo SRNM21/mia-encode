@@ -21,8 +21,44 @@ class User extends Model
         'pass'
     ];
 
+    protected array $casts = [
+        'role' => UserRole::class
+    ];
+
     public function checkPassword(string $password)
     {
         return password_verify($password, $this->getAttribute('pass'));
+    }
+
+    public function getRoleEnum(): ?UserRole
+    {
+        $role = $this->getAttribute('role');
+
+        if ($role instanceof UserRole) 
+        {
+            return $role;
+        }
+
+        if (is_string($role)) 
+        {
+            return UserRole::tryFrom($role);
+        }
+
+        return null;
+    }
+
+    public function isSupAdmin(): bool 
+    {
+        return $this->role === UserRole::SUPER_ADMIN;
+    }
+
+    public function isAdmin(): bool 
+    {
+        return $this->role === UserRole::ADMIN;
+    }
+
+    public function isEncoder(): bool 
+    {
+        return $this->role === UserRole::ENCODER;
     }
 }

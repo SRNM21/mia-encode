@@ -17,7 +17,7 @@
             ]) ?>
             
             <main class='flex-row '>
-                <?= get_component('sidebar', ['role' => $user->role]) ?>
+                <?= get_component('sidebar', ['user' => $user]) ?>
 
                 <div class='content flex-col'>
                     <div class='flex-col'>
@@ -66,7 +66,7 @@
                                                 <th>Mobile Number</th>
                                                 <th>Agent</th>
                                                 
-                                                <?php if ($user->role == 'ENCODER'): ?>
+                                                <?php if ($user->isEncoder()): ?>
                                                     <th>Action</th>
                                                 <?php endif ?>
                                             </tr>
@@ -116,7 +116,7 @@
 
                                                     <?php 
                                                         $request_edit_status = $application['request_status'] ?? '';
-                                                        if ($user->role == 'ENCODER'):
+                                                        if ($user->isEncoder()):
                                                     ?>
                                                         <td>
                                                             <?php if ($request_edit_status == 'pending'): ?>

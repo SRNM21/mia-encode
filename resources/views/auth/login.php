@@ -17,7 +17,7 @@
             </div>
             <form action="<?= url('/login') ?>" method="post" id="login-form" class="form flex-col">
                 <div class="flex-col field-group">
-                    <label for="email">Username</label>
+                    <label for="username">Username</label>
                     <input 
                         type="text" 
                         id="username"

@@ -114,9 +114,7 @@ class Authenticable implements AuthAuthenticableContract
     public function isAdmin(): bool
     {
         $user = $this->user();
-        $role = $user->role;
-
-        return $role == 'ADMIN';
+        return $user->isAdmin();
     }
 
     /**
@@ -127,9 +125,7 @@ class Authenticable implements AuthAuthenticableContract
     public function isEncoder(): bool
     {
         $user = $this->user();
-        $role = $user->role;
-
-        return $role == 'ENCODER';
+        return $user->isEncoder();
     }
 
     /**

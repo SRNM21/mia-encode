@@ -1,21 +1,26 @@
+<?php 
+    /** @var App\Models\User */
+    $user = $user;
+?>
+
 <aside class='sidebar collapsed' id='sidebar'>
     <ul class='sidebar-nav'>
 
-        <?php if ($role == 'ADMIN'): ?>
+        <?php if ($user->isAdmin() || $user->isSupAdmin()): ?>
             <a href='dashboard'>
                 <span class='icon'><?= get_icon('chart-bar-big') ?></span>
                 <span class='label'>Dashboard</span>
             </a>
         <?php endif ?>
 
-        <?php if ($role == 'ADMIN'): ?>
+        <?php if ($user->isAdmin() || $user->isSupAdmin()): ?>
             <a href='leaderboards'>
                 <span class='icon'><?= get_icon('chart-no-axes-column') ?></span>
                 <span class='label'>Leaderboards</span>
             </a>
         <?php endif ?>
 
-        <?php if ($role == 'ENCODER'): ?>
+        <?php if ($user->isEncoder()): ?>
             <a href='encode'>
                 <span class='icon'><?= get_icon('file-user') ?></span>
                 <span class='label'>Encode</span>
@@ -27,24 +32,24 @@
             <span class='label'>Bank Applications</span>
         </a>
 
-        <?php if ($role == 'ADMIN'): ?>
+        <?php if ($user->isAdmin() || $user->isSupAdmin()): ?>
             <a href='banks'>
                 <span class='icon'><?= get_icon('landmark') ?></span>
                 <span class='label'>Banks</span>
             </a>
         <?php endif ?>
 
-        <?php if ($role == 'ADMIN'): ?>
+        <?php if ($user->isAdmin() || $user->isSupAdmin()): ?>
             <a href='requests'>
                 <span class='icon'><?= get_icon('file-pen-line') ?></span>
                 <span class='label'>Requests</span>
             </a>
         <?php endif ?>
 
-        <!-- <a href='settings'>
+        <a href='settings'>
             <span class='icon'><?= get_icon('settings') ?></span>
             <span class='label'>Settings</span>
-        </a> -->
+        </a>
 
         <button id='logout-btn' class='ghost logout-btn'>
             <span class='icon'><?= get_icon('log-out') ?></span>

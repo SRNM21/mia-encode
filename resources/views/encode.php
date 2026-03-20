@@ -17,7 +17,7 @@
             ]) ?>
             
             <main class='flex-row '>
-                <?= get_component('sidebar', ['role' => $user->role]) ?>
+                <?= get_component('sidebar', ['user' => $user]) ?>
 
                 <div class='content flex-col'>
                     <div class='flex-col'>
