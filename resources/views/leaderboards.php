@@ -10,10 +10,12 @@
 
     <body class='dark'>
         <div class='home-page flex-col'>
-
+            
             <?= get_component('header', [
-                'title' => 'Leaderboards',
                 'user' => $user,
+                'breadcrumbs' => [
+                    ['label' => 'Leaderboards'] 
+                ]
             ]) ?>
             
             <main class='flex-row '>
@@ -42,17 +44,19 @@
                                         <p>No submissions found.</p>
                                     </div>
                                 <?php else: ?>
-                                    <div class="podium-container podium-container-second">
-                                        <img src="resources/images/podium-2.png" alt="">
-                                        <div class="podium podium-second">
-                                            <p class="podium-agent-name">
-                                                <?= $podium['second']['agent'] ?? '-' ?>
-                                            </p>
-                                            <p class="podium-agent-score">
-                                                <?= $podium['second']['submissions'] ?? 0 ?>
-                                            </p>
+                                    <?php if ($podium['second'] != null): ?>
+                                        <div class="podium-container podium-container-second">
+                                            <img src="resources/images/podium-2.png" alt="">
+                                            <div class="podium podium-second">
+                                                <p class="podium-agent-name">
+                                                    <?= $podium['second']['agent'] ?? '-' ?>
+                                                </p>
+                                                <p class="podium-agent-score">
+                                                    <?= $podium['second']['submissions'] ?? 0 ?>
+                                                </p>
+                                            </div>
                                         </div>
-                                    </div>
+                                    <?php endif ?>
 
                                     <div class="podium-container podium-container-first">
                                         <img src="resources/images/podium-1.png" alt="">
@@ -66,17 +70,19 @@
                                         </div>
                                     </div>
 
-                                    <div class="podium-container podium-container-third">
-                                        <img src="resources/images/podium-3.png" alt="">
-                                        <div class="podium podium-third">
-                                            <p class="podium-agent-name">
-                                                <?= $podium['third']['agent'] ?? '-' ?>
-                                            </p>
-                                            <p class="podium-agent-score">
-                                                <?= $podium['third']['submissions'] ?? 0 ?>
-                                            </p>
+                                    <?php if ($podium['third'] != null): ?>
+                                        <div class="podium-container podium-container-third">
+                                            <img src="resources/images/podium-3.png" alt="">
+                                            <div class="podium podium-third">
+                                                <p class="podium-agent-name">
+                                                    <?= $podium['third']['agent'] ?? '-' ?>
+                                                </p>
+                                                <p class="podium-agent-score">
+                                                    <?= $podium['third']['submissions'] ?? 0 ?>
+                                                </p>
+                                            </div>
                                         </div>
-                                    </div>
+                                    <?php endif ?>
                                 <?php endif ?>
                             </div>
 

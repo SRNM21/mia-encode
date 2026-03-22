@@ -62,7 +62,7 @@ Route::middleware(AuthMiddleware::class)->group(function () {
         // TODO: ADD ACCOUNT MANAGER0
 
         // TODO: SETTINGS [THEME, ACCOUNT]
-        // Route::get('/settings', [SettingsController::class, 'show']);
+        Route::get('/settings', [SettingsController::class, 'show']);
     });
 
     // Encoder
@@ -73,9 +73,16 @@ Route::middleware(AuthMiddleware::class)->group(function () {
             Route::post('/encode-check', 'check');
         });
 
+        Route::post('/bank-applications/table', [BankApplicationController::class, 'table']);
+        Route::patch('/bank-applications', [BankApplicationController::class, 'update']);
+        
+        Route::post('/bank-applications/check-edit', [BankApplicationController::class, 'checkEdit']);
+        Route::get('/bank-applications/edit', [BankApplicationController::class, 'edit']);
+
         Route::post('/request-edit', [RequestEditController::class, 'store']);
         Route::delete('/request-edit', [RequestEditController::class, 'destroy']);
-
-        // TODO: REQUEST EDIT ACCOUNT
     });
 });
+
+// TODO: ADD FEAT TO LEADERBOARDS [TYPES OF BANK APP PER AGENT]
+// TODO: ADD FEAT TO LEADERBOARDS [TYPES OF BANK APP PER WEEK]

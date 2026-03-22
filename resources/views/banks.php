@@ -10,10 +10,12 @@
 
     <body class='dark'>
         <div class='home-page flex-col'>
-
+            
             <?= get_component('header', [
-                'title' => 'Banks',
                 'user' => $user,
+                'breadcrumbs' => [
+                    ['label' => 'Banks'] 
+                ]
             ]) ?>
             
             <main class='flex-row '>
