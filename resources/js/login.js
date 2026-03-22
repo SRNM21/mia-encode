@@ -23,10 +23,10 @@ loginForm.on('submit', async (e) => {
     e.preventDefault()
 
     showLoading($(".login-button"), true)
-
+    
     try {
         const response = await post({
-            url: $(this).attr('action'),
+            url: 'login',
             data: {
                 username: $('#username').val().trim(),
                 password: $('#password').val().trim()

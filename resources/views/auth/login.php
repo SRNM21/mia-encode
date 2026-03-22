@@ -15,7 +15,7 @@
                 <h1 class='title'>MIA VENTURE SERVICES OPC</h1>
                 <p class='subtitle'>Maximizing Intelligent Access to credit</p>
             </div>
-            <form action="<?= url('/login') ?>" method="post" id="login-form" class="form flex-col">
+            <form method="post" id="login-form" class="form flex-col">
                 <div class="flex-col field-group">
                     <label for="username">Username</label>
                     <input 

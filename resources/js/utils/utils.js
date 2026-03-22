@@ -3,6 +3,7 @@ import { useAjax } from '../hooks/use-ajax.js'
 const toggleBtn = $('#toggle-btn');
 const sidebar = $('#sidebar');
 const logoutBtn = $('#logout-btn');
+const confirmLogoutBtn = $('.confirm-logout-btn')
 
 const { post } = useAjax()
 
@@ -46,17 +47,27 @@ logoutBtn.on('click', () => {
     openModal('logout-confirm-modal');
 });
 
-$('.confirm-logout-btn').on('click', () => {
-    post({
-        url: 'logout',
-        success: (data) => {
-            closeModal('logout-confirm-modal');
-            window.location.href = data.data.redirect;
-        },
-        error: () => {
-            console.log('Error logging out');
-        }
-    })
+confirmLogoutBtn.on('click', async () => {
+    showLoading(confirmLogoutBtn, true)
+        
+    try {
+        const response = await post({
+            url: 'logout',
+        })
+        
+        console.log(response);
+        
+        closeModal('logout-confirm-modal');
+        window.location.href = response.data.redirect;
+    } catch (error) {
+        console.log(error);
+        showNotification(
+            'Error Occured',
+            'Error occured when logging out'
+        )
+    }
+    
+    showLoading(confirmLogoutBtn, false)
 });
 
 // -----------------
@@ -250,17 +261,4 @@ export function debounce(fn, delay = 500) {
             fn.apply(context, args)
         }, delay)
     }
-}
-
-export function equalClientData(a, b) {
-
-    if (a.id !== b.id) return false
-    if (a.agent !== b.agent) return false
-    if (a.firstname !== b.firstname) return false
-    if (a.middlename !== b.middlename) return false
-    if (a.lastname !== b.lastname) return false
-    if (a.mobile !== b.mobile) return false
-    if (a.birthdate !== b.birthdate) return false
-
-    return true
 }

@@ -29,6 +29,30 @@ function renderError(errorContainer, errors) {
     return
 }
 
+export function validateEditAppForm(errorContainer, input) {
+    const [data, clientErrors] = validateCheckClientForm(errorContainer, input)
+
+    const errors = [...clientErrors]
+    
+    const banks = input.banks
+    data.banks = banks
+
+    if (!banks || banks.length <= 0) {
+        errors.push({
+            field: 'banks',
+            message: 'Please select at least one bank.'
+        })
+    }
+    
+    if (errors.length > 0) {
+        renderError(errorContainer, errors)
+    } else {
+        errorContainer.addClass('hidden')
+    }
+
+    return [data, errors]
+}
+
 export function validateCheckClientForm(errorContainer, input) {
     const errors = []
     const data = {}
