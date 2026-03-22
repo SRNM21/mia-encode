@@ -230,8 +230,11 @@
     margin-top: 18px;
 }
 
-.export-note {
+.export-note, .edit-agent-note {
     margin-top: 18px;
+}
+
+.export-note, .edit-request-datetime, .edit-agent-note {
     color: var(--color-neutral-400);
     font-style: italic;
 }
@@ -376,16 +379,6 @@
     width: 20px;
 }
 
-.edit-application-btn {
-    background-color: var(--color-blue-800) !important;
-    border: 1px solid var(--color-blue-600) !important;
-}
-
-.edit-application-btn:hover {
-    background-color: var(--color-blue-900) !important;
-    border: 1px solid var(--color-blue-700) !important;
-}
-
 .form-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -404,26 +397,6 @@
     text-transform: uppercase;
 }
 
-.cancel-edit-application-btn {
-    background-color: var(--color-red-800) !important;
-    border: 1px solid var(--color-red-600) !important;
-}
-
-.cancel-edit-application-btn:hover {
-    background-color: var(--color-red-900) !important;
-    border: 1px solid var(--color-red-700) !important;
-}
-
-.view-edit-application-btn {
-    background-color: var(--color-neutral-800) !important;
-    border: 1px solid var(--color-neutral-600) !important;
-}
-
-.view-edit-application-btn:hover {
-    background-color: var(--color-neutral-900) !important;
-    border: 1px solid var(--color-neutral-700) !important;
-}
-
 .confirm-edit-request-btn {
     background-color: var(--color-red-800) !important;
     color: var(--color-neutral-100) !important;
@@ -431,6 +404,10 @@
 
 .confirm-edit-request-btn:hover {
     background-color: var(--color-red-900) !important;
+}
+
+.actions-cell {
+    width: fit-content;
 }
 
 .field-grid {
@@ -475,11 +452,184 @@
     margin-top: 28px;
 }
 
-.edit-request-datetime {
-    font-style: italic;
-    color: var(--color-neutral-400);
-}
-
 .request-choice {
     display: hidden;   
+}
+
+.global-dropdown-root {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 0; /* important: prevent layout impact */
+    z-index: 9999;
+    pointer-events: none; /* allow clicks to pass through except dropdown */
+}
+
+/* .actions-dropdown-wrapper {
+    position: relative;
+    display: inline-block;
+} */
+
+.dropdown-menu {
+    position: fixed; /* changed from absolute */
+    z-index: 10000;
+
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: all 0.15s ease-out;
+
+    background-color: var(--color-neutral-900);
+    border: 1px solid var(--color-neutral-700);
+    border-radius: 8px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+
+    min-width: 220px;
+    padding: 8px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    pointer-events: auto; /* re-enable interaction */
+}
+
+.dropdown-menu.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    gap: 8px;
+
+    width: 100%;
+    text-align: left;
+
+    background: transparent;
+    border: none;
+
+    padding: 8px 12px;
+    border-radius: 6px;
+
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--color-neutral-200);
+
+    transition: background-color 0.15s ease;
+}
+.dropdown-item:hover {
+    background-color: var(--color-neutral-800) !important;
+}
+
+/* SPECIAL STATES */
+.cancel-edit-application-btn {
+    color: var(--color-red-400);
+}
+
+/* OPTIONAL: DROP-UP SUPPORT */
+.dropdown-menu.drop-up {
+    transform: translateY(8px);
+}
+
+.dropdown-menu.drop-up.show {
+    transform: translateY(0);
+}
+
+
+.banks-container {
+    justify-content: center;
+    margin-bottom: 32px;
+}
+
+.bank-table {
+    width: 100%;
+    font-family: inherit;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--color-neutral-600);
+}
+
+.bank-table thead {
+    background-color: var(--color-neutral-800);
+}
+
+.bank-table th, .bank-table td  {
+    padding: 0 10px;
+    height: 50px;
+    font-weight: 400;
+}
+
+.bank-table td {
+    border: 1px solid var(--color-neutral-600);
+}
+
+.bank-table thead th:first-child {
+    border-top-left-radius: 8px;
+}
+
+.bank-table thead th:last-child {
+    border-top-right-radius: 8px;
+}
+
+.bank-table tbody tr:last-child td:first-child {
+    border-bottom-left-radius: 8px;
+}
+
+.bank-table tbody tr:last-child td:last-child {
+    border-bottom-right-radius: 8px;
+}
+
+.bank-select-cell {
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+.bank-select-cell:hover {
+    background-color: var(--color-neutral-900);
+}
+
+.bank-select {
+    cursor: pointer;
+}
+
+.bank-select-cell.selected {
+    color: var(--color-green-400);
+    font-weight: 600;
+}
+
+.row-disabled {
+    opacity: 0.6;
+}
+
+.row-disabled .bank-select-cell,
+.bank-select-cell.disabled {
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+.bank-select-cell.unavailable {
+    color: var(--color-red-400);
+    font-weight: 600;
+}
+
+.icon-svg {
+    width: 24px;
+    height: 24px;
+    vertical-align: middle;
+}
+
+.icon-check {
+    color: var(--color-green-400);
+}
+
+.icon-unavailable {
+    color: var(--color-red-400);
 }

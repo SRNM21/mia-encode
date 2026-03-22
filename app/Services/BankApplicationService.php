@@ -2,7 +2,11 @@
 
 namespace App\Services;
 
+use App\Models\BankApplication;
+use App\Models\Client;
+use App\Models\RequestEdit;
 use App\Repository\BankApplicationRepository;
+use DateTime;
 
 class BankApplicationService
 {
@@ -10,9 +14,258 @@ class BankApplicationService
         private BankApplicationRepository $bankApplicationRepository
     ) {}
 
+    public function update(string $id, array $data) 
+    {
+        $birthdate = $data['birthdate'];
+        $birthdate = date('Y-m-d', strtotime($birthdate));
+
+        // check if the updated data is an existing client
+        $client = Client::query()
+            ->where('first_name', '=', $data['firstname'])
+            ->where('middle_name', '=', $data['middlename'])
+            ->where('last_name', '=', $data['lastname'])
+            ->where('birthdate', '=', $birthdate)
+            ->where('mobile_num', '=', $data['mobile'])
+            ->first();
+        
+        $bank_app = BankApplication::get($id);
+
+        // update client data
+
+        if ($client)
+        {   
+            // if the updated data is an existing client, 
+            // replace the client of this bank application
+            BankApplication::update(['id' => $bank_app->id], [
+                'client_id' => $client->id,
+            ]);
+        }
+        else     
+        {
+            // if the updated data does not match any 
+            // client, update the client data
+            Client::update(['id' => $bank_app->client_id], [
+                'first_name' => $data['firstname'],
+                'middle_name' => $data['middlename'],
+                'last_name' => $data['lastname'],
+                'birthdate' => $birthdate,
+                'mobile_num' => $data['mobile'],
+            ]);
+        }
+
+        // update client's bank application data
+
+        // all of applications of client
+        $applications = $this->getClientApplications($client->id);
+
+        // store all submitted bank applications of an existing client
+        $bank_application_map = [];
+        foreach ($applications as $app) 
+        {
+            $app_banks_submitted = json_decode($app['bank_submitted_id'], true) ?? [];
+            $app_submitted_date = $app['date_submitted'] ? new DateTime($app['date_submitted']) : null;
+
+            // overwrite previous applications (to make sure only latest appears)
+            foreach ($app_banks_submitted as $bank_id) 
+            {   
+                $bank_application_map[(string)$bank_id] = [
+                    'app_id' => $app['id'],
+                    'date_submitted' => $app_submitted_date,
+                ];
+            }
+        }
+
+        // the submitted bank applications of the current client to update
+        $banks_submitted = $data['banks'];
+        $to_be_removed = [];
+
+        foreach ($banks_submitted as $bank_id)
+        {
+            $can_overwrite = array_key_exists((string)$bank_id, $bank_application_map);
+
+            if (!$can_overwrite) continue;
+
+            // check if the current edited application can overwrite the other application
+            // e.g.:
+            //      [9,1,8,4] - submitted
+            //      [9,3,7,5,2,10,6] - all application of client
+            //      (9 will be remove from other applicationa)
+
+            $application = $bank_application_map[$bank_id];
+
+            // skip this current edit application
+            if ($application['app_id'] === $bank_app->id) continue;
+            
+            // check if that application is past this current edit application
+            // e.g. Mar 21, 2026 > Mar 20, 2026
+            // 
+            // this make sure only past date_submitted of current edit application
+            // will be overwritten
+            if ($application['date_submitted'] > $bank_app->date_submitted)
+            {
+                $to_be_removed[$application['app_id']][] = $bank_id;
+            }
+        }
+
+        // if `to_be_removed` is empty then no overwrite happened in edit mode
+        if (count($to_be_removed) > 0) 
+        {
+            // overwrite applications if overlapped to other applications
+            foreach ($to_be_removed as $bank_app_id => $bank_submitted_id)
+            {
+                $to_be_update_bank_app = BankApplication::get($bank_app_id);
+
+                $to_be_update_submitted_banks = json_decode($to_be_update_bank_app->bank_submitted_id, true) ?? [];
+
+                // overwrite bank applications
+                $to_be_update_submitted_banks = array_values(
+                    array_diff($to_be_update_submitted_banks, $bank_submitted_id)
+                );
+                
+                // delete empty bank application due to overwrite
+                // update bank application otherwise
+                if (count($to_be_update_submitted_banks) > 0)
+                {
+                    BankApplication::update(['id' => $bank_app_id], [
+                        'bank_submitted_id' => json_encode(array_map('intval', $to_be_update_submitted_banks))
+                    ]);
+                }
+                else 
+                {
+                    BankApplication::delete($bank_app_id);
+
+                    // also delete request regarding this submitted application
+                    $requests = RequestEdit::query()
+                        ->where('app_id', '=', $bank_app_id)
+                        ->getArray();
+
+                    foreach ($requests as $req) 
+                    {
+                        RequestEdit::delete($req['id']);
+                    }
+                }
+            }
+        }
+
+        // finally, update the current bank application
+        BankApplication::update(['id' => $id], [
+            'bank_submitted_id' => json_encode(array_map('intval', $banks_submitted))
+        ]);
+    }
+
     public function getClientApplications(int $client_id)
     {
         return $this->bankApplicationRepository->getClientApplications($client_id);
+    }
+
+    public function buildTableRows($banks, $latestSubmissions, $application): array
+    {
+        $appsById = [];
+
+        foreach ($latestSubmissions as $sub) 
+        {
+            $bankIds = json_decode($sub['bank_submitted_id'], true);
+
+            foreach ($bankIds as $id) 
+            {
+                $appsById[(string)$id] = [
+                    'date_submitted' => $sub['date_submitted'],
+                    'agent' => $sub['agent'],
+                    'is_edit' => false
+                ];
+            }
+        }
+
+        $editBankIds = json_decode($application->bank_submitted_id, true);
+
+        foreach ($editBankIds as $id) 
+        {
+            $appsById[(string)$id] = [
+                'date_submitted' => $application->date_submitted,
+                'agent' => $application->agent,
+                'is_edit' => true
+            ];
+        }
+
+        $rows = [];
+
+        foreach ($banks as $bank) 
+        {
+            if (!$bank['is_active']) continue;
+
+            $app = $appsById[(string)$bank['id']] ?? null;
+
+            $isEditMode = $app['is_edit'] ?? false;
+
+            $isPrevious = $app
+                ? strtotime($app['date_submitted']) < strtotime($application->date_submitted)
+                : false;
+
+            $isExpiredApplication = $app
+                ? $this->isExpired($app['date_submitted'], $bank['expiry_months'])
+                : false;
+
+            $isUnavailable = ($app && $isExpiredApplication) || $isPrevious;
+
+            if ($isUnavailable) 
+            {
+                $statusText = 'Unavailable';
+                $statusClass = 'status-unavailable';
+            } 
+            elseif ($isEditMode || $app === null) 
+            {
+                $statusText = 'Available';
+                $statusClass = 'status-available';
+            }
+            else 
+            {
+                $statusText = 'Can Overwrite';
+                $statusClass = 'status-overwrite';
+            }
+
+            $rows[] = [
+                'bank_name' => $bank['name'],
+                'bank_id' => $bank['id'],
+                'date' => $app ? formatDate($app['date_submitted']) : '—',
+                'agent' => $app['agent'] ?? '—',
+                'status_text' => ucfirst($statusText),
+                'status_class' => $statusClass,
+                'row_class' => $isUnavailable ? 'row-disabled' : '',
+                'action_class' => implode(' ', array_filter([
+                    'bank-select-cell',
+                    (!$isUnavailable && $isEditMode) ? 'selected' : null,
+                    $isUnavailable ? 'disabled unavailable' : null
+                ])),
+                'is_unavailable' => $isUnavailable,
+                'is_edit_mode' => $isEditMode
+            ];
+        }
+
+        return $rows;
+    }
+
+    public function isExpired(string $dateSubmitted, int $expirationMonths): bool
+    {
+        $submissionDate = new DateTime($dateSubmitted);
+        $expirationDate = clone $submissionDate;
+
+        $expirationDate->modify("+{$expirationMonths} months");
+        $currentDate = new DateTime();
+
+        return $currentDate > $expirationDate;
+    }
+
+    public function isPastMaxMonths(string $date_submitted, int $max_month): bool
+    {
+        if (!$date_submitted || $max_month <= 0) {
+            return false;
+        }
+
+        $submittedDate = new DateTime($date_submitted);
+        $cutoffDate = new DateTime();
+        $cutoffDate->modify("-{$max_month} months");
+
+        return $submittedDate > $cutoffDate;
     }
 
     public function applicationsTodayByBank(): array

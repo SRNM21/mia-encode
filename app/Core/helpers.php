@@ -3,6 +3,23 @@
 use App\Core\Support\PublicImageManager;
 use App\Core\Support\Session;
 
+if (!function_exists('base_url')) {
+    /**
+     * Returns the base URL of the application.
+     *
+     * @param string $path Optional path to append
+     * @return string
+     */
+    function base_url(string $path = '') {
+        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+        
+        $host = $_SERVER['HTTP_HOST'];
+        $root = $_SERVER['ROOT'];
+        
+        return $protocol . $host . $root . '/' . ltrim($path, '/');
+    }
+}
+
 if (!function_exists('path_parser'))
 {
     /**
@@ -27,7 +44,8 @@ if (!function_exists('get_view'))
      */ 
     function get_view(string $view)
     {   
-        return config('app.resources.views') . path_parser($view) . '.php';
+        $path = config('app.resources.views') . path_parser($view) . '.php';
+        return __DIR__  . '/../../' . $path;
     }
 }
 
@@ -85,7 +103,8 @@ if (!function_exists('get_css'))
      */ 
     function get_css(string $css)
     {
-        return config('app.resources.css') . path_parser($css) . '.css';
+        $path = config('app.resources.css') . path_parser($css) . '.css';
+        return base_url($path);
     }
 }
 
@@ -99,7 +118,8 @@ if (!function_exists('get_js'))
      */ 
     function get_js(string $js)
     {
-        return config('app.resources.js') . path_parser($js) .".js";
+        $path = config('app.resources.js') . path_parser($js) .".js";
+        return base_url($path);
     }
 }
 
@@ -113,7 +133,8 @@ if (!function_exists('get_image'))
      */ 
     function get_image(string $img)
     {
-        return config('app.resources.images') . $img;
+        $path = config('app.resources.images') . $img;
+        return base_url($path);
     }
 }
 
@@ -127,7 +148,8 @@ if (!function_exists('get_favicon'))
      */
     function get_favicon(?string $favicon = null)
     {
-        return config('app.public') . ($favicon ?? 'favicon.ico');
+        $path = config('app.public') . ($favicon ?? 'favicon.ico');
+        return base_url($path);
     }
 }
 
@@ -463,9 +485,9 @@ if (!function_exists('dd'))
     }
 }
 
-if (!function_exists('timeAgo'))
+if (!function_exists('time_ago'))
 {
-    function timeAgo($datetime) 
+    function time_ago($datetime) 
     {
         $now = time();
         $past = strtotime($datetime);
@@ -493,3 +515,16 @@ if (!function_exists('timeAgo'))
         return $days . 'd';
     }
 }
+
+if (!function_exists('render_component'))
+{
+    function render_component($component, $data = [])
+    {
+        extract($data);
+
+        ob_start();
+        require get_view('components.' . $component);
+        return ob_get_clean();
+    }
+}
+

@@ -19,6 +19,15 @@
     justify-content: space-between;
 }
 
+.breadcrumbs a {
+    color: var(--foreground);
+    text-decoration: none;
+}
+
+.breadcrumbs a:hover {
+    text-decoration: underline;
+}
+
 .sidebar {
     width: 250px;
     background-color: var(--color-neutral-900);

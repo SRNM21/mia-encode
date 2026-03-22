@@ -219,9 +219,13 @@ function isExpired(dateSubmitted, expirationMonths) {
 }
 
 function renderClientBankApplication(data) {
+    console.log(data);
+    
     const client = data.client
     const banks = Array.isArray(data.banks) ? data.banks : []
-    const applications = data.applications ? [data.applications] : [] // normalize to array
+    const applications = Array.isArray(data.applications)
+        ? data.applications
+        : []
 
     const hasClient = client != null
 
@@ -273,6 +277,7 @@ function renderClientBankApplication(data) {
         const statusClass = app && !isExpiredApplication 
             ? 'status-unavailable' 
             : 'status-available'
+
         const agent = app ? app.agent : '—'
 
         const bankCell = $('<td></td>').text(bank.name)

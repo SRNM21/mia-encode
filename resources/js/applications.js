@@ -1,15 +1,15 @@
-import { closeModal, formatDate, href, equalClientData, openModal, setErrorState, showLoading, showNotification, formatDateTime } from './utils/utils.js'
+import { closeModal, formatDate, href, openModal, setErrorState, showLoading, showNotification, formatDateTime } from './utils/utils.js'
 import { useAjax } from './hooks/use-ajax.js'
-import { validateEditClientForm, validateExportDateForm } from './utils/validation.js'
+import { setErrorMessage, validateExportDateForm } from './utils/validation.js'
 
-const { post, patch, del } = useAjax()
+const { post, del } = useAjax()
 
 const CLOSE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x-icon lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`
 
 const EXPORT_LOADING_MODAL = 'export-loading-modal'
 const SELECT_DATE_MODAL = 'select-date-export-modal'
 const ADD_FILTER_MODAL = 'add-filter-modal'
-const EDIT_APP_MODAL = 'edit-application-modal'
+const EDIT_AGENT_MODAL = 'edit-agent-modal'
 const CANCEL_EDIT_REQUEST_MODAL = 'cancel-edit-request-modal'
 const VIEW_EDIT_REQUEST_MODAL = 'view-edit-request-modal'
 
@@ -63,22 +63,17 @@ const exportDownloadCard = exportBodyContent.find('.download-link-container')
 const exportDownloadLink = $('#export-download-link')
 
 // Edit modal details
-let EDIT_APP_ID = null
 let EDIT_APP_ORIG_DATA = {}
-let CURRENT_EDIT_CELL = null
-let CURRENT_EDIT_ROW = null
-const firstname = $('#ea-firstname')
-const middlename = $('#ea-middlename')
-const lastname = $('#ea-lastname')
-const birthdate = $('#ea-birthdate')
-const mobile = $('#ea-mobile')
+let CURRENT_EDIT_TR = null
 const agent = $('#ea-agent')
 
-const confirmEditAppBtn = $('#edit-application-confirm')
+const confirmEditAgentBtn = $('#edit-agent-confirm')
 const applicationEditErrorCard = $('.application-edit-error-card')
 const applicationEditInfoCard = $('.application-edit-info-card')
 
 const confirmCancelEditRequestBtn = $('.confirm-edit-request-btn')
+
+const tableWrapper = $('.table-wrapper')
 
 // -------------------------
 //   STATE
@@ -294,68 +289,6 @@ function showInfo(title, message) {
     rangeDateInfoCard.find('.status-message').html(message)
 }
 
-function clearEditModal() {
-    EDIT_APP_ID = null
-    EDIT_APP_ORIG_DATA = {}
-    CURRENT_EDIT_CELL = null
-    CURRENT_EDIT_ROW = null
-    applicationEditInfoCard.addClass('hidden')
-    applicationEditErrorCard.addClass('hidden')
-    firstname.removeClass('error')
-    middlename.removeClass('error')
-    lastname.removeClass('error')
-    birthdate.removeClass('error')
-    mobile.removeClass('error')
-    agent.removeClass('error')
-
-    firstname.val('')
-    middlename.val('')
-    lastname.val('')
-    birthdate.val('')
-    mobile.val('')
-    agent.val('')
-}
-
-function hydrateEditModal(data) {
-    EDIT_APP_ORIG_DATA = data
-
-    EDIT_APP_ID = data.id
-    firstname.val(data.firstname)
-    middlename.val(data.middlename)
-    lastname.val(data.lastname)
-    birthdate.val(data.birthdate)
-    mobile.val(data.mobile)
-    agent.val(data.agent)
-}
-
-function changeToAvailable(isAvailable) {  
-
-    const pendingEditCell = $(`
-        <div class="flex-row gap-8">
-            <button 
-                data-request-edit-id='<?= $application->request_edit_id ?>' 
-                class="outline sm cancel-edit-application-btn"
-            >
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x-icon lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-                Cancel Request
-            </button>
-            <button class="outline sm view-edit-application-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye-icon lucide-eye"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>
-                View
-            </button>
-        </div>
-    `)
-
-    const availableEditCell = $(`
-        <button class="outline sm edit-application-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil-icon lucide-pencil"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg>
-            Request Edit
-        </button>
-    `)
-    
-    CURRENT_EDIT_CELL.html(isAvailable ? availableEditCell : pendingEditCell)
-}
-
 function setField(originalSelector, editSelector, originalValue, editValue) {
     const originalEl = $(originalSelector);
     const editEl = $(editSelector);
@@ -372,7 +305,23 @@ function setField(originalSelector, editSelector, originalValue, editValue) {
     }
 }
 
+async function refereshTable() {
+    try {
+        const response = await post({
+            url: 'bank-applications/table',
+        })
+        
+        const result = response.data
+        tableWrapper.html(result.html)
+        renderPaginationState()
+    } catch (error) {
+        const response = error?.responseJSON ?? error
+        console.error(response)
+    }
+}
+
 $(document).ready(function () {
+    checkUpdateSuccess()
     renderPaginationState()
 
     startDateExport.datepicker({
@@ -603,107 +552,110 @@ $(document).ready(function () {
     // Edit Application
     // ---------------------
 
-    birthdate.datepicker({
-        changeMonth: true,
-        changeYear: true,
-        yearRange: "-100:+0",
-        dateFormat: 'mm/dd/yy'
-    });
-
-    $(document).on('click', '.edit-application-btn', function () {
-        const row = $(this).closest('tr')
+    $(document).on('click', '.edit-application-btn', async function () {
+        const row = CURRENT_EDIT_TR
         const data = row.data()
-        
-        clearEditModal()
 
-        const date = new Date(data.birthdate)
-        const month = String(date.getMonth() + 1).padStart(2, '0')
-        const day = String(date.getDate()).padStart(2, '0')
-        const year = String(date.getFullYear())
-        const formattedBirthdate = `${month}/${day}/${year}`
+        // Check if the application is still valid for edit
+        try {
+            const response = await post({
+                url: 'bank-applications/check-edit',
+                data: {app_id: data.id,}
+            })
+            
+            const canEdit = response.data
 
-        data.birthdate = formattedBirthdate
-        EDIT_APP_ORIG_DATA = data
+            if (canEdit) {
+                const base = window.location.origin + '/mia/'
+                const url = new URL('bank-applications/edit', base)
+                url.searchParams.set('id', data.id)
 
-        hydrateEditModal(EDIT_APP_ORIG_DATA)
+                href(url.toString())
+            } else {
+                showNotification(
+                    'Edit Restricted', 
+                    'This bank application is past due of bank application valid months.',
+                    'error'
+                )
+            }
+        } catch (error) {
+            const response = error.responseJSON
+            console.log(response)
+        }
 
-        CURRENT_EDIT_ROW = row
-        CURRENT_EDIT_CELL = $(this).closest('td')
-        openModal(EDIT_APP_MODAL)
     })
 
-    confirmEditAppBtn.on('click', async function () {  
+    $(document).on('click', '.edit-agent-btn', function () {
+        const row = CURRENT_EDIT_TR
+        const data = row.data()
+        console.log(data);
+        
+        EDIT_APP_ORIG_DATA = data
+        agent.val(EDIT_APP_ORIG_DATA.agent)
+        openModal(EDIT_AGENT_MODAL)
+    })
+
+    confirmEditAgentBtn.on('click', async function() {
         if (IS_LOADING) return
         IS_LOADING = true
+        
+        showLoading(confirmEditAgentBtn, true)
 
-        const [data, errors] = validateEditClientForm(applicationEditErrorCard, {
-            firstname: firstname,
-            middlename: middlename,
-            lastname: lastname,
-            birthdate: birthdate,
-            mobile: mobile,
-            agent: agent,
-        })
+        const agentVal = agent.val().trim().toUpperCase()
+        agent.removeClass('error')
 
-        const eq = equalClientData(EDIT_APP_ORIG_DATA, data)
+        if (!agentVal) {
+            setErrorMessage(applicationEditErrorCard, [{
+                message: 'Agent is required.'
+            }])
+            agent.addClass('error')
+        } else {
+            applicationEditErrorCard.addClass('hidden')
+        }
+
+        const eq = agentVal === EDIT_APP_ORIG_DATA.agent
         
         if (eq) {
             applicationEditInfoCard.removeClass('hidden')
             applicationEditInfoCard.find('.status-title').html('Nothing to edit')
             applicationEditInfoCard.find('.status-message').html('All inputs are the same as the previous.')
             IS_LOADING = false
+            showLoading(confirmEditAgentBtn, false)
             return
         } else {
             applicationEditInfoCard.addClass('hidden')
         }
 
-        if (errors.length > 0) return
-        
         try {
             const response = await post({
                 url: 'request-edit',
                 data: {
-                    edit_id: EDIT_APP_ID,
-                    old_data: EDIT_APP_ORIG_DATA,
-                    new_data: data
+                    app_id: EDIT_APP_ORIG_DATA.id,
+                    old_agent: EDIT_APP_ORIG_DATA.agent,
+                    new_agent: agentVal
                 }
             })
             
             const result = response.data
             console.log(result);
             
+            await refereshTable()
+
             showNotification(
-                'Success', 
-                'Edit request was successfully sent.'
+                'Request Sent', 
+                'Edit agent request was successfully sent.'
             )
-
-            changeToAvailable(false)
-
-            CURRENT_EDIT_ROW.attr({
-                'data-request-edit-id': result.id,
-                'data-request-encoder': result.encoder,
-                'data-request-new-content': result.new_content,
-                'data-request-status': result.status,
-                'data-request-datetime': result.datetime_request,
-            })
-
         } catch (error) {
             const response = error.responseJSON
             console.log(response)
         }
 
         IS_LOADING = false
-        closeModal(EDIT_APP_MODAL)
+        showLoading(confirmEditAgentBtn, false)
+        closeModal(EDIT_AGENT_MODAL)
     })
 
-    let REQUEST_EDIT_ID_TO_DELETE = null
-
     $(document).on('click', '.cancel-edit-application-btn', function () {
-        const btn = $(this)
-        const requestEditId = btn.data('requestEditId')
-        REQUEST_EDIT_ID_TO_DELETE = requestEditId
-        
-        CURRENT_EDIT_CELL = $(this).closest('td')
         openModal(CANCEL_EDIT_REQUEST_MODAL)
     })
 
@@ -716,14 +668,14 @@ $(document).ready(function () {
         try {
             const response = await del({
                 url: 'request-edit',
-                data: {id: REQUEST_EDIT_ID_TO_DELETE}
+                data: {id: CURRENT_EDIT_TR.attr('data-request-edit-id')}
             })
             
             const result = response.data
             console.log(result);
+            await refereshTable()
             
             showNotification(result.title, result.message)
-            changeToAvailable(true)
         } catch (error) {
             const response = error.responseJSON
             console.log(response)
@@ -762,3 +714,137 @@ $(document).ready(function () {
     })
 
 })
+
+function createDropdownContent(app) {
+    console.log(app);
+    
+    return `
+        <div class="dropdown-menu show">
+            <button class="dropdown-item edit-application-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil-icon lucide-pencil"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg>
+                Edit Application
+            </button>
+
+            ${
+                app.request_edit_id && app.request_status === 'pending'
+                ? `<button class="dropdown-item cancel-edit-application-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x-icon lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                        Cancel Edit Agent
+                   </button>`
+                : `<button class="dropdown-item edit-agent-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil-icon lucide-pencil"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg>
+                        Edit Agent
+                   </button>`
+            }
+        </div>
+    `
+}
+
+function checkUpdateSuccess() {
+    const url = new URL(window.location.href)
+    const params = url.searchParams
+
+    const status = params.get('edit')
+
+    if (status === 'success') {
+        showNotification(
+            'Edit Success',
+            'Edit was successfully saved.'
+        )
+
+        params.delete('edit')
+        window.history.replaceState({}, '', url.pathname)
+    }
+}
+
+let activeDropdown = null
+let activeTrigger = null
+
+function closeAllMenus() {
+    if (activeDropdown) {
+        activeDropdown.remove();
+        activeDropdown = null;
+    }
+
+    if (activeTrigger) {
+        activeTrigger.attr('aria-expanded', 'false');
+        activeTrigger = null;
+    }
+}
+$(document).on('click', '.dropdown-trigger', function (e) {
+    e.stopPropagation();
+
+    const $trigger = $(this);
+    
+    const isSameTrigger = activeTrigger && activeTrigger[0] === $trigger[0];
+
+    closeAllMenus();
+
+    if (isSameTrigger) {
+        console.log('closed by clicking trigger again');
+        return;
+    }
+
+    CURRENT_EDIT_TR = $trigger.closest('tr')
+    activeTrigger = $trigger;
+    activeTrigger.attr('aria-expanded', 'true');
+
+    const rect = this.getBoundingClientRect();
+    const viewportHeight = window.innerHeight;
+    const viewportWidth = window.innerWidth;
+
+    const dropdown = $(createDropdownContent({
+        request_edit_id: CURRENT_EDIT_TR.attr('data-request-edit-id'),
+        request_status: CURRENT_EDIT_TR.attr('data-request-status')
+    }));
+
+    $('#global-dropdown-root').append(dropdown);
+
+    activeDropdown = dropdown;
+
+    dropdown.css({
+        visibility: 'hidden',
+        display: 'flex'
+    });
+
+    const dropdownHeight = dropdown.outerHeight();
+    let top = rect.bottom + 8;
+
+    if (rect.bottom + dropdownHeight > viewportHeight) {
+        top = rect.top - dropdownHeight - 8;
+    }
+
+    const dropdownWidth = dropdown.outerWidth();
+    let left = rect.right - dropdownWidth;
+
+    if (left < 8) left = 8;
+    if (left + dropdownWidth > viewportWidth) {
+        left = viewportWidth - dropdownWidth - 8;
+    }
+
+    dropdown.css({
+        position: 'fixed',
+        left: left,
+        top: top,
+        visibility: 'visible',
+        display: '',
+        zIndex: 9999
+    });
+});
+
+
+$(document).on('click', function (e) {
+    if (activeDropdown) {
+        if (!$(e.target).closest('.dropdown-menu').length && 
+            !$(e.target).closest('.dropdown-trigger').length) {
+            closeAllMenus();
+        }
+    }
+});
+
+$(document).on('click', '.dropdown-menu .dropdown-item', function () {
+    closeAllMenus()
+})
+
+$(window).on('scroll', closeAllMenus)
+tableWrapper.on('scroll', closeAllMenus)

@@ -12,8 +12,8 @@ class RequestEdit extends Model
     protected array $fillable = [
         'encoder', 
         'app_id',
-        'old_content',
-        'new_content',
+        'old',
+        'new',
         'is_read',
         'status',
         'datetime_request',

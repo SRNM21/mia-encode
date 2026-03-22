@@ -1,14 +1,14 @@
 <div id='cancel-edit-request-modal' class='modal-backdrop'>
     <div class='modal-content card'>
         <div class='modal-header flex-row'>
-            <p>Cancel Edit Request</p>
+            <p>Cancel Edit Agent Request</p>
             <button data-modal='cancel-edit-request-modal' class='modal-close-btn ghost sm'>
                 <?= get_icon('x') ?>
             </button>
         </div>
         <hr>
         <div class='modal-body'>
-            <p>Are you sure you want to cancel this edit request?</p>
+            <p>Are you sure you want to cancel this edit agent request?</p>
         </div>
         <hr>
         <div class='modal-actions'>

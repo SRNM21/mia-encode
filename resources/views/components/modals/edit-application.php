@@ -1,7 +1,7 @@
 <div id='edit-application-modal' class='modal-backdrop'>
     <div class='modal-content card'>
         <div class='modal-header flex-row'>
-            <p class="edit-application-modal-title">Edit Client Details</p>
+            <p class="edit-application-modal-title">Edit Application Details</p>
             <button data-modal='edit-application-modal' class='modal-close-btn ghost sm'>
                 <?= get_icon('x') ?>
             </button>
@@ -35,10 +35,6 @@
                     <input type="tel" id="ea-mobile" name="ea-mobile" class="client-details-input" placeholder="e.g. 09XXXXXXXXX" maxlength="11" required>
                 </div>
 
-                <div class="flex-col field-group">
-                    <label for="ea-agent">Agent</label>
-                    <input type="text" id="ea-agent" name="ea-agent" class="client-details-input" placeholder="e.g. Greg" required>
-                </div>
             </div>
 
             <?php get_component('error-card', [
@@ -49,11 +45,32 @@
                 'class' => 'application-edit-info-card',
             ]) ?>
 
+            <div class="banks-container field-set">
+                <table class="bank-table">
+                    <thead>
+                        <tr>
+                            <th>Bank Name</th>
+                            <th>Last Submitted</th>
+                            <th>Agent</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="bank-table-body"></tbody>
+                </table>
+            </div>
+
         </div>
         <hr>
         <div class='modal-actions'>
             <button id="edit-application-cancel" class="outline sm modal-cancel-btn" data-modal='edit-application-modal'>Cancel</button>
-            <button id="edit-application-confirm" class="primary sm">Send Request Edit</button>
+            <button id="edit-application-confirm" class="primary sm">
+                <p>Save</p>
+                <?php get_component('loader', [
+                    'size' => 'sm',
+                ]) ?>
+            </button>
         </div>
     </div>
 </div>

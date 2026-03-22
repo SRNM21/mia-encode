@@ -12,8 +12,10 @@
         <div class='home-page flex-col'>
 
             <?= get_component('header', [
-                'title' => 'Requests',
                 'user' => $user,
+                'breadcrumbs' => [
+                    ['label' => 'Requests'] 
+                ]
             ]) ?>
             
             <main class='flex-row '>
@@ -37,7 +39,10 @@
                         <div class="flex-col gap-16">
                             <?php if (count($requests) > 0): ?>
                                 <?php foreach ($requests as $request): ?>
-                                    <?php get_component('request-card', ['request' => $request]) ?>
+                                    <?php get_component('request-card', [
+                                        'request' => $request,
+                                        'banks' => $banks
+                                    ]) ?>
                                 <?php endforeach ?>
                             <?php else: ?>
                                 <?php get_component('empty-chart', ['text' => 'No request for now.']) ?>
@@ -49,7 +54,7 @@
         </div>
         
         <?= get_modal('view-edit-request', [
-            'role' => $user->role
+            'user' => $user
         ]) ?>
 
         <?= js_jq('requests') ?>

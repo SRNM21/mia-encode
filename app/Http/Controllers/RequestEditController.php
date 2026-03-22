@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Core\Controllers\Controller;
 use App\Core\Facades\Auth;
 use App\Http\Request\Request;
+use App\Models\Bank;
 use App\Models\RequestEdit;
 use App\Services\RequestEditService;
 use Exception;
@@ -30,20 +31,14 @@ class RequestEditController extends Controller
             $filter = 'all';
         }
 
-        $query = RequestEdit::query()
-            ->orderBy('datetime_request', $order);
-
-        if ($filter != 'all')
-        {
-            $query = $query->where('status', '=', $filter);
-        }
-
-        $requests = $query->get();
+        $requests = $this->requestEditService->fetchRequest($order, $filter);
+        $banks = Bank::getAll();
 
         return $this->view('requests', [
             'requests' => $requests,
             'order' => $order,
-            'filter' => $filter
+            'filter' => $filter,
+            'banks' => $banks
         ]);
     }
 
@@ -70,15 +65,11 @@ class RequestEditController extends Controller
 
     public function store(Request $request) 
     {
-        $oldData = $request->post('old_data');
-        $newData = $request->post('new_data');
+        /** @var \App\Models\User */
+        $user = Auth::user();
 
-        if (Auth::isEncoder()) 
+        if ($user->isEncoder()) 
         {
-            /**
-             * @var \App\Models\User
-             */
-            $user = Auth::user();
             $encoder =  $user->username;
         }
 
@@ -86,9 +77,9 @@ class RequestEditController extends Controller
         {
             $request = RequestEdit::create([
                 'encoder' => $encoder ?? 'Anonymous',
-                'app_id' => $request->post('edit_id'),
-                'old_content' => $this->encodeToJson($oldData),
-                'new_content' => $this->encodeToJson($newData)
+                'app_id' => $request->post('app_id'),
+                'old' => $request->post('old_agent'),
+                'new' => $request->post('new_agent')
             ]);
 
             $this->responseJson($request->toArray());
@@ -102,29 +93,6 @@ class RequestEditController extends Controller
         }
     }
     
-    public function encodeToJson($data)
-    {
-        $firstName = $data['firstname'];
-        $middleName = $data['middlename'];
-        $lastName = $data['lastname'];
-        $birthdate = $data['birthdate'];
-        $mobile = $data['mobile'];
-        $agent = $data['agent'];
-        
-        $birthdate = date('Y-m-d', strtotime($birthdate));
-
-        $updatedData = [
-            'first_name' => $firstName,
-            'middle_name' => $middleName,
-            'last_name' => $lastName,
-            'birthdate' => $birthdate,
-            'mobile' => $mobile,
-            'agent' => $agent
-        ];
-
-        return json_encode($updatedData);
-    }
-
     public function destroy(Request $request)
     {
         try
@@ -164,7 +132,7 @@ class RequestEditController extends Controller
         try
         {
             $id = $request->input('id');
-            $data = $request->input('update');
+            $data = $request->input('data');
 
             $this->requestExistGuard($id);
             $this->requestEditService->update($id, $data);

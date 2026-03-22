@@ -6,6 +6,7 @@ use App\Core\Controllers\Controller;
 use App\Http\Request\CheckClientApplicationRequest;
 use App\Http\Request\StoreClientApplicationRequest;
 use App\Models\Bank;
+use App\Models\BankApplication;
 use App\Services\BankApplicationService;
 use App\Services\ClientService;
 use App\Services\EncodeService;
@@ -56,8 +57,8 @@ class EncodeController extends Controller
             $applications = $this->bankApplicationRepository->getClientApplications($client->id);
 
             return $this->responseJson([
-                'client' => true,
-                'applications' => $applications->toArray(),
+                'client' => $client->toArray(),
+                'applications' => model_list_to_array(BankApplication::class, $applications),
                 'banks' => $bank_list,
             ]);
         }
