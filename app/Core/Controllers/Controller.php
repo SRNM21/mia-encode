@@ -32,7 +32,7 @@ abstract class Controller
         if ($user) 
         {
             $data['user'] = $user;
-            $data['theme'] = Setting::where('user_id', '=', $user->id)->first()->preference;
+            $data['theme'] = Setting::where('user_id', '=', $user->id)->first()->preference ?? '';
         }
 
         // Get and join session data (passed data using 'redirect' method of Route class)
