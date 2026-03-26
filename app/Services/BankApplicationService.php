@@ -2,11 +2,13 @@
 
 namespace App\Services;
 
+use App\Models\Bank;
 use App\Models\BankApplication;
 use App\Models\Client;
 use App\Models\RequestEdit;
 use App\Repository\BankApplicationRepository;
 use DateTime;
+use DateTimeImmutable;
 
 class BankApplicationService
 {
@@ -270,10 +272,47 @@ class BankApplicationService
 
     public function applicationsTodayByBank(): array
     {
+        $banks = Bank::getAll();
         $applications = $this->bankApplicationRepository->getTodaysApplicationsByBank();
 
-        $labels = array_column($applications, 'bank_name');
-        $counts = array_column($applications, 'count');
+        $bankMap = [];
+        foreach ($banks as $bank) 
+        {
+            $bankMap[$bank->id] = [
+                'name' => $bank->name,
+                'count' => 0
+            ];
+        }
+
+        foreach ($applications as $app) 
+        {
+            if (empty($app['bank_submitted_id'])) continue;
+
+            $bankIds = json_decode($app['bank_submitted_id'], true);
+
+            if (!is_array($bankIds)) continue;
+
+            foreach ($bankIds as $bankId) 
+            {
+                $bankId = (int) $bankId;
+
+                if (isset($bankMap[$bankId])) 
+                {
+                    $bankMap[$bankId]['count']++;
+                }
+            }
+        }
+
+        $labels = [];
+        $counts = [];
+
+        foreach ($bankMap as $bank) 
+        {
+            if ($bank['count'] === 0) continue;
+
+            $labels[] = $bank['name'];
+            $counts[] = $bank['count'];
+        }
 
         return [
             'labels' => $labels,
@@ -284,130 +323,144 @@ class BankApplicationService
     public function bankApplicationsSeries(?string $scope, ?string $year): array
     {
         $rows = $this->bankApplicationRepository->getAllWithBankAndDate();
-        $yearsRows = $this->bankApplicationRepository->getAvailableYears();
-        $years = array_map(fn($r) => (string)($r['year'] ?? ''), $yearsRows);
+        $years_rows = $this->bankApplicationRepository->getAvailableYears();
+        $banks = Bank::getAll();
+
+        $bank_map = [];
+        foreach ($banks as $bank) $bank_map[$bank->id] = $bank;
+
+        $years = array_map(fn($r) => (string)($r['year'] ?? ''), $years_rows);
         sort($years);
 
-        $selectedYear = $year ?: (count($years) ? max($years) : date('Y'));
+        $selected_year = $year ?: (count($years) ? max($years) : date('Y'));
         $scope = $scope ?: 'daily';
-
-        $banks = [];
-        foreach ($rows as $r) 
-        {
-            $bn = $r['bank_name'] ?? null;
-            if ($bn) $banks[$bn] = true;
-        }
-
-        $bankList = array_keys($banks);
-        sort($bankList);
 
         $series = [];
         if (in_array($scope, ['daily', 'weekly', 'monthly'], true)) 
         {
-            $countsByDay = $this->aggregateDailyCountsForYear($rows, $selectedYear);
+            $countsByDay = $this->aggregateDailyCountsForYear($rows, $selected_year, $bank_map);
 
             if ($scope === 'daily') 
             {
-                $series['daily'] = $this->buildDailyBankSeries($countsByDay, $selectedYear, $bankList);
+                $series['daily'] = $this->buildDailyBankSeries($countsByDay, $selected_year, $bank_map);
             } 
             elseif ($scope === 'weekly') 
             {
-                $series['weekly'] = $this->buildWeeklyBankSeries($countsByDay, $selectedYear, $bankList);
+                $series['weekly'] = $this->buildWeeklyBankSeries($countsByDay, $selected_year, $bank_map);
             } 
             else 
             {
-                $series['monthly'] = $this->buildMonthlyBankSeries($countsByDay, $selectedYear, $bankList);
+                $series['monthly'] = $this->buildMonthlyBankSeries($countsByDay, $selected_year, $bank_map);
             }
         } 
         elseif ($scope === 'yearly') 
         {
-            $series['yearly'] = $this->buildYearlyBankSeries($rows, $years, $bankList);
+            $series['yearly'] = $this->buildYearlyBankSeries($rows, $years, $bank_map);
         }
 
         return [
             'years' => $years,
-            'selected_year' => (string)$selectedYear,
+            'selected_year' => (string)$selected_year,
             'series' => $series,
         ];
     }
 
-    private function aggregateDailyCountsForYear(array $rows, string $year): array
+    private function aggregateDailyCountsForYear(array $rows, string $year, array $bankMap): array
     {
         $counts = [];
 
-        foreach ($rows as $r) 
+        foreach ($rows as $row) 
         {
-            $day = isset($r['date_submitted']) ? date('Y-m-d', strtotime($r['date_submitted'])) : null;
-            $bank = $r['bank_name'] ?? null;
+            $day = isset($row['date_submitted']) ? date('Y-m-d', strtotime($row['date_submitted'])) : null;
+            $banks_submitted = json_decode($row['bank_submitted_id'], true) ?? [];
 
-            if (!$day || !$bank) continue;
-            if (substr($day, 0, 4) !== $year) continue;
-            if (!isset($counts[$day])) $counts[$day] = [];
-            if (!isset($counts[$day][$bank])) $counts[$day][$bank] = 0;
+            if (!$day || empty($banks_submitted)) continue;
 
-            $counts[$day][$bank]++;
+
+            if (substr($day, 0, 4) !== $year) continue; // skip not scope year
+            if (!isset($counts[$day])) $counts[$day] = []; 
+
+            foreach ($banks_submitted as $bs)
+            {
+                if (!isset($counts[$day][$bs])) $counts[$day][$bs] = 0;
+                $counts[$day][$bs]++;
+            }
         }
 
         ksort($counts);
         return $counts;
     }
 
-    private function buildDailyBankSeries(array $countsByDay, string $year, array $bankList): array
+    private function buildDailyBankSeries(array $countsByDay, string $year, array $bankMap): array
     {
         $labels = [];
         $keys = [];
+
         $start = new \DateTimeImmutable($year . '-01-01');
         $end = new \DateTimeImmutable($year . '-12-31');
 
-        for ($d = $start; $d <= $end; $d = $d->add(new \DateInterval('P1D'))) 
+        for ($d = $start; $d <= $end; $d = $d->add(new \DateInterval('P1D')))
         {
             $key = $d->format('Y-m-d');
             $keys[] = $key;
             $labels[] = $d->format('D, M j');
         }
 
+        $bankIds = array_keys($bankMap);
+        sort($bankIds);
+
         $datasets = [];
-        foreach ($bankList as $bank) 
+
+        foreach ($bankIds as $bankId)
         {
             $data = [];
-            foreach ($keys as $k) 
+
+            foreach ($keys as $k)
             {
-                $data[] = $countsByDay[$k][$bank] ?? 0;
+                $data[] = $countsByDay[$k][$bankId] ?? 0;
             }
 
-            $datasets[] = ['label' => $bank, 'data' => $data];
+            $datasets[] = [
+                'label' => $bankMap[$bankId]->name,
+                'data' => $data
+            ];
         }
+
         return ['labels' => $labels, 'datasets' => $datasets];
     }
 
-    private function buildWeeklyBankSeries(array $countsByDay, string $year, array $bankList): array
+    private function buildWeeklyBankSeries(array $countsByDay, string $year, array $bankMap): array
     {
         $labels = [];
         $weekRanges = [];
 
-        for ($m = 1; $m <= 12; $m++) 
+        for ($m = 1; $m <= 12; $m++)
         {
             $monthStr = sprintf('%02d', $m);
             $monthNameShort = date('M', strtotime($year . '-' . $monthStr . '-01'));
-            $first = new \DateTimeImmutable($year . '-' . $monthStr . '-01');
-            $last = (new \DateTimeImmutable($year . '-' . $monthStr . '-01'))->modify('last day of this month');
-            $firstMonday = $first;
 
-            if ((int)$firstMonday->format('N') !== 1) $firstMonday = $firstMonday->modify('next monday');
+            $first = new \DateTimeImmutable($year . '-' . $monthStr . '-01');
+            $last = $first->modify('last day of this month');
+
+            $firstMonday = $first;
+            if ((int)$firstMonday->format('N') !== 1)
+            {
+                $firstMonday = $firstMonday->modify('next monday');
+            }
+
             $idx = 1;
-            
-            for ($ws = $firstMonday; $ws <= $last; $ws = $ws->add(new \DateInterval('P7D'))) 
+
+            for ($ws = $firstMonday; $ws <= $last; $ws = $ws->add(new \DateInterval('P7D')))
             {
                 $we = $ws->add(new \DateInterval('P6D'));
                 if ((int)$ws->format('m') !== $m) break;
 
                 $labels[] = $monthNameShort . ' W' . $idx;
-                $range = [];
 
-                for ($cur = $ws; $cur <= $we; $cur = $cur->add(new \DateInterval('P1D'))) 
+                $range = [];
+                for ($cur = $ws; $cur <= $we; $cur = $cur->add(new \DateInterval('P1D')))
                 {
                     if ((int)$cur->format('m') !== $m) continue;
-
                     $range[] = $cur->format('Y-m-d');
                 }
 
@@ -416,92 +469,131 @@ class BankApplicationService
             }
         }
 
+        $bankIds = array_keys($bankMap);
+        sort($bankIds);
+
         $datasets = [];
-        foreach ($bankList as $bank) 
+
+        foreach ($bankIds as $bankId)
         {
             $data = [];
-            foreach ($weekRanges as $days) 
+
+            foreach ($weekRanges as $days)
             {
                 $sum = 0;
-                foreach ($days as $k) $sum += ($countsByDay[$k][$bank] ?? 0);
+
+                foreach ($days as $k)
+                {
+                    $sum += ($countsByDay[$k][$bankId] ?? 0);
+                }
+
                 $data[] = $sum;
             }
 
-            $datasets[] = ['label' => $bank, 'data' => $data];
+            $datasets[] = [
+                'label' => $bankMap[$bankId]->name,
+                'data' => $data
+            ];
         }
 
         return ['labels' => $labels, 'datasets' => $datasets];
     }
 
-    private function buildMonthlyBankSeries(array $countsByDay, string $year, array $bankList): array
+    private function buildMonthlyBankSeries(array $countsByDay, string $year, array $bankMap): array
     {
         $labels = [];
         $monthRanges = [];
 
-        for ($m = 1; $m <= 12; $m++) 
+        for ($m = 1; $m <= 12; $m++)
         {
             $monthStr = sprintf('%02d', $m);
             $labels[] = date('F', strtotime($year . '-' . $monthStr . '-01'));
+
             $first = new \DateTimeImmutable($year . '-' . $monthStr . '-01');
-            $last = (new \DateTimeImmutable($year . '-' . $monthStr . '-01'))->modify('last day of this month');
+            $last = $first->modify('last day of this month');
+
             $days = [];
 
-            for ($d = $first; $d <= $last; $d = $d->add(new \DateInterval('P1D'))) 
+            for ($d = $first; $d <= $last; $d = $d->add(new \DateInterval('P1D')))
             {
                 if ((int)$d->format('m') !== $m) continue;
-
                 $days[] = $d->format('Y-m-d');
             }
 
             $monthRanges[] = $days;
         }
 
+        $bankIds = array_keys($bankMap);
+        sort($bankIds);
+
         $datasets = [];
-        foreach ($bankList as $bank) 
+
+        foreach ($bankIds as $bankId)
         {
             $data = [];
 
-            foreach ($monthRanges as $days) 
+            foreach ($monthRanges as $days)
             {
                 $sum = 0;
-                foreach ($days as $k) $sum += ($countsByDay[$k][$bank] ?? 0);
+
+                foreach ($days as $k)
+                {
+                    $sum += ($countsByDay[$k][$bankId] ?? 0);
+                }
 
                 $data[] = $sum;
             }
 
-            $datasets[] = ['label' => $bank, 'data' => $data];
+            $datasets[] = [
+                'label' => $bankMap[$bankId]->name,
+                'data' => $data
+            ];
         }
-        
+
         return ['labels' => $labels, 'datasets' => $datasets];
     }
 
-    private function buildYearlyBankSeries(array $rows, array $years, array $bankList): array
+    private function buildYearlyBankSeries(array $rows, array $years, array $bankMap): array
     {
         $labels = $years;
+
         $counts = [];
-
         foreach ($years as $yr) $counts[$yr] = [];
-        
-        foreach ($rows as $r) 
+
+        foreach ($rows as $row)
         {
-            $day = isset($r['date_submitted']) ? date('Y-m-d', strtotime($r['date_submitted'])) : null;
+            $day = isset($row['date_submitted']) ? date('Y-m-d', strtotime($row['date_submitted'])) : null;
             $yr = $day ? substr($day, 0, 4) : null;
-            $bank = $r['bank_name'] ?? null;
 
-            if (!$yr || !$bank) continue;
-            if (!isset($counts[$yr][$bank])) $counts[$yr][$bank] = 0;
+            $banks_submitted = json_decode($row['bank_submitted_id'], true) ?? [];
 
-            $counts[$yr][$bank]++;
+            if (!$yr || empty($banks_submitted)) continue;
+
+            foreach ($banks_submitted as $bankId)
+            {
+                if (!isset($counts[$yr][$bankId])) $counts[$yr][$bankId] = 0;
+                $counts[$yr][$bankId]++;
+            }
         }
 
+        $bankIds = array_keys($bankMap);
+        sort($bankIds);
+
         $datasets = [];
-        foreach ($bankList as $bank) 
+
+        foreach ($bankIds as $bankId)
         {
             $data = [];
 
-            foreach ($labels as $yr) $data[] = $counts[$yr][$bank] ?? 0;
+            foreach ($labels as $yr)
+            {
+                $data[] = $counts[$yr][$bankId] ?? 0;
+            }
 
-            $datasets[] = ['label' => $bank, 'data' => $data];
+            $datasets[] = [
+                'label' => $bankMap[$bankId]->name,
+                'data' => $data
+            ];
         }
 
         return ['labels' => $labels, 'datasets' => $datasets];
@@ -592,5 +684,182 @@ class BankApplicationService
     {
         return $this->bankApplicationRepository
             ->getPaginatedApplicationsWithRelations($page,$perPage,$filters,$sort,$order);
+    }
+
+    private function getWeekRange(int $year, int $month, int $weekOffset = 0): array
+    {
+        $firstDay = new DateTimeImmutable("$year-$month-01");
+        $lastDay  = $firstDay->modify('last day of this month');
+
+        if ($weekOffset === 0) 
+        {
+            $start = $firstDay;
+            $weekday = (int)$start->format('N');
+
+            if ($weekday >= 6) {
+                $start = $start->modify('next monday');
+                $weekday = (int)$start->format('N');
+            }
+
+            if ($start > $lastDay) {
+                return ['start' => null, 'end' => null];
+            }
+
+            $daysToFriday = 5 - $weekday;
+            $end = $start->modify("+{$daysToFriday} days");
+
+            if ($end > $lastDay) $end = $lastDay;
+
+            return [
+                'start' => $start,
+                'end'   => $end
+            ];
+        }
+
+        $firstMonday = ($firstDay->format('N') == 1)
+            ? $firstDay
+            : $firstDay->modify('next monday');
+
+        $start = $firstMonday->modify('+' . ($weekOffset - 1) . ' weeks');
+
+        if ($start > $lastDay) 
+        {
+            return [
+                'start' => null,
+                'end'   => null
+            ];
+        }
+
+        $end = $start->modify('+4 days');
+
+        if ($end > $lastDay) 
+        {
+            $end = $lastDay;
+        }
+
+        return [
+            'start' => $start,
+            'end'   => $end
+        ];
+    }
+
+    private function getLastWeekOffset(int $year, int $month): int
+    {
+        $firstDay = new DateTimeImmutable("$year-$month-01");
+        $lastDay  = $firstDay->modify('last day of this month');
+
+        $weekOffset = 0;
+
+        while (true)
+        {
+            $range = $this->getWeekRange($year, $month, $weekOffset);
+
+            if (!$range['start'] || $range['start'] > $lastDay) break;
+
+            $weekOffset++;
+        }
+
+        return max(0, $weekOffset - 1);
+    }
+
+    public function getMonthlyWeeklyCalendar(int $year, int $month): array
+    {
+        $firstDay = new DateTimeImmutable("$year-$month-01");
+        $lastDay  = $firstDay->modify('last day of this month');
+
+        $years = $this->bankApplicationRepository->getAvailableYears();
+
+        $lastWeek = $this->getLastWeekOffset($year, $month);
+
+        $weeks = [];
+
+        for ($week = 0; $week <= $lastWeek; $week++)
+        {
+            $range = $this->getWeekRange($year, $month, $week);
+
+            // Skip invalid weeks
+            if (!$range['start'] || !$range['end']) continue;
+
+            $start = $range['start']->format('Y-m-d');
+            $end   = $range['end']->format('Y-m-d');
+
+            $rows = $this->bankApplicationRepository->getByDateRange($start, $end);
+
+            $weeks[] = [
+                'week' => $week,
+                'range' => [
+                    'start' => $start,
+                    'end' => $end
+                ],
+                'data' => $this->aggregateWeekData($rows)
+            ];
+        }
+
+        return [
+            'years' => $years,
+            'range' => [
+                'start' => $firstDay->format('Y-m-01'),
+                'end'   => $lastDay->format('Y-m-d')
+            ],
+            'weeks' => $weeks
+        ];
+    }
+
+    private function aggregateWeekData(array $rows): array
+    {
+        $banks = Bank::getAll();
+
+        $bankMap = [];
+        foreach ($banks as $b) {
+            $bankMap[$b->id] = $b->name;
+        }
+
+        $counts = [];
+
+        foreach ($bankMap as $id => $name) {
+            $counts[$id] = [
+                1 => 0,
+                2 => 0,
+                3 => 0,
+                4 => 0,
+                5 => 0,
+                'total' => 0
+            ];
+        }
+
+        foreach ($rows as $row)
+        {
+            $date = new DateTime($row['date_submitted']);
+            $weekday = (int)$date->format('N');
+
+            if ($weekday > 5) continue;
+
+            $bankIds = json_decode($row['bank_submitted_id'], true) ?? [];
+
+            foreach ($bankIds as $bankId)
+            {
+                if (!isset($counts[$bankId])) continue;
+
+                $counts[$bankId][$weekday]++;
+                $counts[$bankId]['total']++;
+            }
+        }
+
+        $result = [];
+
+        foreach ($counts as $bankId => $c)
+        {
+            $result[] = [
+                'bank' => $bankMap[$bankId],
+                'mon' => $c[1],
+                'tue' => $c[2],
+                'wed' => $c[3],
+                'thu' => $c[4],
+                'fri' => $c[5],
+                'total' => $c['total'],
+            ];
+        }
+
+        return $result;
     }
 }

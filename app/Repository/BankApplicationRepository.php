@@ -9,21 +9,10 @@ class BankApplicationRepository
     public function getTodaysApplicationsByBank(): array
     {
         return BankApplication::query()
-            ->select(
-                'bank_list_tbl.name AS bank_name',
-                'COUNT(bank_application_tbl.id) AS count'
-            )
-            ->join(
-                'bank_list_tbl',
-                'bank_application_tbl.bank_submitted_id',
-                '=',
-                'bank_list_tbl.id',
-                'LEFT'
-            )            
-            ->where('date_submitted', '=', date('Y-m-d'))
-            ->groupBy('bank_name')
-            ->orderBy('bank_name', 'ASC')
-            ->getArray();
+            ->select('bank_submitted_id')
+            ->where('date_submitted', '>=', date('Y-m-d 00:00:00'))
+            ->where('date_submitted', '<',  date('Y-m-d 00:00:00', strtotime('+1 day')))
+            ->getRaw(true)['results'];
     }
 
     public function getClientApplications(int $client_id)
@@ -184,18 +173,18 @@ class BankApplicationRepository
     public function getAllWithBankAndDate(): array
     {
         return BankApplication::query()
-            ->select(
-                'bank_application_tbl.date_submitted AS date_submitted',
-                'bank_application_tbl.bank_submitted_id AS bank_id',
-                'bank_list_tbl.name AS bank_name'
-            )
-            ->join('bank_list_tbl', 'bank_application_tbl.bank_submitted_id', '=', 'bank_list_tbl.id', 'LEFT')
+            ->select('*')
             ->orderBy('date_submitted', 'ASC')
             ->getArray();
     }
 
     public function getAgentsApplicationCountByRange(string $startDate, string $endDate): array
     {
+        dd([
+            'start' => $startDate,
+            'end' => $endDate
+        ]);
+        
         return BankApplication::query()
             ->select(
                 'agent',
@@ -208,5 +197,18 @@ class BankApplicationRepository
             ->orderBy('count', 'DESC')
             ->limit(5)
             ->getRaw()['results'];
+    }
+
+    public function getByDateRange(string $start, string $end): array 
+    { 
+        return BankApplication::query() 
+        ->select( 
+            'bank_application_tbl.date_submitted', 
+            'bank_application_tbl.bank_submitted_id' 
+        ) 
+        ->where('DATE(bank_application_tbl.date_submitted)', '>=', $start) 
+        ->where('DATE(bank_application_tbl.date_submitted)', '<=', $end) 
+        ->orderBy('date_submitted', 'ASC') 
+        ->getArray(); 
     }
 }

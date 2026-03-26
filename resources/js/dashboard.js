@@ -5,7 +5,10 @@ import { bindSelect, populateSelect } from './ui/select-utils.js'
 import { normalizeBankSeries, renderBankSeries, renderBankTodayChart } from './charts/bank-charts.js'
 import { renderClientSeries } from './charts/client-charts.js'
 import { renderLeaderboards } from './components/leaderboards.js'
+import { useAjax } from './hooks/use-ajax.js'
+import { formatDate } from './utils/utils.js'
 
+const { post } = useAjax()
 const doc = $(document)
 
 const clientTodayCanvas = $('#clients-type-chart')
@@ -15,12 +18,14 @@ const clientSeriesCanvas = $('#clients-type-line')
 const bankSeriesCanvas = $('#bank-applications-type-line')
 
 const leaderboardsContent = $('.leaderboards-table-content')
+const bankCalendarTable = $('.bank-calendar-table')
 
 const emptyClientsToday = $('.empty-clients-today')
 const emptyBanksToday = $('.empty-banks-today')
 const emptyClientsSeries = $('.empty-clients-series')
 const emptyBanksSeries = $('.empty-banks-series')
 const emptyLeaderboards = $('.empty-leaderboards')
+const emptyBankCalendar = $('.empty-bank-calendar')
 
 const clientsTypeFilter = $('#clients-type-filter')
 const clientsYearSelect = $('#clients-year-select')
@@ -29,6 +34,11 @@ const clientsRangeSelect = $('#clients-series-select')
 const banksTypeFilter = $('#bank-apps-type-filter')
 const banksYearSelect = $('#bank-apps-year-select')
 const banksRangeSelect = $('#bank-apps-series-select')
+
+const bankCalendarRangeDisplay = $('#bank-calendar-range-display')
+const bankCalendarWeekFilter = $("#bank-calendar-week-select")
+const bankCalendarMonthFilter = $("#bank-calendar-month-select")
+const bankCalendarYearFilter = $("#bank-calendar-year-select")
 
 let clientSeriesCache = {}
 let bankSeriesCache = {}
@@ -60,6 +70,9 @@ function initDashboard() {
     // Leaderboards
     bindSelect($('#agent-leaderboards-select'), loadLeaderboards)
     loadLeaderboards()
+
+    // Weekly bank table
+    loadWeeklyBankTable()
 }
 
 // Filters
@@ -307,4 +320,202 @@ async function loadLeaderboards() {
         showEmpty(emptyBanksToday, 'Error Occured.')
         console.error(error)
     }
+}
+
+const state = {
+    year: null,
+    month: null,
+    selectedWeek: 0
+};
+
+let weekMap = new Map(); 
+
+async function loadWeeklyBankTable() {
+    
+    showLoading(emptyBankCalendar, bankCalendarTable)
+
+    try {
+        const now = new Date();
+
+        const response = await post({
+            url: 'dashboard/chart/weekly-bank-table',
+            data: {
+                year: state.year ?? now.getFullYear(),
+                month: state.month ?? now.getMonth() + 1
+            }
+        });
+
+        const data = response.data || {};
+        const weeks = data.weeks || [];
+
+        hydrateYears(data.years || []);
+        hydrateMonths()
+        hydrateWeeks(weeks);
+
+        if (isMonthEmpty(weeks)) {
+            showEmpty(emptyBankCalendar, 'No submissions for this month.');
+            bankCalendarRangeDisplay.text('Banks Calendar');
+            bankCalendarWeekFilter.addClass('hidden')
+            return;
+        }
+
+        bankCalendarWeekFilter.removeClass('hidden')
+        showContent(emptyBankCalendar, bankCalendarTable)
+
+        weekMap.clear();
+        (data.weeks || []).forEach(w => {
+            weekMap.set(w.week, w);
+        });
+
+        if (!weekMap.has(state.selectedWeek)) {
+            state.selectedWeek = [...weekMap.keys()][0] ?? 0;
+        }
+
+        updateWeekUI();
+        renderWeek(state.selectedWeek);
+
+    } catch (error) {
+        console.error(error);
+        showEmpty(emptyBankCalendar, 'Error Occured.');
+    }
+}
+
+function hydrateYears(years) {
+    bankCalendarYearFilter.empty();
+
+    years.forEach(y => {
+        bankCalendarYearFilter.append(`<option value="${y.year}">${y.year}</option>`);
+    });
+
+    const latestYear = years.at(-1)?.year;
+
+    if (state.year === null) {
+        state.year = latestYear;
+    }
+
+    bankCalendarYearFilter.val(state.year);
+}
+
+function hydrateMonths() {
+    const months = [
+        'January','February','March','April','May','June',
+        'July','August','September','October','November','December'
+    ];
+
+    const currentMonth = new Date().getMonth() + 1;
+
+    bankCalendarMonthFilter.empty();
+
+    $.each(months, function (index, name) {
+        const value = index + 1;
+
+        bankCalendarMonthFilter.append(`<option value="${value}">${name}</option>`);
+    });
+
+    if (state.month === null) {
+        state.month = currentMonth;
+    }
+
+    bankCalendarMonthFilter.val(state.month);
+}
+
+function hydrateWeeks(weeks) {
+    bankCalendarWeekFilter.empty();
+
+    weeks.forEach(w => {
+        bankCalendarWeekFilter.append(
+            `<option value="${w.week}">Week ${w.week + 1}</option>`
+        );
+    });
+
+}
+
+function renderWeek(weekIndex) {
+    if (!weekMap.has(weekIndex)) return;
+
+    const weekData = weekMap.get(weekIndex);
+
+    bankCalendarRangeDisplay.text(
+        `${formatDate(weekData.range.start)} — ${formatDate(weekData.range.end)}`
+    );
+
+    renderTable(weekData.data);
+}
+
+bankCalendarWeekFilter.on('change', function () {
+    state.selectedWeek = parseInt($(this).val());
+    renderWeek(state.selectedWeek);
+});
+
+bankCalendarMonthFilter.on('change', async function () {
+    state.month = parseInt($(this).val());
+    state.selectedWeek = 0; 
+    await loadWeeklyBankTable();
+});
+
+bankCalendarYearFilter.on('change', async function () {
+    state.year = parseInt($(this).val());
+    state.selectedWeek = 0; 
+    await loadWeeklyBankTable();
+});
+
+function updateWeekUI() {
+    bankCalendarWeekFilter.val(state.selectedWeek)
+    renderWeek(state.selectedWeek);
+}
+
+function renderTable(data) {
+    const $tbody = bankCalendarTable.find('tbody');
+    $tbody.empty();
+
+    let totals = {
+        mon: 0,
+        tue: 0,
+        wed: 0,
+        thu: 0,
+        fri: 0,
+        total: 0
+    };
+
+    data.forEach(row => {
+        totals.mon += Number(row.mon) || 0;
+        totals.tue += Number(row.tue) || 0;
+        totals.wed += Number(row.wed) || 0;
+        totals.thu += Number(row.thu) || 0;
+        totals.fri += Number(row.fri) || 0;
+        totals.total += Number(row.total) || 0;
+
+        $tbody.append(`
+            <tr>
+                <td>${row.bank}</td>
+                <td class="bank-calendar-td ${row.mon <= 0 ? 'zero' : ''}">${row.mon}</td>
+                <td class="bank-calendar-td ${row.tue <= 0 ? 'zero' : ''}">${row.tue}</td>
+                <td class="bank-calendar-td ${row.wed <= 0 ? 'zero' : ''}">${row.wed}</td>
+                <td class="bank-calendar-td ${row.thu <= 0 ? 'zero' : ''}">${row.thu}</td>
+                <td class="bank-calendar-td ${row.fri <= 0 ? 'zero' : ''}">${row.fri}</td>
+                <td class="bank-calendar-td ${row.total <= 0 ? 'zero' : ''}"><strong>${row.total}</strong></td>
+            </tr>
+        `);
+    });
+
+    // totals row
+    $tbody.append(`
+        <tr>
+            <td></td>
+            <td class="bank-calendar-td ${totals.mon <= 0 ? 'zero' : ''}">${totals.mon}</td>
+            <td class="bank-calendar-td ${totals.tue <= 0 ? 'zero' : ''}">${totals.tue}</td>
+            <td class="bank-calendar-td ${totals.wed <= 0 ? 'zero' : ''}">${totals.wed}</td>
+            <td class="bank-calendar-td ${totals.thu <= 0 ? 'zero' : ''}">${totals.thu}</td>
+            <td class="bank-calendar-td ${totals.fri <= 0 ? 'zero' : ''}">${totals.fri}</td>
+            <td class="bank-calendar-td ${totals.total <= 0 ? 'zero' : ''}">${totals.total}</td>
+        </tr>
+    `);
+}
+
+function isMonthEmpty(week) {
+    let total = 0
+
+    week.forEach(w => w.data.forEach(d => total += d.total))
+    
+    return total <= 0
 }

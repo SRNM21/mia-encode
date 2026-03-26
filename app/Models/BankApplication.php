@@ -14,5 +14,6 @@ class BankApplication extends Model
         'bank_submitted_id', 
         'date_submitted',
         'agent',
+        'team',
     ];
 }

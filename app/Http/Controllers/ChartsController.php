@@ -67,4 +67,14 @@ class ChartsController extends Controller
 
         $this->responseJson($result);
     }
+
+    public function weeklyCalendar(Request $request)
+    {
+        $year = (int)$request->post('year');
+        $month = (int)$request->post('month');
+
+        $data = $this->bankApplicationService->getMonthlyWeeklyCalendar($year, $month);
+
+        $this->responseJson($data);
+    }
 }

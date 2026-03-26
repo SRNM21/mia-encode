@@ -2,8 +2,8 @@ export function getChartTheme() {
     const css = getComputedStyle(document.documentElement)
 
     return {
-        axisText: (css.getPropertyValue('--color-text') || '#e5e7eb').trim(),
-        gridColor: (css.getPropertyValue('--color-neutral-700') || 'rgba(255,255,255,0.08)').trim()
+        axisText: (css.getPropertyValue('--foreground') || '#e5e7eb').trim(),
+        gridColor: (css.getPropertyValue('--border-color') || 'rgba(255,255,255,0.08)').trim()
     }
 }
 

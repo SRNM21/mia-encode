@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="<?= $theme ?>">
     <head>
         <meta charset='UTF-8'>
         <meta name='viewport' content='width=device-width, initial-scale=1.0'>
@@ -8,7 +8,7 @@
         <?= css('dashboard') ?>
     </head>
 
-    <body class='dark'>
+    <body>
         <div class='home-page flex-col'>
             
             <?= get_component('header', [
@@ -80,6 +80,39 @@
                     
                     <!-- Lower Charts -->
                     <div class="lower-chart-col flex-col">
+                        <div class="card bank-calendar-container">
+                            <div class="flex-row bank-calendar-header">
+                                <div id="bank-calendar-range-display"></div>
+
+                                <div class="bank-calendar-filters flex-row gap-8">
+                                    <select id="bank-calendar-week-select" class="size-sm"></select>
+                                    <select id="bank-calendar-month-select" class="size-sm"></select>
+                                    <select id="bank-calendar-year-select" class="size-sm"></select>
+                                </div>
+                            </div>
+
+                            <div class="bank-calendar-table-content">
+                                <?= get_component('empty-chart', [
+                                    'class' => 'empty-bank-calendar load',
+                                    'text' => 'No submissions as of now.'
+                                ]) ?>
+                                <table class="bank-calendar-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Bank</th>
+                                            <th class="bank-calendar-th">Mon</th>
+                                            <th class="bank-calendar-th">Tue</th>
+                                            <th class="bank-calendar-th">Wed</th>
+                                            <th class="bank-calendar-th">Thu</th>
+                                            <th class="bank-calendar-th">Fri</th>
+                                            <th class="bank-calendar-th">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+
+                        </div>
                         <div class="card line-chart-card flex-col">
                             <div class="chart-control flex-row">
                                 <p class="chart-title">Clients Trend</p>
