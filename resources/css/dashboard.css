@@ -144,7 +144,7 @@
 }
 
 .leaderboards-table tbody tr {
-    color: var(--color-neutral-300);
+    color: var(--text-hint-color);
 }
 
 .clients-today-container,
@@ -164,8 +164,8 @@
     width: 100%;
     position: absolute;
     border-radius: 4px;
-    border: 2px solid var(--color-neutral-600);
-    color: var(--color-neutral-600);
+    border: 2px solid var(--btn-outline-border);
+    color: var(--btn-outline-border);
     font-weight: 600;
     user-select: none;
 }
@@ -188,8 +188,8 @@
     background: linear-gradient(
         45deg,
         transparent 30%,
-        var(--color-neutral-600) 45%,
-        var(--color-neutral-600) 55%,
+        var(--btn-outline-border) 45%,
+        var(--btn-outline-border) 55%,
         transparent 70%
     );
 
@@ -198,11 +198,11 @@
 
     padding: 1px;
     -webkit-mask:
-        linear-gradient(#000 0 0) content-box,
-        linear-gradient(#000 0 0);
+        linear-gradient(var(--foreground) 0 0) content-box,
+        linear-gradient(var(--foreground) 0 0);
     mask:
-        linear-gradient(#000 0 0) content-box,
-        linear-gradient(#000 0 0);
+        linear-gradient(var(--foreground) 0 0) content-box,
+        linear-gradient(var(--foreground) 0 0);
 
     -webkit-mask-composite: xor;
     mask-composite: exclude;
@@ -212,8 +212,8 @@
     background: linear-gradient(
         45deg,
         transparent 30%,
-        var(--color-neutral-600) 45%,
-        var(--color-neutral-600) 55%,
+        var(--btn-outline-border) 45%,
+        var(--btn-outline-border) 55%,
         transparent 70%
     );
     background-size: 300% 300%;
@@ -225,7 +225,7 @@
 }
 
 .empty.load svg {
-    color: var(--color-neutral-600);
+    color: var(--btn-outline-border);
     animation: svgPulse 1.5s linear infinite;
 }
 
@@ -241,4 +241,63 @@
 @keyframes svgPulse {
     0%,100% { opacity: 0.5; }
     50% { opacity: 1; }
+}
+
+.bank-calendar-header {
+    justify-content: space-between;
+    align-items: center;
+}
+
+.bank-calendar-table-content {
+    position: relative;
+    min-height: 300px;
+    margin-top: 24px;
+}
+
+.bank-calendar-table {
+    width: 100%;
+    font-family: inherit;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--btn-outline-border);
+}
+
+.bank-calendar-table thead {
+    background-color: var(--table-header-bg);
+}
+
+.bank-calendar-table th, .bank-calendar-table td  {
+    padding: 10px;
+    font-weight: 400;
+    text-align: start;
+}
+
+.bank-calendar-table td {
+    border: 1px solid var(--btn-outline-border);
+}
+
+.bank-calendar-table thead th:first-child {
+    border-top-left-radius: 8px;
+}
+
+.bank-calendar-table thead th:last-child {
+    border-top-right-radius: 8px;
+}
+
+.bank-calendar-table tbody tr:last-child td:first-child {
+    border-bottom-left-radius: 8px;
+}
+
+.bank-calendar-table tbody tr:last-child td:last-child {
+    border-bottom-right-radius: 8px;
+}
+
+.bank-calendar-th, .bank-calendar-td {
+    text-align: center !important;
+}
+
+.bank-calendar-td.zero {
+    color: var(--color-danger);
 }

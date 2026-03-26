@@ -35,6 +35,7 @@ Route::middleware(AuthMiddleware::class)->group(function () {
     Route::get('/settings', [SettingsController::class, 'show']);
     Route::patch('/settings/profile', [SettingsController::class, 'updateProfile']);
     Route::patch('/settings/password', [SettingsController::class, 'updatePassword']);
+    Route::patch('/settings/theme', [SettingsController::class, 'updateTheme']);
         
     Route::post('/logout', [LoginController::class, 'logout']);
 

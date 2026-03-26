@@ -1,7 +1,5 @@
 @import url('home.css');
 
-@import url('home.css');
-
 .title {
     font-size: 18px;
     font-weight: 400;
@@ -18,12 +16,12 @@
 }
 
 .client-badge {
-    background-color: var(--color-neutral-100);
-    color: var(--color-neutral-900);
+    background-color: var(--foreground);
+    color: var(--background);
     font-weight: 600;
-    border-radius: 6px;
-    padding: 4px;
-    font-size: 11px;
+    border-radius: 16px;
+    padding: 8px 16px;
+    font-size: 14px;
     height: fit-content;
 }
 
@@ -65,11 +63,11 @@
     border-spacing: 0;
     border-radius: 8px;
     overflow: hidden;
-    border: 1px solid var(--color-neutral-600);
+    border: 1px solid var(--input-border);
 }
 
 .bank-table thead {
-    background-color: var(--color-neutral-800);
+    background-color: var(--header-bg);
 }
 
 .bank-table th, .bank-table td  {
@@ -79,7 +77,7 @@
 }
 
 .bank-table td {
-    border: 1px solid var(--color-neutral-600);
+    border: 1px solid var(--input-border);
 }
 
 .bank-table thead th:first-child {
@@ -105,7 +103,7 @@
 }
 
 .bank-select-cell:hover {
-    background-color: var(--color-neutral-900);
+    background-color: var(--hover-link-btn);
 }
 
 .bank-select {
@@ -113,7 +111,7 @@
 }
 
 .bank-select-cell.selected {
-    color: var(--color-green-400);
+    color: var(--color-success);
     font-weight: 600;
 }
 
@@ -128,7 +126,7 @@
 }
 
 .bank-select-cell.unavailable {
-    color: var(--color-red-400);
+    color: var(--color-danger);
     font-weight: 600;
 }
 
@@ -139,11 +137,11 @@
 }
 
 .icon-check {
-    color: var(--color-green-400);
+    color: var(--color-success);
 }
 
 .icon-unavailable {
-    color: var(--color-red-400);
+    color: var(--color-danger);
 }
 
 .form-grid {
@@ -170,16 +168,16 @@
 
 .submit-notes {
     font-size: 14px;
-    color: var(--color-neutral-400);
+    color: var(--text-hint-color);
     font-style: italic;
 }
 
 .status-unavailable {
-    color: var(--color-red-400);
+    color: var(--color-danger);
 }
 
 .status-available {
-    color: var(--color-green-400);
+    color: var(--color-success);
 }
 
 .status-overwrite {

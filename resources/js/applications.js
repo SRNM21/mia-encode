@@ -400,12 +400,23 @@ $(document).ready(function () {
 
     confirmAddFilterBtn.on('click', function () {
         const column = filterColumns.val()
-        const value = filterValue.val().trim()
+        let value = filterValue.val().trim()
+
+        console.log(column);
+        
 
         setErrorState(filterColumns, !column)
         setErrorState(filterValue, !value)
 
         if (!column || !value) return
+
+        if (
+            column !== 'birthdate' && 
+            column !== 'start_date' && 
+            column !== 'end_date'
+        ) {
+            value = value.toUpperCase()
+        }
 
         activeFilters[column] = value
 

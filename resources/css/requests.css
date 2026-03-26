@@ -23,7 +23,7 @@
 }
 
 .request-container:hover {
-    background-color: var(--color-neutral-800);
+    background-color: var(--hover-outline-btn);
 }
 
 .request-container::before {
@@ -75,11 +75,11 @@
 
 .container-past-time {
     font-size: 14px;
-    color: var(--color-neutral-400);
+    color: var(--text-hint-color);
 }
 
 .request-container-body {
-    color: var(--color-neutral-300);
+    color: var(--text-subtle-color);
 }
 
 .field-group {
@@ -94,7 +94,7 @@
 }
 
 .field-title {
-    color: var(--color-neutral-400);
+    color: var(--text-hint-color);
 }
 
 .field-value {
@@ -102,11 +102,11 @@
 }
 
 .data-old {
-    color: var(--color-red-400);
+    color: var(--color-danger);
 }
 
 .data-new {
-    color: var(--color-green-400);
+    color: var(--color-success);
 }
 
 .transform-icon {
@@ -116,7 +116,7 @@
 
 .edit-request-datetime, .action-request-datetime, .client-bank-date-submitted {
     font-style: italic;
-    color: var(--color-neutral-400);
+    color: var(--text-hint-color);
 }
 
 .request-choice {
@@ -127,24 +127,49 @@
     width: 100%;
 }
 
-.reject-edit-request-btn {
+html.dark .reject-edit-request-btn {
+    color: var(--color-neutral-50) !important;
     background-color: var(--color-red-800) !important;
     border: 1px solid var(--color-red-600) !important;
 }
 
-.reject-edit-request-btn:hover {
+html.dark .reject-edit-request-btn:hover {
     background-color: var(--color-red-900) !important;
     border: 1px solid var(--color-red-700) !important;
 }
 
-.approve-edit-request-btn {
+html.dark .approve-edit-request-btn {
+    color: var(--color-neutral-50) !important;
     background-color: var(--color-green-800) !important;
     border: 1px solid var(--color-green-600) !important;
 }
 
-.approve-edit-request-btn:hover {
+html.dark .approve-edit-request-btn:hover {
     background-color: var(--color-green-900) !important;
     border: 1px solid var(--color-green-700) !important;
+}
+
+
+.reject-edit-request-btn {
+    color: var(--color-neutral-50) !important;
+    background-color: var(--color-red-700) !important;
+    border: 1px solid var(--color-red-500) !important;
+}
+
+.reject-edit-request-btn:hover {
+    background-color: var(--color-red-800) !important;
+    border: 1px solid var(--color-red-600) !important;
+}
+
+.approve-edit-request-btn {
+    color: var(--color-neutral-50) !important;
+    background-color: var(--color-green-700) !important;
+    border: 1px solid var(--color-green-500) !important;
+}
+
+.approve-edit-request-btn:hover {
+    background-color: var(--color-green-800) !important;
+    border: 1px solid var(--color-green-600) !important;
 }
 
 .empty {
@@ -152,8 +177,8 @@
     width: 100%;
     padding: 24px;
     border-radius: 4px;
-    border: 2px solid var(--color-neutral-600);
-    color: var(--color-neutral-600);
+    border: 2px solid var(--btn-outline-border);
+    color: var(--btn-outline-border);
     font-weight: 600;
     user-select: none;
 }
@@ -194,7 +219,7 @@ hr {
 }
 
 .original-banks .badge {
-    border: 1px solid var(--color-neutral-400);
+    border: 1px solid var(--text-hint-color);
     padding: 4px 8px;
     border-radius: 8px;
     font-size: 12px;

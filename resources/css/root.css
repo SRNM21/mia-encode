@@ -273,16 +273,92 @@
     --color-stone-900: oklch(0.216 0.006 56.043);
     --color-stone-950: oklch(0.147 0.004 49.25);
 
-    --color-black: #000;
-    --color-white: #fff;
-
+    /* colors */
+    --color-error: var(--color-red-600);
+    --color-danger: var(--color-red-600);
+    --color-success: var(--color-green-600);
+    
     --foreground: var(--color-neutral-950);
     --background: var(--color-neutral-50);
+
+    /* components */
+    --header-bg: var(--color-neutral-200);
+    --sidebar-bg: var(--color-neutral-100);
+    
+    --input-bg: var(--color-neutral-100);
+    --input-color: var(--foreground);
+    --input-border: var(--color-neutral-400);
+
+    --btn-outline-bg: var(--color-neutral-200);
+    
+    --card-bg: var(--color-neutral-100);
+
+    --text-hint-color: var(--color-neutral-600);
+    --text-subtle-color: var(--color-neutral-700);
+
+    /* elements */
+    --scrollbar-thumb-color: var(--color-neutral-400);
+    --scrollbar-track-color: var(--color-neutral-100);
+
+    --border-color: var(--color-neutral-300);
+    --btn-outline-border: var(--color-neutral-400);
+    
+    --table-header-bg: var(--color-neutral-200);
+
+    /* state */
+    --hover-primary-btn: var(--color-neutral-700);
+    --hover-ghost-btn: var(--color-neutral-300);
+    --hover-sidebar-nav: var(--color-neutral-200);
+    --hover-outline-btn: var(--color-neutral-300);
+    --hover-link-btn: var(--color-neutral-100);
+    --active-link-btn: var(--color-neutral-200);
+    
+    --hover-scrollbar-thumb: var(--color-neutral-500);
 }
 
 .dark {
+    
+    /* colors */
+    --color-error: var(--color-red-500);
+    --color-danger: var(--color-red-400);
+    --color-success: var(--color-green-400);
+    
     --foreground: var(--color-neutral-50);
     --background: var(--color-neutral-950);
+
+    /* components */
+    --header-bg: var(--color-neutral-800);
+    --sidebar-bg: var(--color-neutral-900);
+
+    --input-bg: var(--color-neutral-900);
+    --input-color: var(--foreground);
+    --input-border: var(--color-neutral-600);
+    
+    --btn-outline-bg: var(--color-neutral-900);
+
+    --card-bg: var(--color-neutral-900);
+
+    --text-hint-color: var(--color-neutral-400);
+    --text-subtle-color: var(--color-neutral-300);
+
+    /* elements */
+    --scrollbar-thumb-color: var(--color-neutral-600);
+    --scrollbar-track-color: var(--color-neutral-900);
+
+    --border-color: var(--color-neutral-700);
+    --btn-outline-border: var(--color-neutral-600);
+    
+    --table-header-bg: var(--color-neutral-800);
+
+    /* state */
+    --hover-primary-btn: var(--color-neutral-300);
+    --hover-ghost-btn: var(--color-neutral-700);
+    --hover-sidebar-nav: var(--color-neutral-800);
+    --hover-outline-btn: var(--color-neutral-800);
+    --hover-link-btn: var(--color-neutral-900);
+    --active-link-btn: var(--color-neutral-800);
+    
+    --hover-scrollbar-thumb: var(--color-neutral-500);
 }
 
 /* 
@@ -338,10 +414,10 @@ input, select {
     padding: 8px 16px;
     outline: none;
     border-radius: 8px;
-
-    border: 1px solid var(--color-neutral-600);
-    background-color: var(--color-neutral-900);
-    color: var(--foreground);
+    
+    border: 1px solid var(--input-border);
+    background-color: var(--input-bg);
+    color: var(--input-color);
     
     &:focus-visible {
         box-shadow: 0 0 1px 2px var(--color-neutral-700);
@@ -380,7 +456,7 @@ button, button.primary {
     white-space: nowrap;
 
     &:hover {
-        background-color: var(--color-neutral-300);
+        background-color: var(--hover-primary-btn);
     }
 }
 
@@ -393,21 +469,21 @@ button > p {
 }
 
 button.outline {
-    background-color: var(--color-neutral-900);
-    color: var(--color-neutral-100);
-    border: 1px solid var(--color-neutral-600);
+    background-color: var(--btn-outline-bg);
+    color: var(--foreground);
+    border: 1px solid var(--btn-outline-border);
     
     &:hover {
-        background-color: var(--color-neutral-800);
+        background-color: var(--hover-outline-btn);
     }
 }
 
 button.ghost {
-    background-color: var(--color-neutral-900);
-    color: var(--color-neutral-100);
+    background-color: var(--btn-outline-bg);
+    color: var(--foreground);
     
     &:hover {
-        background-color: var(--color-neutral-800);
+        background-color: var(--hover-outline-btn);
     }
 }
 
@@ -428,9 +504,9 @@ button svg {
 }
 
 .status-card.error-card {
-    color: var(--color-red-500);
-    background-color: rgb(from var(--color-red-500) r g b / 10%);
-    border: 1px solid var(--color-red-500);
+    color: var(--color-error);
+    background-color: rgb(from var(--color-error) r g b / 10%);
+    border: 1px solid var(--color-error);
 }
 
 .status-card.info-card {
@@ -471,8 +547,8 @@ button svg {
 }
 
 .card {
-    background-color: var(--color-neutral-900);
-    border: 1px solid var(--color-neutral-700);
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 16px;
 }
@@ -508,12 +584,32 @@ input[type=number] {
 */
 
 input.error, select.error {
-    box-shadow: 0 0 1px 2px var(--color-red-400);
-    border: 1px solid var(--color-red-500);
+    box-shadow: 0 0 1px 2px var(--color-danger);
+    border: 1px solid var(--color-error);
 }
 
 .field-group:has(input.error) label {
-    color: var(--color-red-500);
+    color: var(--color-error);
+}
+
+input[read-only], 
+select[read-only] {
+    background-color: var(--color-neutral-950);
+    border-color: var(--color-neutral-800);
+    color: var(--color-neutral-400);
+    cursor: default;
+    pointer-events: none;
+    box-shadow: none !important;
+}
+
+input:not(:read-only):hover {
+    border-color: var(--color-neutral-500);
+}
+
+input:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    filter: grayscale(1);
 }
 
 /* 
@@ -523,12 +619,12 @@ input.error, select.error {
 */
 
 html {
-    scrollbar-color: var(--color-neutral-600) var(--color-neutral-900); 
+    scrollbar-color: var(--scrollbar-thumb-color) var(--scrollbar-track-color); 
     scrollbar-width: thin;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-neutral-500);
+  background: var(--hover-scrollbar-thumb);
 }
 
 body {
@@ -541,7 +637,7 @@ body {
 }
 
 hr {
-    border-color: var(--color-neutral-700);
+    border: none;
+    height: 1px;
+    background-color: var(--border-color);
 }
-
-@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));

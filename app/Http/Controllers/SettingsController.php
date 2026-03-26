@@ -7,6 +7,7 @@ use App\Core\Facades\Auth;
 use App\Http\Request\PasswordRequest;
 use App\Http\Request\ProfileRequest;
 use App\Http\Request\Request;
+use App\Models\Setting;
 use App\Models\User;
 use Throwable;
 
@@ -129,6 +130,51 @@ class SettingsController extends Controller
             $this->responseJson([
                 'title' => 'Unknown Error',
                 'message' => 'An unknown error occured ['. $e->getCode() .'].'
+            ], 500);
+        }
+    }
+
+    public function updateTheme(Request $request) 
+    {
+        $user = $this->checkAuthenticated();
+
+        try {
+            $theme = $request->input('theme');
+
+            if (!in_array($theme, ['dark', 'light', 'system'])) {
+                return $this->responseJson([
+                    'title' => 'Invalid Theme',
+                    'message' => 'The selected theme is invalid.'
+                ], 400);
+            }
+
+            $existingSetting = Setting::where('user_id', '=', $user->id)->first();
+
+            if ($existingSetting) 
+            {
+                Setting::update(
+                    ['user_id' => $user->id], 
+                    ['preference' => $theme]
+                );
+            } 
+            else 
+            {
+                Setting::create([
+                    'user_id' => $user->id,
+                    'preference' => $theme
+                ]);
+            }
+
+            $this->responseJson([
+                'title' => 'Theme Updated',
+                'message' => 'Your appearance preference has been saved successfully.'
+            ]);
+
+        } catch (Throwable $e) {
+            dd($e);
+            $this->responseJson([
+                'title' => 'Unknown Error',
+                'message' => 'An unknown error occurred [' . $e->getCode() . '].'
             ], 500);
         }
     }

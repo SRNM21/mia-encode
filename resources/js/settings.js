@@ -15,9 +15,6 @@ const securityCancelBtn = $('.security-cancel-btn')
 const profileErrorCard = $('.profile-error-card')
 const securityErrorCard = $('.security-error-card')
 
-const savedTheme = localStorage.getItem('user-theme') || 'dark' // Default to dark
-applyTheme(savedTheme)
-
 let IS_LOADING = false
 
 async function withLoading(fn, onError) {
@@ -41,21 +38,34 @@ async function withLoading(fn, onError) {
 }
 
 function applyTheme(theme) {
-    // $('body').removeClass('dark light')
+    $('html').removeClass('dark light');
 
-    // if (theme === 'system') {
-    //     const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    //     $('body').addClass(isDark ? 'dark' : 'light')
-    // } else {
-    //     $('body').addClass(theme)
-    // }
+    if (theme === 'system') {
+        const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        $('html').addClass(isDark ? 'dark' : 'light');
+    } else {
+        $('html').addClass(theme);
+    }
 
-    // // Update active state in UI
-    // $('.themes-selection-container .card').removeClass('active')
-    // $(`.themes-selection-container .card[data-theme="${theme}"]`).addClass('active')
+    $('.themes-selection-container .card').removeClass('active');
+    $(`.themes-selection-container .card[data-theme="${theme}"]`).addClass('active');
+}
 
-    // // Save to localStorage
-    // localStorage.setItem('user-theme', theme)
+async function saveTheme(theme) {
+    await withLoading(async () => { 
+        const response = await patch({
+            url: 'settings/theme',
+            data: { theme: theme }
+        });
+
+        const result = response.data;
+        showNotification(
+            result.title,
+            result.message,
+        );
+    }, (error) => {
+        console.error('Failed to save theme:', error);
+    });
 }
 
 async function saveProfile(section) {
@@ -265,4 +275,14 @@ $(document).ready(function() {
             securityErrorCard.addClass('hidden')
         }
     })
+
+    $('.themes-selection-container .card').on('click', function() {
+        const selectedTheme = $(this).data('theme');
+        const currentTheme = localStorage.getItem('user-theme');
+
+        if (selectedTheme !== currentTheme) {
+            applyTheme(selectedTheme);
+            saveTheme(selectedTheme);
+        }
+    });
 })

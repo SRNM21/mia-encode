@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="<?= $theme ?>">
     <head>
         <meta charset='UTF-8'>
         <meta name='viewport' content='width=device-width, initial-scale=1.0'>
@@ -8,7 +8,7 @@
         <?= css('encode') ?>
     </head>
 
-    <body class='dark'>
+    <body>
         <div class='home-page flex-col'>
             
             <?= get_component('header', [

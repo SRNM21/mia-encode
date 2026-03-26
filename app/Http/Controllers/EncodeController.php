@@ -11,6 +11,7 @@ use App\Services\BankApplicationService;
 use App\Services\ClientService;
 use App\Services\EncodeService;
 use Exception;
+use Throwable;
 
 class EncodeController extends Controller
 {   
@@ -91,7 +92,7 @@ class EncodeController extends Controller
                 'message' => 'Your application has been submitted successfully.',
             ]);
         }
-        catch (Exception $e)
+        catch (Throwable $e)
         {
             return $this->responseJson([
                 'title' => 'Error Occured',

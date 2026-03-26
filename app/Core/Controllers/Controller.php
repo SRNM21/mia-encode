@@ -5,6 +5,7 @@ namespace App\Core\Controllers;
 use App\Core\Facades\Auth;
 use App\Core\Facades\Route;
 use App\Core\Support\Session;
+use App\Models\Setting;
 
 abstract class Controller
 {
@@ -26,7 +27,13 @@ abstract class Controller
      */
     protected function view(string $view, array $data = [])
     {   
-        if (Auth::check()) $data['user'] = Auth::user();
+        $user = Auth::user();
+
+        if ($user) 
+        {
+            $data['user'] = $user;
+            $data['theme'] = Setting::where('user_id', '=', $user->id)->first()->preference;
+        }
 
         // Get and join session data (passed data using 'redirect' method of Route class)
         extract(array_merge($data, Session::get('PASSED_DATA', [])));
