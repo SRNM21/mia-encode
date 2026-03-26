@@ -3,8 +3,11 @@
 namespace App\Core\Auth;
 
 use App\Core\Contracts\Auth\Authenticable as AuthAuthenticableContract;
+use App\Core\Facades\Auth;
+use App\Core\Facades\DB;
 use App\Core\Support\Session;
 use App\Models\User;
+use Exception;
 
 /**
  * Class Authenticable
@@ -126,6 +129,56 @@ class Authenticable implements AuthAuthenticableContract
     {
         $user = $this->user();
         return $user->isEncoder();
+    }
+
+    /**
+     * Attempts to change the current authenticated user.
+     *
+     * @return boolean
+     */
+    public function changePassword(string $newPassword): bool 
+    {
+        $user_table = 'account_tbl';
+        $password_column = 'pass';
+        $where_column = 'id';
+        $password_update_column = 'last_password_update';
+
+        try
+        {
+            $user = Auth::user();
+
+            // check authenthicated user on this session
+            if (!$user) return false;
+
+            $sql = "UPDATE {$user_table}
+                SET {$password_column} = ?,
+                    {$password_update_column} = ?
+                WHERE {$where_column} = ?
+                LIMIT 1";
+
+            $bindings = [
+                password_hash($newPassword, PASSWORD_DEFAULT), // SET password_column
+                date('Y-m-d H:i:s'), // SET password_update_column
+                $user->id // WHERE where_column
+            ];
+
+            $stm = DB::getPDO()->prepare($sql);
+
+            foreach ($bindings as $index => $value) 
+            {
+                $stm->bindValue($index + 1, $value);
+            }
+
+            $stm->execute();
+
+            return $stm->rowCount() > 0;
+        }
+        catch (Exception $e)
+        {
+            return false;
+        }
+
+        return true;
     }
 
     /**

@@ -116,8 +116,6 @@ class BankApplicationController extends Controller
             $request_map[$request['app_id']] = $request;
         }
         
-        // dd($request_map);
-
         return $this->view('applications', [
             'banks' => $banks,
             'applications' => $data['applications'],

@@ -32,6 +32,10 @@ Route::middleware(AuthMiddleware::class)->group(function () {
     Route::post('/bank-applications/pre-export', [BankApplicationController::class, 'preExport']);
     Route::post('/bank-applications/export', [BankApplicationController::class, 'export']);
     
+    Route::get('/settings', [SettingsController::class, 'show']);
+    Route::patch('/settings/profile', [SettingsController::class, 'updateProfile']);
+    Route::patch('/settings/password', [SettingsController::class, 'updatePassword']);
+        
     Route::post('/logout', [LoginController::class, 'logout']);
 
     // Admin
@@ -46,6 +50,8 @@ Route::middleware(AuthMiddleware::class)->group(function () {
             Route::post('/dashboard/chart/bank-apps-series', 'bankAppsSeries');
             
             Route::post('/dashboard/chart/agents-leaderboards', 'agentsLeaderboards');
+            
+            Route::post('/dashboard/chart/weekly-bank-table', 'weeklyCalendar');
         });
         
         Route::get('/leaderboards', [LeaderboardsController::class, 'show']);
@@ -58,11 +64,6 @@ Route::middleware(AuthMiddleware::class)->group(function () {
         Route::patch('/requests/read', [RequestEditController::class, 'read']);
         Route::patch('/requests/reject', [RequestEditController::class, 'reject']);
         Route::patch('/requests/approve', [RequestEditController::class, 'approve']);
-
-        // TODO: ADD ACCOUNT MANAGER0
-
-        // TODO: SETTINGS [THEME, ACCOUNT]
-        Route::get('/settings', [SettingsController::class, 'show']);
     });
 
     // Encoder
@@ -83,6 +84,3 @@ Route::middleware(AuthMiddleware::class)->group(function () {
         Route::delete('/request-edit', [RequestEditController::class, 'destroy']);
     });
 });
-
-// TODO: ADD FEAT TO LEADERBOARDS [TYPES OF BANK APP PER AGENT]
-// TODO: ADD FEAT TO LEADERBOARDS [TYPES OF BANK APP PER WEEK]

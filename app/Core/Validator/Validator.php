@@ -13,6 +13,7 @@ use App\Core\Validator\Rules\RequiredRule;
 use App\Core\Validator\Rules\DateRule;
 use App\Core\Validator\Rules\RegexRule;
 use App\Core\Validator\Exceptions\ValidationException;
+use App\Core\Validator\Rules\EmailRule;
 
 class Validator 
 {
@@ -30,6 +31,7 @@ class Validator
         'in' => InRule::class,
         'date' => DateRule::class,
         'regex' => RegexRule::class,
+        'email' => EmailRule::class,
     ];
 
     /**

@@ -57,7 +57,7 @@ abstract class ValidationRequest extends Request
     protected function validateResolved(): void
     {
         Validator::validate(
-            $this->posts(),
+            $this->all(),
             $this->rules(),
             $this->messages(),
             $this->strict(),

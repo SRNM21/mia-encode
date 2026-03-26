@@ -1,0 +1,134 @@
+@import url('home.css');
+
+.content {
+    flex: 1;
+    align-items: center;
+}
+
+.content > div {
+    width: 100%;
+    max-width: 800px;
+}
+
+.settings-content {
+    width: 100%;
+}
+
+.setting-container {
+    width: 100%;
+}
+
+.section {
+    margin-bottom: 24px;
+}
+
+.section-header {
+    justify-content: space-between; 
+    align-items: center; 
+    border-bottom: 1px solid var(--input-border); 
+    padding-bottom: 12px; 
+    margin-bottom: 20px;
+}
+
+.section-title {
+    font-weight: 600;
+    font-size: 18px;
+}
+
+.section-desc {
+    color: var(--text-hint-color);
+    font-size: 16px;
+}
+
+.section-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.settings-nav-container {
+    width: 200px;
+    margin-right: 24px;
+}
+
+.settings-link {
+    width: 100%;
+    justify-content: start !important;
+    align-items: start !important;
+    color: var(--foreground) !important;
+    background-color: var(--background) !important;
+    position: relative;
+}
+
+.settings-link:hover {
+    color: var(--foreground) !important;
+    background-color: var(--hover-link-btn) !important;
+}
+
+.settings-link.active {
+    background-color: var(--active-link-btn) !important;
+}
+
+.settings-link.active::before {
+    content: ' ';
+    background-color: var(--color-amber-600);
+    height: 80%;
+    width: 4px;
+    position: absolute;
+    top: 50%;
+    left: -8px;
+    transform: translateY(-50%);
+    border-radius: 8px;
+}
+
+.profile-form-wrapper {
+    gap: 18px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.field-group {
+    gap: 8px;
+}
+
+.action-buttons {
+    justify-content: end;
+}
+
+.password-info-datetime {
+    font-weight: 600;
+}
+
+.password-info-note {
+    font-size: 14px;
+    color: var(--text-hint-color);
+}
+
+.setting-container {
+    opacity: 1;
+}
+
+.setting-container.fade-out {
+    opacity: 0;
+}
+
+.setting-container.hide {
+    display: none;
+}
+
+.setting-container.fade-in {
+    opacity: 0;
+}
+
+.themes-selection-container {
+    margin-top: 24px;
+}
+
+.themes-selection-container .card {
+    width: 100%;
+    cursor: pointer;
+}
+
+.themes-selection-container .card.active {
+    border: 1px solid var(--color-amber-600);
+}

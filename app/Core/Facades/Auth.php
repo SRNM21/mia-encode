@@ -4,13 +4,14 @@ namespace App\Core\Facades;
 
 /**
  * 
- * @method static \App\Core\Auth\Authenticable user()
+ * @method static \App\Models\User user()
  * @method static bool check()
  * @method static bool isAdmin()
  * @method static bool isEncoder()
  * @method static void login()
  * @method static void logout()
  * @method static bool attempt(array $credentials)
+ * @method static bool changePassword(string $newPassword)
  * 
  * @see \App\Core\Auth\Authenticable
  */

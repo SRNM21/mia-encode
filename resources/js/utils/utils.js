@@ -36,10 +36,22 @@ $('.modal-close-btn, .modal-cancel-btn').on('click', (e) => {
 // -----------------
 
 toggleBtn.on('click', () => {
-    if (sidebar.hasClass('collapsed')) {
-        sidebar.removeClass('collapsed')
+    sidebar.toggleClass('pinned');
+    
+    if (sidebar.hasClass('pinned')) {
+        sidebar.removeClass('collapsed');
     } else {
-        sidebar.addClass('collapsed')
+        sidebar.addClass('collapsed');
+    }
+});
+
+sidebar.on('mouseenter', () => {
+    sidebar.removeClass('collapsed');
+});
+
+sidebar.on('mouseleave', () => {
+    if (!sidebar.hasClass('pinned')) {
+        sidebar.addClass('collapsed');
     }
 });
 

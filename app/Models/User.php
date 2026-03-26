@@ -14,6 +14,8 @@ class User extends Model
         'email',
         'pass',
         'role',
+        'team',
+        'last_password_update',
         'status'
     ];
 
@@ -24,6 +26,13 @@ class User extends Model
     protected array $casts = [
         'role' => UserRole::class
     ];
+
+    public function getPreference(): Setting
+    {
+        return Setting::query()
+            ->where('user_id', '=', $this->id)
+            ->first();
+    }
 
     public function checkPassword(string $password)
     {

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="">
     <head>
         <meta charset='UTF-8'>
         <meta name='viewport' content='width=device-width, initial-scale=1.0'>
@@ -8,13 +8,15 @@
         <?= css('settings') ?>
     </head>
 
-    <body class='dark'>
+    <body
+
+    >
         <div class='home-page flex-col'>
 
-            <?= get_component('Settings', [
+            <?= get_component('header', [
                 'user' => $user,
                 'breadcrumbs' => [
-                    ['label' => 'Requests'] 
+                    ['label' => 'Settings'] 
                 ]
             ]) ?>
             
@@ -24,62 +26,116 @@
                 <div class='content flex-col'>
                     <div class='flex-row'>
                         <div class="settings-nav-container flex-col gap-8">
-                            <button class="settings-link active">Account</button>
-                            <button class="settings-link">Theme </button>
+                            <button data-tab="account" class="settings-link">Account</button>
+                            <button data-tab="theme" class="settings-link">Theme </button>
                         </div>
                         <div class="settings-content">
-                            <div class="account-setting-container setting-container">
+                            <div class="account-setting-container setting-container hide" data-tab="account">
                                 <div class="account-setting-content">
+                                    
                                     <div class="profile-section section">
-                                        <p class="section-title">Profile</p>
+                                        <div class="flex-row section-header">
+                                            <p class="section-title">Profile</p>
+                                            <button type="button" class="outline sm profile-edit-btn">Edit Account</button>
+                                            <div class="action-buttons flex-row gap-8 hidden">
+                                                <button class="outline sm profile-cancel-btn" type="button">Cancel</button>
+                                                <button class="primary sm profile-save-btn" type="button">
+                                                    <p>Save Changes</p>
+                                                    <?php get_component('loader', [
+                                                        'size' => 'sm',
+                                                    ]) ?>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
                                         <div class="section-content">
                                             <div class="profile-form-wrapper">
                                                 <div class="flex-col field-group">
                                                     <label for="username">Username</label>
-                                                    <input 
-                                                        type="text" 
-                                                        id="username"
-                                                        name="username"
-                                                        required
-                                                    >
+                                                    <input type="text" id="username" name="username" value="<?= $user->username ?>" readonly disabled required>
                                                 </div>
                                                 <div class="flex-col field-group">
                                                     <label for="email">Email</label>
-                                                    <input 
-                                                        type="email" 
-                                                        id="email"
-                                                        name="email"
-                                                        required
-                                                    >
-                                                </div>
-                                                <div class="flex-col field-group">
-                                                    <label for="team">Team</label>
-                                                    <input 
-                                                        type="text" 
-                                                        id="team"
-                                                        name="team"
-                                                        required
-                                                    >
+                                                    <input type="email" id="email" name="email" value="<?= $user->email ?>" readonly disabled required>
                                                 </div>
                                             </div>
+                                            
+                                            <?php get_component('error-card', [
+                                                'class' => 'profile-error-card',
+                                            ]) ?>
+                                            
                                         </div>
                                     </div>
+
                                     <div class="security-section section">
-                                        <p class="section-title">Security</p>
-                                        <div class="section-content">
-
+                                        <div class="flex-row section-header">
+                                            <p class="section-title">Security</p>
+                                            
+                                            <button type="button" class="outline sm security-edit-btn">Edit Password</button>
+                                            
+                                            <div class="action-buttons flex-row gap-8 hidden">
+                                                <button class="outline sm security-cancel-btn" type="button">Cancel</button>
+                                                <button class="primary sm security-save-btn" type="button">
+                                                    <p>Update Password</p>
+                                                    <?php get_component('loader', [
+                                                        'size' => 'sm',
+                                                    ]) ?>
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="activity-section section">
-                                        <p class="section-title">Activity</p>
+                                        
                                         <div class="section-content">
+                                            <div class="password-info card flex-row">
+                                                <div class="flex-col gap-4">
+                                                    <p class="password-info-datetime"><?= formatDate($user->last_password_update, 'F j, Y \a\t h:i A') ?? 'ASD' ?></p>
+                                                    <p class="password-info-note">Password last updated at</p>
+                                                </div>
+                                            </div>
 
+
+                                            <div class="profile-form-wrapper hidden">
+                                                <div class="flex-col field-group">
+                                                    <label for="current-password">Current Password</label>
+                                                    <input type="password" id="current-password" name="current-password">
+                                                </div>
+                                                <div class="flex-col field-group">
+                                                    <label for="new-password">New Password</label>
+                                                    <input type="password" id="new-password" name="new-password">
+                                                </div>
+                                                <div class="flex-col field-group">
+                                                    <label for="confirm-password">Confirm New Password</label>
+                                                    <input type="password" id="confirm-password" name="confirm-password">
+                                                </div>
+                                            </div>
+                                            
+                                            <?php get_component('error-card', [
+                                                'class' => 'security-error-card',
+                                            ]) ?>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="hidden theme-setting-container setting-container">
-                                THEME
+
+                            <div class="theme-setting-container setting-container hide" data-tab="theme">
+                                <div class="section">
+                                    <div class="flex-col gap-4">
+                                        <p class="section-title">Appearance</p>
+                                        <p class="section-desc">Choose how MIA looks to you. This affects your local session only.</p>
+                                    </div>
+                                    <div class="section-content">
+                                        <div class="flex-row gap-16 themes-selection-container">
+                                            <div class="card flex-col flex-center gap-8 active" data-theme="dark">
+                                                <p>Dark Mode</p>
+                                            </div>
+                                            <div class="card flex-col flex-center gap-8" data-theme="light">
+                                                <p>Light Mode</p>
+                                            </div>
+                                            <div class="card flex-col flex-center gap-8" data-theme="system">
+                                                <p>System</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

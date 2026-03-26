@@ -349,3 +349,124 @@ export function validateBankDetails(errorContainer, input) {
 
     return [data, errors]
 }
+
+export function validateEditProfileForm(errorContainer, input) { 
+    const errors = []
+    const data = {}
+
+    const username = input.username.val().trim()
+    input.username.removeClass('error')
+    data.username = username
+
+    if (!username) {
+        errors.push({
+            field: 'username',
+            el: input.username,
+            message: 'Username is required.'
+        })
+    }
+
+    if (username.length < 4) {
+        errors.push({
+            field: 'username',
+            el: input.username,
+            message: 'Username must be at least 4 characters.'
+        })
+    }
+    
+    if (username.length > 20) {
+        errors.push({
+            field: 'username',
+            el: input.username,
+            message: 'Username must not exceed 20 characters.'
+        })
+    }
+
+    const email = input.email.val().trim()
+    input.email.removeClass('error')
+    data.email = email
+
+    if (!email) {
+        errors.push({
+            field: 'email',
+            el: input.email,
+            message: 'Email is required.'
+        })
+    }
+
+    if (errors.length > 0) {
+        renderError(errorContainer, errors)
+    } else {
+        errorContainer.addClass('hidden')
+    }
+
+    return [data, errors]
+}
+
+
+export function validateEditPasswordForm(errorContainer, input) { 
+    const errors = []
+    const data = {}
+
+    const currentPassword = input.currentPassword.val().trim()
+    input.currentPassword.removeClass('error')
+    data.current_password = currentPassword
+
+    if (!currentPassword) {
+        errors.push({
+            field: 'current_password',
+            el: input.currentPassword,
+            message: 'Current password is required.'
+        })
+    }
+
+    const newPassword = input.newPassword.val().trim()
+    input.newPassword.removeClass('error')
+    data.new_password = newPassword
+
+    if (!newPassword) {
+        errors.push({
+            field: 'new_password',
+            el: input.newPassword,
+            message: 'New password is required.'
+        })
+    }
+
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/
+
+    if (!passwordRegex.test(newPassword)) {
+        errors.push({
+            field: 'new_password',
+            el: input.newPassword,
+            message: 'New password must be at least 8 characters long, has: digit and special, lowercase, and uppercase characters.'
+        })
+    }
+
+    const confirmPassword = input.confirmPassword.val().trim()
+    input.confirmPassword.removeClass('error')
+    data.confirm_password = confirmPassword
+
+    if (!confirmPassword) {
+        errors.push({
+            field: 'confirm_password',
+            el: input.confirmPassword,
+            message: 'Confirm password is required.'
+        })
+    }
+
+    if (newPassword !== confirmPassword) {
+        errors.push({
+            field: 'new_password',
+            el: input.newPassword,
+            message: 'New password does not match.'
+        })
+    }
+
+    if (errors.length > 0) {
+        renderError(errorContainer, errors)
+    } else {
+        errorContainer.addClass('hidden')
+    }
+
+    return [data, errors]
+}
