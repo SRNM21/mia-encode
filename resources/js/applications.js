@@ -312,6 +312,8 @@ async function refereshTable() {
         })
         
         const result = response.data
+        console.log(result);
+        
         tableWrapper.html(result.html)
         renderPaginationState()
     } catch (error) {

@@ -94,17 +94,7 @@ class BankApplicationController extends Controller
                 $application['banks'] = [];
             }
         }
-
-        return [
-            'applications' => $clientsApplications,
-            'meta' => $meta
-        ];
-    }
-
-    public function show(Request $request)
-    {
-        $banks = Bank::getAll();
-        $data = $this->getApplicationsData($request);
+        
         $requests = RequestEdit::query()
             ->where('status', '=', 'pending')
             ->orderBy('datetime_request', 'ASC')
@@ -115,12 +105,24 @@ class BankApplicationController extends Controller
         {
             $request_map[$request['app_id']] = $request;
         }
+
+        return [
+            'applications' => $clientsApplications,
+            'meta' => $meta,
+            'request_map' => $request_map
+        ];
+    }
+
+    public function show(Request $request)
+    {
+        $banks = Bank::getAll();
+        $data = $this->getApplicationsData($request);
         
         return $this->view('applications', [
             'banks' => $banks,
             'applications' => $data['applications'],
             'meta' => $data['meta'],
-            'request_map' => $request_map
+            'request_map' => $data['request_map'],
         ]);
     }
 
@@ -132,6 +134,7 @@ class BankApplicationController extends Controller
         $html = render_component('applications-table', [
             'banks' => $banks,
             'applications' => $data['applications'],
+            'request_map' => $data['request_map'],
             'user' => Auth::user()
         ]);
 
