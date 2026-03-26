@@ -450,4 +450,8 @@ abstract class Model
         return array_intersect_key($data, array_flip($this->fillable));
     }
 
+    public function __debugInfo(): array
+    {
+        return $this->toArray();
+    }
 }

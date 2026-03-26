@@ -20,7 +20,8 @@ class User extends Model
     ];
 
     protected array $hidden = [
-        'pass'
+        'pass',
+        'last_password_update'
     ];
 
     protected array $casts = [
