@@ -11,12 +11,19 @@ class LoginController extends Controller
 {
     public function redirectUser()
     {
-        if (Auth::isAdmin()) 
+        $user = Auth::user();
+
+        if ($user === null) 
+        {
+            $this->redirect('/login');
+        }
+        
+        if ($user->isAdmin()) 
         {
             $this->redirect('/dashboard');
         }
 
-        if (Auth::isEncoder()) 
+        if ($user->isEncoder()) 
         {
             $this->redirect('/encode');
         }
