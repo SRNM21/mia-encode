@@ -70,18 +70,6 @@ doc.ready(function () {
         clear()
     })
 
-    // Toggle check on cell click
-    tbody.on('click', 'td.bank-select-cell', function () {
-        const cell = $(this)
-
-        if (cell.hasClass('disabled') || cell.closest('tr').hasClass('row-disabled')) return
-        if (cell.hasClass('selected')) {
-            cell.removeClass('selected').html('')
-        } else {
-            cell.addClass('selected').html(ICON_CHECK)
-        }
-    })
-
     checkClientBtn.on('click', async (e) => {        
         e.preventDefault()
 
@@ -152,6 +140,7 @@ doc.ready(function () {
             
             clear()
             showNotification('Saved Successfully', 'Client\'s bank application successfully submitted.')
+            firstname.focus()
         } catch (error) {
             const response = error.responseJSON
 
@@ -161,6 +150,13 @@ doc.ready(function () {
             )
 
             scrollToBottom('.content')
+        }
+    })
+
+    submitBtn.on('keydown', function(e) {
+        if (e.key === 'Tab' && !e.shiftKey) {
+            e.preventDefault();
+            firstname.focus()
         }
     })
 })
@@ -261,6 +257,20 @@ function renderClientBankApplication(data) {
             })
         })
     }
+        
+    // Toggle check on cell click
+    function checkBank(element) {
+        const cell = $(element)
+
+        if (cell.hasClass('disabled') || cell.closest('tr').hasClass('row-disabled')) return
+        if (cell.hasClass('selected')) {
+            cell.removeClass('selected').html('')
+        } else {
+            cell.addClass('selected').html(ICON_CHECK)
+        }
+    }
+
+    let tabIndex = 9 // next for submit
 
     banks.forEach(bank => {
         if (!bank.is_active) return
@@ -291,17 +301,38 @@ function renderClientBankApplication(data) {
             .addClass('bank-select-cell')
             .attr('data-bank-name', bank.name)
             .attr('data-bank-id', bank.id)
+            .attr('tabindex', `${tabIndex++}`)
             .text('')
 
-        if (app && !isExpiredApplication) {
-            row.addClass('row-disabled')
-            actionCell.addClass('disabled unavailable').html(ICON_UNAVAILABLE)
+        const isDisabled = isExpiredApplication || (app && !isExpiredApplication);
+
+        if (isDisabled) {
+            row.addClass('row-disabled');
+            actionCell.addClass('disabled unavailable').html(ICON_UNAVAILABLE);
+            actionCell.removeAttr('tabindex'); 
+            actionCell.off('click keydown'); 
+
+        } else {
+            actionCell.attr('tabindex', `${tabIndex++}`);
+            actionCell.on('click', function() {
+                checkBank(this); 
+            });
+            
+            actionCell.on('keydown', function(event) {
+                console.log(event);
+
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    $(this).trigger('click');
+                }
+            });
         }
 
         row.append(bankCell, dateCell, agentCell, statusCell, actionCell)
         tbody.append(row)
     })
 
+    submitBtn.attr('tabindex', tabIndex++)
     showBankApplicationsContent(true)
     showSubmitContent(true)
 }

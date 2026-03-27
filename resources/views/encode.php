@@ -27,11 +27,11 @@
                             <div class="container-header flex-row">
                                 <h1 class='title'>Client Details</h1>
                                 <div class="flex-row gap-16">
-                                    <button type="button" id="clear-client-button" class="outline clear-client-button">
+                                    <button type="button" id="clear-client-button" class="outline clear-client-button" tabindex="7">
                                         <?= get_icon('eraser') ?>
                                         Clear
                                     </button>
-                                    <button type="button" id="check-client-button" class="outline check-client-button">
+                                    <button type="button" id="check-client-button" class="outline check-client-button" tabindex="8">
                                         <?= get_icon('file-search-corner') ?>
                                         Check Client
                                     </button>
@@ -40,32 +40,32 @@
                             <div class="field-set form-grid">
                                 <div class="flex-col field-group">
                                     <label for="firstname">Firstname</label>
-                                    <input type="text" id="firstname" name="firstname" class="client-details-input" placeholder="e.g. Juan" required>
+                                    <input type="text" id="firstname" name="firstname" class="client-details-input" placeholder="e.g. Juan" required tabindex="1">
                                 </div>
 
                                 <div class="flex-col field-group">
                                     <label for="middlename">Middlename</label>
-                                    <input type="text" id="middlename" name="middlename" class="client-details-input" placeholder="e.g. Dela" required>
+                                    <input type="text" id="middlename" name="middlename" class="client-details-input" placeholder="e.g. Dela" required tabindex="2">
                                 </div>
 
                                 <div class="flex-col field-group">
                                     <label for="lastname">Lastname</label>
-                                    <input type="text" id="lastname" name="lastname" class="client-details-input" placeholder="e.g. Cruz" required>
+                                    <input type="text" id="lastname" name="lastname" class="client-details-input" placeholder="e.g. Cruz" required tabindex="3">
                                 </div>
 
                                 <div class="flex-col field-group">
                                     <label for="birthdate">Birthdate</label>
-                                    <input type="text" id="birthdate" name="birthdate" class="client-details-input" placeholder="e.g. 01/01/2000" autocomplete="off" required>
+                                    <input type="text" id="birthdate" name="birthdate" class="client-details-input" placeholder="e.g. 01/01/2000" autocomplete="off" required tabindex="4">
                                 </div>
                                 
                                 <div class="flex-col field-group">
                                     <label for="mobile">Mobile Number</label>
-                                    <input type="tel" id="mobile" name="mobile" class="client-details-input" placeholder="e.g. 09XXXXXXXXX" maxlength="11" required>
+                                    <input type="tel" id="mobile" name="mobile" class="client-details-input" placeholder="e.g. 09XXXXXXXXX" maxlength="11" required tabindex="5">
                                 </div>
 
                                 <div class="flex-col field-group">
                                     <label for="agent">Agent</label>
-                                    <input type="text" id="agent" name="agent" class="client-details-input" placeholder="e.g. Greg" required>
+                                    <input type="text" id="agent" name="agent" class="client-details-input" placeholder="e.g. Greg" required tabindex="6">
                                 </div>
                             </div>
 

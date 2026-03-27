@@ -442,7 +442,6 @@ button, button.primary {
     padding: 8px 16px;
     border-radius: 8px;
     cursor: pointer;
-    outline: none;
     display: flex;
     align-items: center;
     justify-content: center;
