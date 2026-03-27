@@ -47,10 +47,6 @@ export function renderBankSeries(canvas, labels, datasets) {
                         position: 'bottom',
                         labels: { color: axisText }
                     },
-                    tooltip: {
-                        titleColor: axisText,
-                        bodyColor: axisText
-                    }
                 },
                 scales: {
                     y: { ticks: { color: axisText }, grid: { color: gridColor } },

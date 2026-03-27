@@ -29,10 +29,6 @@ export function renderClientTodayChart(canvas, newClient, oldClient) {
             maintainAspectRatio: false,
             plugins: {
                 legend: { display: false },
-                tooltip: {
-                    titleColor: axisText,
-                    bodyColor: axisText
-                }
             },
             scales: {
                 y: { ticks: { color: axisText }, grid: { color: gridColor } },
@@ -64,10 +60,6 @@ export function renderClientSeries(canvas, labels, datasets) {
                         position: 'bottom',
                         labels: { color: axisText }
                     },
-                    tooltip: {
-                        titleColor: axisText,
-                        bodyColor: axisText
-                    }
                 },
                 scales: {
                     y: { ticks: { color: axisText }, grid: { color: gridColor } },
