@@ -55,7 +55,7 @@
 
                                 <div class="flex-col field-group">
                                     <label for="birthdate">Birthdate</label>
-                                    <input type="text" id="birthdate" name="birthdate" class="client-details-input" placeholder="e.g. 01/01/2000" autocomplete="off" required tabindex="4">
+                                    <input type="text" id="birthdate" name="birthdate" class="client-details-input" placeholder="e.g. mm/dd/yyyy" autocomplete="off" required tabindex="4">
                                 </div>
                                 
                                 <div class="flex-col field-group">
