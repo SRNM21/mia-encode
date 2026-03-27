@@ -14,7 +14,7 @@ if (!function_exists('base_url')) {
         $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
         
         $host = $_SERVER['HTTP_HOST'];
-        $root = env('ROOT')?? '/mia';
+        $root = env('ROOT')?? '/mia_encode';
         
         return $protocol . $host . $root . '/' . ltrim($path, '/');
     }

@@ -1,5 +1,5 @@
 RewriteEngine On
-RewriteBase /mia
+RewriteBase /mia_encode
 
 # Redirect Trailing Slashes If Not A Folder...
 RewriteCond %{REQUEST_FILENAME} !-d

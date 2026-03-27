@@ -9,7 +9,7 @@ export function useAjax() {
     const ajx = ({ url, method = 'GET', data = {} }) => {
         return new Promise((resolve, reject) => {
             $.ajax({
-                url: '/mia/'+ url,
+                url: '/mia_encode/'+ url,
                 method,
                 dataType: 'json',
                 data,
