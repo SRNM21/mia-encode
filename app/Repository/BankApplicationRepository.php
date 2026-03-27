@@ -138,7 +138,7 @@ class BankApplicationRepository
         foreach ($filters as $key => $value) 
         {
             if ($value === '' || $value === null) continue;
-            $query->where($key, '=', $value);
+            $query->where($key, 'LIKE', '%' . $value . '%');
         }
 
         // Sorting
