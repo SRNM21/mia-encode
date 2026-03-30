@@ -15,7 +15,7 @@
     overflow: hidden;
 }
 
-.content > div {
+.content>div {
     height: 100%;
 }
 
@@ -58,7 +58,8 @@
     margin-top: 24px;
 }
 
-.pagination-left, .pagination-right {
+.pagination-left,
+.pagination-right {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
@@ -94,7 +95,8 @@
     box-sizing: border-box;
 }
 
-.applications-table th, .applications-table td  {
+.applications-table th,
+.applications-table td {
     min-width: 200px;
     border: none;
     padding: 8px;
@@ -181,14 +183,14 @@
     grid-template-columns: repeat(5, 1fr);
 }
 
-.filter-popover{
+.filter-popover {
     z-index: 1000;
     position: absolute;
-    border-radius:6px;
-    box-shadow:0 6px 20px rgba(0,0,0,0.4);
+    border-radius: 6px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
 
-.filter-chip{
+.filter-chip {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -200,10 +202,10 @@
     border-radius: 100px;
 }
 
-.filter-chip button{
-    border:none;
-    background:none;
-    cursor:pointer;
+.filter-chip button {
+    border: none;
+    background: none;
+    cursor: pointer;
 }
 
 .filter-chip-remove-btn {
@@ -211,7 +213,7 @@
     padding: 4px;
 }
 
-.filter-actions > button {
+.filter-actions>button {
     flex: 1;
 }
 
@@ -226,15 +228,19 @@
     margin-top: 32px;
 }
 
-.range-date-error-card, .range-date-info-card {
+.range-date-error-card,
+.range-date-info-card {
     margin-top: 18px;
 }
 
-.export-note, .edit-agent-note {
+.export-note,
+.edit-agent-note {
     margin-top: 18px;
 }
 
-.export-note, .edit-request-datetime, .edit-agent-note {
+.export-note,
+.edit-request-datetime,
+.edit-agent-note {
     color: var(--text-hint-color);
     font-style: italic;
 }
@@ -293,13 +299,11 @@ html.dark .export-excel:hover {
     position: absolute;
     inset: 0;
 
-    background: linear-gradient(
-        45deg,
-        transparent 30%,
-        var(--btn-outline-border) 45%,
-        var(--btn-outline-border) 55%,
-        transparent 70%
-    );
+    background: linear-gradient(45deg,
+            transparent 30%,
+            var(--btn-outline-border) 45%,
+            var(--btn-outline-border) 55%,
+            transparent 70%);
 
     background-size: 300% 300%;
     animation: cardLoading 2s linear infinite;
@@ -317,13 +321,11 @@ html.dark .export-excel:hover {
 }
 
 .empty.load {
-    background: linear-gradient(
-        45deg,
-        transparent 30%,
-        var(--btn-outline-border) 45%,
-        var(--btn-outline-border) 55%,
-        transparent 70%
-    );
+    background: linear-gradient(45deg,
+            transparent 30%,
+            var(--btn-outline-border) 45%,
+            var(--btn-outline-border) 55%,
+            transparent 70%);
     background-size: 300% 300%;
     animation: cardLoading 1.5s linear infinite;
 
@@ -341,14 +343,22 @@ html.dark .export-excel:hover {
     from {
         background-position: 0% 100%;
     }
+
     to {
         background-position: 100% 0%;
     }
 }
 
 @keyframes svgPulse {
-    0%,100% { opacity: 0.5; }
-    50% { opacity: 1; }
+
+    0%,
+    100% {
+        opacity: 0.5;
+    }
+
+    50% {
+        opacity: 1;
+    }
 }
 
 @media (max-width: 900px) {
@@ -377,7 +387,7 @@ html.dark .export-excel:hover {
     text-decoration: none;
     background-color: var(--color-green-800) !important;
     border: 1px solid var(--color-green-600) !important;
-    color: var(--foreground);
+    color: var(--color-neutral-50);
 }
 
 .export-download-link:hover {
@@ -385,7 +395,7 @@ html.dark .export-excel:hover {
     border: 1px solid var(--color-green-700) !important;
 }
 
-.export-download-link > svg {
+.export-download-link>svg {
     height: 20px;
     width: 20px;
 }
@@ -400,7 +410,8 @@ html.dark .export-excel:hover {
     gap: 8px;
 }
 
-.application-edit-error-card, .application-edit-info-card {
+.application-edit-error-card,
+.application-edit-info-card {
     margin-top: 24px;
 }
 
@@ -455,7 +466,7 @@ html.dark .export-excel:hover {
 }
 
 .request-choice {
-    display: hidden;   
+    display: hidden;
 }
 
 .global-dropdown-root {
@@ -489,7 +500,7 @@ html.dark .export-excel:hover {
     flex-direction: column;
     gap: 4px;
 
-    pointer-events: auto; 
+    pointer-events: auto;
 }
 
 .dropdown-menu.show {

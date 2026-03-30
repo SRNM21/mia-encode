@@ -51,7 +51,6 @@ class EncodeController extends Controller
         }
 
         $banks = model_list_to_array(Bank::class, Bank::getAll());
-        $bank_list = sort_by($banks, 'name');
         
         if ($client) 
         {
@@ -60,13 +59,13 @@ class EncodeController extends Controller
             return $this->responseJson([
                 'client' => $client->toArray(),
                 'applications' => model_list_to_array(BankApplication::class, $applications),
-                'banks' => $bank_list,
+                'banks' => $banks,
             ]);
         }
         else 
         {
             return $this->responseJson([
-                'banks' => $bank_list,
+                'banks' => $banks,
             ]);
         }
     }

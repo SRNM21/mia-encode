@@ -103,9 +103,12 @@ doc.ready(function () {
         } catch (error) {
             const response = error.responseJSON
 
+            console.log(error);
+            
+
             setErrorMessage(
                 checkClientErrorCard,
-                normalizedServerErrors(response.data.errors)
+                normalizedServerErrors(response?.data?.errors ?? [])
             )
         }
     })
@@ -204,11 +207,9 @@ function hideBadge() {
 
 function isExpired(dateSubmitted, expirationMonths) {
     const submissionDate = new Date(dateSubmitted);
-
-    // clone the submission date to avoid mutating the original
     const expirationDate = new Date(submissionDate);
     
-    expirationDate.setMonth(expirationDate.getMonth() + expirationMonths);
+    expirationDate.setMonth(expirationDate.getMonth() + parseInt(expirationMonths, 10));
     const currentDate = new Date();
 
     return currentDate > expirationDate;
@@ -280,6 +281,9 @@ function renderClientBankApplication(data) {
             ? isExpired(app.date_submitted, bank.expiry_months) 
             : false
 
+        console.log(app);
+        
+
         const row = $('<tr></tr>')
 
         const date = app ? formatDate(app.date_submitted) : '—'
@@ -304,7 +308,7 @@ function renderClientBankApplication(data) {
             .attr('tabindex', `${tabIndex++}`)
             .text('')
 
-        const isDisabled = isExpiredApplication || (app && !isExpiredApplication);
+        const isDisabled = app && !isExpiredApplication;
 
         if (isDisabled) {
             row.addClass('row-disabled');
