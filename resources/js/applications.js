@@ -579,7 +579,7 @@ $(document).ready(function () {
             const canEdit = response.data
 
             if (canEdit) {
-                const base = window.location.origin + '/mia/'
+                const base = window.location.origin + '/mia_encode/'
                 const url = new URL('bank-applications/edit', base)
                 url.searchParams.set('id', data.id)
 
