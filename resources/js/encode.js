@@ -99,7 +99,6 @@ doc.ready(function () {
             })
             
             renderClientBankApplication(response.data)
-            scrollToBottom('.content')
         } catch (error) {
             const response = error.responseJSON
 
@@ -143,7 +142,7 @@ doc.ready(function () {
             
             clear()
             showNotification('Saved Successfully', 'Client\'s bank application successfully submitted.')
-            firstname.focus()
+            lastname.focus()
         } catch (error) {
             const response = error.responseJSON
 

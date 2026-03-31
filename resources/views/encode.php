@@ -43,15 +43,15 @@
                                     <label for="lastname">Lastname</label>
                                     <input type="text" id="lastname" name="lastname" class="client-details-input" placeholder="e.g. Cruz" required tabindex="1">
                                 </div>
-                                
-                                <div class="flex-col field-group">
-                                    <label for="middlename">Middlename</label>
-                                    <input type="text" id="middlename" name="middlename" class="client-details-input" placeholder="e.g. Dela" required tabindex="2">
-                                </div>
 
                                 <div class="flex-col field-group">
                                     <label for="firstname">Firstname</label>
-                                    <input type="text" id="firstname" name="firstname" class="client-details-input" placeholder="e.g. Juan" required tabindex="3">
+                                    <input type="text" id="firstname" name="firstname" class="client-details-input" placeholder="e.g. Juan" required tabindex="2">
+                                </div>
+                                
+                                <div class="flex-col field-group">
+                                    <label for="middlename">Middlename</label>
+                                    <input type="text" id="middlename" name="middlename" class="client-details-input" placeholder="e.g. Dela" required tabindex="3">
                                 </div>
 
                                 <div class="flex-col field-group">
