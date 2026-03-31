@@ -34,4 +34,33 @@ class RequestEditService
         ]);
     }
 
+    public function markAsRead(string $id)
+    {
+        RequestEdit::update(['id' => $id], [
+            'is_read' => true
+        ]);
+    }
+
+    public function createRequestEdit(string $encoder, string $appId, ?string $oldAgent, ?string $newAgent)
+    {
+        return RequestEdit::create([
+            'encoder' => $encoder,
+            'app_id' => $appId,
+            'old' => $oldAgent,
+            'new' => $newAgent
+        ]);
+    }
+
+    public function cancelRequestEdit(string $id)
+    {
+        RequestEdit::delete($id);
+    }
+
+    public function rejectRequestEdit(string $id)
+    {
+        RequestEdit::update(['id' => $id], [
+            'status' => 'rejected',
+            'datetime_action' => date('Y-m-d H:i:s')
+        ]);
+    }
 }

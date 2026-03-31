@@ -13,11 +13,6 @@ class LoginController extends Controller
     {
         $user = Auth::user();
 
-        if ($user === null) 
-        {
-            $this->redirect('/login');
-        }
-        
         if ($user->isAdmin()) 
         {
             $this->redirect('/dashboard');
@@ -33,7 +28,6 @@ class LoginController extends Controller
 
     public function show()
     {
-
         $this->view('auth.login');
     }
 

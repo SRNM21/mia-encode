@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Http\Request\Request;
 use App\Models\BankApplication;
 use App\Repository\ClientRepository;
+use DateInterval;
+use DateTimeImmutable;
 
 class ClientService
 {
@@ -103,13 +105,13 @@ class ClientService
         $applications = $this->getApplications();
         $availableYears = $this->getAvailableYearsFromApplications($applications);
         $scope = $scope ?: 'daily';
-        $requestedYear = $year ?: (count($availableYears) ? max($availableYears) : date('Y'));
+        $requestedYear = $year ?: (\count($availableYears) ? max($availableYears) : date('Y'));
         $year = (string) $requestedYear;
 
         $earliestByClient = $this->computeEarliestDayByClient($applications);
         $series = [];
 
-        if (in_array($scope, ['daily', 'weekly', 'monthly'], true)) 
+        if (\in_array($scope, ['daily', 'weekly', 'monthly'], true)) 
         {
             $countsByDay = $this->countClientTypesByDayForYear($applications, $year, $earliestByClient);
             
@@ -188,7 +190,7 @@ class ClientService
             if (!$cid || !$day) continue;
             if (substr($day, 0, 4) !== $year) continue;
 
-            $k = $cid . '|' . $day;
+            $k = "{$cid}|{$day}";
             if (isset($seen[$k])) continue;
 
             $seen[$k] = true;
@@ -205,10 +207,10 @@ class ClientService
     private function buildDailySeries(array $countsByDay, string $year): array
     {
         $out = [];
-        $start = new \DateTimeImmutable($year . '-01-01');
-        $end = new \DateTimeImmutable($year . '-12-31');
+        $start = new DateTimeImmutable("{$year}-01-01");
+        $end = new DateTimeImmutable("{$year}-12-31");
 
-        for ($d = $start; $d <= $end; $d = $d->add(new \DateInterval('P1D'))) 
+        for ($d = $start; $d <= $end; $d = $d->add(new DateInterval('P1D'))) 
         {
             $key = $d->format('Y-m-d');
             $out[] = [
@@ -227,24 +229,24 @@ class ClientService
 
         for ($m = 1; $m <= 12; $m++) 
         {
-            $monthStr = sprintf('%02d', $m);
-            $monthNameShort = date('M', strtotime($year . '-' . $monthStr . '-01'));
-            $firstOfMonth = new \DateTimeImmutable($year . '-' . $monthStr . '-01');
-            $lastOfMonth = (new \DateTimeImmutable($year . '-' . $monthStr . '-01'))->modify('last day of this month');
+            $monthStr = \sprintf('%02d', $m);
+            $monthNameShort = date('M', strtotime("{$year}-{$monthStr}-01"));
+            $firstOfMonth = new DateTimeImmutable("{$year}-{$monthStr}-01");
+            $lastOfMonth = (new DateTimeImmutable("{$year}-{$monthStr}-01"))->modify('last day of this month');
             $firstMonday = $firstOfMonth;
             
             if ((int)$firstMonday->format('N') !== 1) $firstMonday = $firstMonday->modify('next monday');
 
             $weekIndex = 1;
-            for ($ws = $firstMonday; $ws <= $lastOfMonth; $ws = $ws->add(new \DateInterval('P7D'))) 
+            for ($ws = $firstMonday; $ws <= $lastOfMonth; $ws = $ws->add(new DateInterval('P7D'))) 
             {
-                $we = $ws->add(new \DateInterval('P6D'));
+                $we = $ws->add(new DateInterval('P6D'));
                 if ((int) $ws->format('m') !== $m) break;
 
                 $sumNew = 0;
                 $sumOld = 0;
 
-                for ($cur = $ws; $cur <= $we; $cur = $cur->add(new \DateInterval('P1D'))) 
+                for ($cur = $ws; $cur <= $we; $cur = $cur->add(new DateInterval('P1D'))) 
                 {
                     if ((int) $cur->format('m') !== $m) continue;
                     $key = $cur->format('Y-m-d');
@@ -252,7 +254,7 @@ class ClientService
                     $sumOld += $countsByDay[$key]['old'] ?? 0;
                 }
 
-                $weekly[] = ['label' => $monthNameShort . ' W' . $weekIndex, 'new' => $sumNew, 'old' => $sumOld];
+                $weekly[] = ['label' => "{$monthNameShort} W{$weekIndex}", 'new' => $sumNew, 'old' => $sumOld];
                 $weekIndex++;
             }
         }
@@ -266,14 +268,14 @@ class ClientService
 
         for ($m = 1; $m <= 12; $m++) 
         {
-            $monthStr = sprintf('%02d', $m);
-            $monthNameFull = date('F', strtotime($year . '-' . $monthStr . '-01'));
+            $monthStr = \sprintf('%02d', $m);
+            $monthNameFull = date('F', strtotime("{$year}-{$monthStr}-01"));
             $sumNew = 0;
             $sumOld = 0;
-            $firstOfMonth = new \DateTimeImmutable($year . '-' . $monthStr . '-01');
-            $lastOfMonth = (new \DateTimeImmutable($year . '-' . $monthStr . '-01'))->modify('last day of this month');
+            $firstOfMonth = new DateTimeImmutable("{$year}-{$monthStr}-01");
+            $lastOfMonth = (new DateTimeImmutable("{$year}-{$monthStr}-01"))->modify('last day of this month');
 
-            for ($d = $firstOfMonth; $d <= $lastOfMonth; $d = $d->add(new \DateInterval('P1D'))) 
+            for ($d = $firstOfMonth; $d <= $lastOfMonth; $d = $d->add(new DateInterval('P1D'))) 
             {
                 $key = $d->format('Y-m-d');
                 $sumNew += $countsByDay[$key]['new'] ?? 0;
@@ -298,7 +300,7 @@ class ClientService
             if (!$cid || !$day) continue;
 
             $yr = substr($day, 0, 4);
-            $k = $cid . '|' . $day;
+            $k = "{$cid}|{$day}";
             if (isset($seen[$k])) continue;
 
             $seen[$k] = true;

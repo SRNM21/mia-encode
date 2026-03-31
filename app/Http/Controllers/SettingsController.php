@@ -7,12 +7,17 @@ use App\Core\Facades\Auth;
 use App\Http\Request\PasswordRequest;
 use App\Http\Request\ProfileRequest;
 use App\Http\Request\Request;
-use App\Models\Setting;
 use App\Models\User;
+use App\Services\SettingsService;
+use Exception;
 use Throwable;
 
 class SettingsController extends Controller
 {
+    public function __construct(
+        private SettingsService $settingsService
+    ) {}
+
     public function show(Request $request) 
     {
         $this->view('settings');
@@ -52,10 +57,7 @@ class SettingsController extends Controller
             $username = $request->input('username');
             $email = $request->input('email');
 
-            User::update(['id' => $user->id], [
-                'username' => $username,
-                'email' => $email,
-            ]);
+            $this->settingsService->updateProfile($user, $username, $email);
 
             $this->responseJson([
                 'title' => 'Saved Successfully',
@@ -91,39 +93,24 @@ class SettingsController extends Controller
             $newPassword = $request->input('new_password');
             $confirmPassword = $request->input('confirm_password');
 
-            $matchCurrentPassword = $user->checkPassword($currentPassword);
-
-            if (!$matchCurrentPassword)
-            {
-                $this->responseJson([
-                    'title' => 'Does not Match',
-                    'message' => 'Current password does not match.'
-                ], 401);
-            }
-
-            if ($newPassword != $confirmPassword)
-            {
-                $this->responseJson([
-                    'title' => 'Does not Match',
-                    'message' => 'New password does not match.'
-                ], 400);
-            }
-                
-            // Attempt to change password if current password is matched
-            $success = Auth::changePassword($newPassword);
-
-            if (!$success) 
-            {
-                $this->responseJson([
-                    'title' => 'Update Failed',
-                    'message' => 'Change password has failed.'
-                ], 401);
-            }
+            $this->settingsService->updatePassword(
+                $user, 
+                $currentPassword, 
+                $newPassword, 
+                $confirmPassword
+            );
 
             $this->responseJson([
                 'title' => 'Password Changed',
                 'message' => 'Password changed successfully.'
             ]);
+        }
+        catch (Exception $e)
+        {
+            $this->responseJson([
+                'title' => 'Update Failed',
+                'message' => $e->getMessage()
+            ], $e->getCode() ?: 400);
         }
         catch (Throwable $e)
         {
@@ -141,37 +128,19 @@ class SettingsController extends Controller
         try {
             $theme = $request->input('theme');
 
-            if (!in_array($theme, ['dark', 'light', 'system'])) {
-                return $this->responseJson([
-                    'title' => 'Invalid Theme',
-                    'message' => 'The selected theme is invalid.'
-                ], 400);
-            }
-
-            $existingSetting = Setting::where('user_id', '=', $user->id)->first();
-
-            if ($existingSetting) 
-            {
-                Setting::update(
-                    ['user_id' => $user->id], 
-                    ['preference' => $theme]
-                );
-            } 
-            else 
-            {
-                Setting::create([
-                    'user_id' => $user->id,
-                    'preference' => $theme
-                ]);
-            }
+            $this->settingsService->updateTheme($user, $theme);
 
             $this->responseJson([
                 'title' => 'Theme Updated',
                 'message' => 'Your appearance preference has been saved successfully.'
             ]);
 
+        } catch (Exception $e) {
+            $this->responseJson([
+                'title' => 'Update Failed',
+                'message' => $e->getMessage()
+            ], $e->getCode() ?: 400);
         } catch (Throwable $e) {
-            dd($e);
             $this->responseJson([
                 'title' => 'Unknown Error',
                 'message' => 'An unknown error occurred [' . $e->getCode() . '].'

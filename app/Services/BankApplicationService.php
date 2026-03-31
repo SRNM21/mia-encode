@@ -2,11 +2,13 @@
 
 namespace App\Services;
 
+use App\Http\Request\Request;
 use App\Models\Bank;
 use App\Models\BankApplication;
 use App\Models\Client;
 use App\Models\RequestEdit;
 use App\Repository\BankApplicationRepository;
+use DateInterval;
 use DateTime;
 use DateTimeImmutable;
 
@@ -15,6 +17,105 @@ class BankApplicationService
     public function __construct(
         private BankApplicationRepository $bankApplicationRepository
     ) {}
+
+    public function getApplicationsData(Request $request): array
+    {
+        $page = (int) ($request->get('page') ?? 1);
+        if ($page < 1) $page = 1;
+
+        $perPage = (int) ($request->get('per_page') ?? 25);
+        $allowed = [25, 50, 100, 500];
+        if (!\in_array($perPage, $allowed, true)) $perPage = 25;
+
+        $sort = $request->get('sort') ?? 'date_submitted';
+        $order = strtolower($request->get('order') ?? 'desc');
+
+        $allowedSort = [
+            'date_submitted',
+            'last_name',
+            'first_name',
+            'middle_name',
+            'birthdate'
+        ];
+
+        if (!\in_array($sort, $allowedSort, true)) 
+        {
+            $sort = 'date_submitted';
+        }
+
+        if (!\in_array($order, ['asc','desc'], true)) 
+        {
+            $order = 'desc';
+        }
+
+        $available_queries = [
+            'last_name',
+            'first_name',
+            'middle_name',
+            'birthdate',
+            'mobile_num',
+            'start_date',
+            'end_date',
+        ];
+
+        $filters = [];
+        foreach ($available_queries as $key) 
+        {
+            if ($request->get($key)) 
+            {
+                if ($key === 'start_date') 
+                {
+                    $filters[$key] = date('Y-m-d 00:00:00', strtotime($request->get($key)));
+                } 
+                elseif ($key === 'end_date') 
+                {
+                    $filters[$key] = date('Y-m-d 23:59:59', strtotime($request->get($key)));
+                } 
+                else 
+                {
+                    $filters[$key] = $request->get($key);
+                }
+            }
+        }
+
+        $result = $this->getClientsPage($page, $perPage, $filters, $sort, $order);
+
+        $clientsApplications = $result['data'] ?? [];
+        $meta = $result['meta'] ?? [
+            'total' => 0,
+            'page' => $page,
+            'per_page' => $perPage,
+            'last_page' => 1
+        ];
+
+        foreach ($clientsApplications as &$application) 
+        {
+            $application['banks'] = isset($application['banks'])
+                ? (
+                    \is_array($application['banks'])
+                        ? $application['banks']
+                        : json_decode($application['banks'], true)
+                )
+                : [];
+        }
+        
+        $requests = RequestEdit::query()
+            ->where('status', '=', 'pending')
+            ->orderBy('datetime_request', 'ASC')
+            ->getArray();
+
+        $request_map = [];
+        foreach ($requests as $req)
+        {
+            $request_map[$req['app_id']] = $req;
+        }
+
+        return [
+            'applications' => $clientsApplications,
+            'meta' => $meta,
+            'request_map' => $request_map
+        ];
+    }
 
     public function update(string $id, array $data) 
     {
@@ -83,7 +184,7 @@ class BankApplicationService
 
         foreach ($banks_submitted as $bank_id)
         {
-            $can_overwrite = array_key_exists((string)$bank_id, $bank_application_map);
+            $can_overwrite = \array_key_exists((string)$bank_id, $bank_application_map);
 
             if (!$can_overwrite) continue;
 
@@ -110,7 +211,7 @@ class BankApplicationService
         }
 
         // if `to_be_removed` is empty then no overwrite happened in edit mode
-        if (count($to_be_removed) > 0) 
+        if (\count($to_be_removed) > 0) 
         {
             // overwrite applications if overlapped to other applications
             foreach ($to_be_removed as $bank_app_id => $bank_submitted_id)
@@ -126,7 +227,7 @@ class BankApplicationService
                 
                 // delete empty bank application due to overwrite
                 // update bank application otherwise
-                if (count($to_be_update_submitted_banks) > 0)
+                if (\count($to_be_update_submitted_banks) > 0)
                 {
                     BankApplication::update(['id' => $bank_app_id], [
                         'bank_submitted_id' => json_encode(array_map('intval', $to_be_update_submitted_banks))
@@ -290,7 +391,7 @@ class BankApplicationService
 
             $bankIds = json_decode($app['bank_submitted_id'], true);
 
-            if (!is_array($bankIds)) continue;
+            if (!\is_array($bankIds)) continue;
 
             foreach ($bankIds as $bankId) 
             {
@@ -332,13 +433,13 @@ class BankApplicationService
         $years = array_map(fn($r) => (string)($r['year'] ?? ''), $years_rows);
         sort($years);
 
-        $selected_year = $year ?: (count($years) ? max($years) : date('Y'));
+        $selected_year = $year ?: (\count($years) ? max($years) : date('Y'));
         $scope = $scope ?: 'daily';
 
         $series = [];
-        if (in_array($scope, ['daily', 'weekly', 'monthly'], true)) 
+        if (\in_array($scope, ['daily', 'weekly', 'monthly'], true)) 
         {
-            $countsByDay = $this->aggregateDailyCountsForYear($rows, $selected_year, $bank_map);
+            $countsByDay = $this->aggregateDailyCountsForYear($rows, $selected_year);
 
             if ($scope === 'daily') 
             {
@@ -365,7 +466,7 @@ class BankApplicationService
         ];
     }
 
-    private function aggregateDailyCountsForYear(array $rows, string $year, array $bankMap): array
+    private function aggregateDailyCountsForYear(array $rows, string $year): array
     {
         $counts = [];
 
@@ -396,10 +497,10 @@ class BankApplicationService
         $labels = [];
         $keys = [];
 
-        $start = new \DateTimeImmutable($year . '-01-01');
-        $end = new \DateTimeImmutable($year . '-12-31');
+        $start = new DateTimeImmutable("{$year}-01-01");
+        $end = new DateTimeImmutable("{$year}-12-31");
 
-        for ($d = $start; $d <= $end; $d = $d->add(new \DateInterval('P1D')))
+        for ($d = $start; $d <= $end; $d = $d->add(new DateInterval('P1D')))
         {
             $key = $d->format('Y-m-d');
             $keys[] = $key;
@@ -436,10 +537,10 @@ class BankApplicationService
 
         for ($m = 1; $m <= 12; $m++)
         {
-            $monthStr = sprintf('%02d', $m);
-            $monthNameShort = date('M', strtotime($year . '-' . $monthStr . '-01'));
+            $monthStr = \sprintf('%02d', $m);
+            $monthNameShort = date('M', strtotime("{$year}-{$monthStr}-01"));
 
-            $first = new \DateTimeImmutable($year . '-' . $monthStr . '-01');
+            $first = new DateTimeImmutable("{$year}-{$monthStr}-01");
             $last = $first->modify('last day of this month');
 
             $firstMonday = $first;
@@ -450,15 +551,15 @@ class BankApplicationService
 
             $idx = 1;
 
-            for ($ws = $firstMonday; $ws <= $last; $ws = $ws->add(new \DateInterval('P7D')))
+            for ($ws = $firstMonday; $ws <= $last; $ws = $ws->add(new DateInterval('P7D')))
             {
-                $we = $ws->add(new \DateInterval('P6D'));
+                $we = $ws->add(new DateInterval('P6D'));
                 if ((int)$ws->format('m') !== $m) break;
 
-                $labels[] = $monthNameShort . ' W' . $idx;
+                $labels[] = "{$monthNameShort} W{$idx}";
 
                 $range = [];
-                for ($cur = $ws; $cur <= $we; $cur = $cur->add(new \DateInterval('P1D')))
+                for ($cur = $ws; $cur <= $we; $cur = $cur->add(new DateInterval('P1D')))
                 {
                     if ((int)$cur->format('m') !== $m) continue;
                     $range[] = $cur->format('Y-m-d');
@@ -506,15 +607,15 @@ class BankApplicationService
 
         for ($m = 1; $m <= 12; $m++)
         {
-            $monthStr = sprintf('%02d', $m);
-            $labels[] = date('F', strtotime($year . '-' . $monthStr . '-01'));
+            $monthStr = \sprintf('%02d', $m);
+            $labels[] = date('F', strtotime("{$year}-{$monthStr}-01"));
 
-            $first = new \DateTimeImmutable($year . '-' . $monthStr . '-01');
+            $first = new DateTimeImmutable("{$year}-{$monthStr}-01");
             $last = $first->modify('last day of this month');
 
             $days = [];
 
-            for ($d = $first; $d <= $last; $d = $d->add(new \DateInterval('P1D')))
+            for ($d = $first; $d <= $last; $d = $d->add(new DateInterval('P1D')))
             {
                 if ((int)$d->format('m') !== $m) continue;
                 $days[] = $d->format('Y-m-d');
@@ -601,7 +702,7 @@ class BankApplicationService
 
     public function getAgentsLeaderboards(string $scope): array
     {
-        $now = new \DateTimeImmutable('now');
+        $now = new DateTimeImmutable('now');
         $start = null;
         $end = null;
 
@@ -641,7 +742,7 @@ class BankApplicationService
 
         $rows = $this->bankApplicationRepository->getAgentsApplicationCountByRange($start, $end);
         
-        return array_slice($rows, 0, 5);
+        return \array_slice($rows, 0, 5);
     }
 
     public function getEstimateTimeOfExport(string $startDate, string $endDate)
@@ -810,13 +911,15 @@ class BankApplicationService
         $banks = Bank::getAll();
 
         $bankMap = [];
-        foreach ($banks as $b) {
+        foreach ($banks as $b) 
+        {
             $bankMap[$b->id] = $b->name;
         }
 
         $counts = [];
 
-        foreach ($bankMap as $id => $name) {
+        foreach ($bankMap as $id => $name) 
+        {
             $counts[$id] = [
                 1 => 0,
                 2 => 0,

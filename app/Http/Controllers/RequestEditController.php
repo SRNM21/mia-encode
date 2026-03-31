@@ -6,7 +6,6 @@ use App\Core\Controllers\Controller;
 use App\Core\Facades\Auth;
 use App\Http\Request\Request;
 use App\Models\Bank;
-use App\Models\RequestEdit;
 use App\Services\RequestEditService;
 use Exception;
 
@@ -48,9 +47,7 @@ class RequestEditController extends Controller
 
         try
         {
-            RequestEdit::update(['id' => $id], [
-                'is_read' => true
-            ]);
+            $this->requestEditService->markAsRead($id);
             
             $this->responseJson([]);
         }
@@ -75,14 +72,14 @@ class RequestEditController extends Controller
 
         try
         {
-            $request = RequestEdit::create([
-                'encoder' => $encoder ?? 'Anonymous',
-                'app_id' => $request->post('app_id'),
-                'old' => $request->post('old_agent'),
-                'new' => $request->post('new_agent')
-            ]);
+            $requestEdit = $this->requestEditService->createRequestEdit(
+                $encoder ?? 'Anonymous',
+                $request->post('app_id'),
+                $request->post('old_agent'),
+                $request->post('new_agent')
+            );
 
-            $this->responseJson($request->toArray());
+            $this->responseJson($requestEdit->toArray());
         }
         catch (Exception $e)
         {
@@ -97,7 +94,7 @@ class RequestEditController extends Controller
     {
         try
         {
-            RequestEdit::delete($request->input('id'));
+            $this->requestEditService->cancelRequestEdit($request->input('id'));
 
             $this->responseJson([
                 'title' => 'Edit Request Cancelled',
@@ -157,10 +154,7 @@ class RequestEditController extends Controller
         {
             $this->requestExistGuard($request->input('id'));
 
-            RequestEdit::update(['id' => $request->input('id')], [
-                'status' => 'rejected',
-                'datetime_action' => date('Y-m-d H:i:s')
-            ]);
+            $this->requestEditService->rejectRequestEdit($request->input('id'));
 
             $this->responseJson([
                 'title' => 'Edit Request Rejected',

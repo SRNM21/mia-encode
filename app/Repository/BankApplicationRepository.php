@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Models\BankApplication;
+use App\Core\Facades\Auth;
 
 class BankApplicationRepository
 {
@@ -131,6 +132,13 @@ class BankApplicationRepository
         {
             $query->where('bank_application_tbl.date_submitted', '<=', $endDate);
         }
+
+        // Only on team
+        // $user = Auth::user();
+        // if ($user && $user->team) 
+        // {
+        //     $query->where('bank_application_tbl.team', '=', $user->team);
+        // }
 
         unset($filters['start_date'], $filters['end_date']);
 

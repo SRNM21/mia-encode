@@ -61,6 +61,53 @@ class BankService
         return $banks;
     }
 
+    public function getPaginatedBanks(Request $request): array
+    {
+        $page = (int) ($request->get('page') ?? 1);
+        if ($page < 1) $page = 1;
+
+        $perPage = (int) ($request->get('per_page') ?? 25);
+        $allowed = [25, 50, 100, 500];
+        if (!\in_array($perPage, $allowed, true)) $perPage = 25;
+
+        $sort = $request->get('sort') ?? 'name';
+        $order = strtolower($request->get('order') ?? 'desc');
+        $allowedSort = [
+            'name',
+            'short_name',
+            'expiry_months',
+            'is_active',
+            'total',
+            'created_at',
+            'updated_at'
+        ];
+
+        if (!\in_array($sort, $allowedSort, true)) 
+        {
+            $sort = 'name';
+        }
+
+        if (!\in_array($order, ['asc','desc'], true)) 
+        {
+            $order = 'desc';
+        }
+
+        $result = $this->getBanksWithApplicationCount($page, $perPage, $sort, $order);
+
+        $banks = $result['data'] ?? [];
+        $meta = $result['meta'] ?? [
+            'total' => 0,
+            'page' => $page,
+            'per_page' => $perPage,
+            'last_page' => 1
+        ];
+        
+        return [
+            'banks' => $banks,
+            'meta' => $meta
+        ];
+    }
+
     public function countBankApplications(): array
     {
         $applications = $this->bankRepository->getBankApplicationBanks();
@@ -70,10 +117,7 @@ class BankService
         {
             $banks = json_decode($app['bank_submitted_id'], true);
 
-            if (!is_array($banks))
-            {
-                continue;
-            }
+            if (!\is_array($banks)) continue;
 
             foreach ($banks as $bankId) 
             {
