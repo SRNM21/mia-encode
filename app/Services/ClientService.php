@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Http\Request\Request;
 use App\Models\BankApplication;
+use App\Models\Client;
 use App\Repository\ClientRepository;
 use DateInterval;
 use DateTimeImmutable;
@@ -18,12 +19,12 @@ class ClientService
     // Encoding
     // -------------------------------
 
-    public function getClient(Request $request)
+    public function getClient(Request $request): ?Client
     {
         return $this->clientRepository->getClient($request);
     }
 
-    public function create(array $data)
+    public function create(array $data): Client
     {
         return $this->clientRepository->create($data);
     }

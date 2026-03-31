@@ -32,3 +32,4 @@
 </header>
 
 <?= get_modal('logout-confirm') ?>
+<?= get_modal('page-loader') ?>

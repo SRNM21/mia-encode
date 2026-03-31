@@ -1,8 +1,8 @@
 import { useAjax } from '../hooks/use-ajax.js'
 
-const toggleBtn = $('#toggle-btn');
-const sidebar = $('#sidebar');
-const logoutBtn = $('#logout-btn');
+const toggleBtn = $('#toggle-btn')
+const sidebar = $('#sidebar')
+const logoutBtn = $('#logout-btn')
 const confirmLogoutBtn = $('.confirm-logout-btn')
 
 const { post } = useAjax()
@@ -12,24 +12,24 @@ const { post } = useAjax()
 // -----------------
 
 export function closeModal(modalId) {
-    const modal = $('#' + modalId);
+    const modal = $('#' + modalId)
 
-    modal.removeClass('active').addClass('closing');
+    modal.removeClass('active').addClass('closing')
 
     setTimeout(() => {
-        modal.removeClass('closing');
-    }, 250);
+        modal.removeClass('closing')
+    }, 250)
 }
 
 export function openModal(modalId) {
-    const modal = $('#' + modalId);
-    modal.addClass('active');
+    const modal = $('#' + modalId)
+    modal.addClass('active')
 }
 
 $('.modal-close-btn, .modal-cancel-btn').on('click', (e) => {
-    const modalId = $(e.currentTarget).data('modal');
-    closeModal(modalId);
-});
+    const modalId = $(e.currentTarget).data('modal')
+    closeModal(modalId)
+})
 
 // -----------------
 // Sidebar
@@ -37,15 +37,15 @@ $('.modal-close-btn, .modal-cancel-btn').on('click', (e) => {
 
 toggleBtn.on('click', () => {
     if (sidebar.hasClass('collapsed')) {
-        sidebar.removeClass('collapsed');
+        sidebar.removeClass('collapsed')
     } else {
-        sidebar.addClass('collapsed');
+        sidebar.addClass('collapsed')
     }
-});
+})
 
 logoutBtn.on('click', () => {
-    openModal('logout-confirm-modal');
-});
+    openModal('logout-confirm-modal')
+})
 
 confirmLogoutBtn.on('click', async () => {
     showLoading(confirmLogoutBtn, true)
@@ -55,12 +55,12 @@ confirmLogoutBtn.on('click', async () => {
             url: 'logout',
         })
         
-        console.log(response);
+        console.log(response)
         
-        closeModal('logout-confirm-modal');
-        window.location.href = response.data.redirect;
+        closeModal('logout-confirm-modal')
+        window.location.href = response.data.redirect
     } catch (error) {
-        console.log(error);
+        console.log(error)
         showNotification(
             'Error Occured',
             'Error occured when logging out'
@@ -68,7 +68,27 @@ confirmLogoutBtn.on('click', async () => {
     }
     
     showLoading(confirmLogoutBtn, false)
-});
+})
+
+// -----------------
+// Navigation
+// -----------------
+
+export function handleNavigationLoader(e, element) {
+    const el = $(element)
+    const href = el.attr('href') || el.data('href')
+    const target = el.attr('target')
+    
+    if (href && (href.startsWith('#') || href.startsWith('javascript:'))) return
+    if (e && (e.ctrlKey || e.metaKey || e.shiftKey)) return
+    if (target === '_blank' || el.attr('download') !== undefined || el.hasClass('no-loader')) return
+
+    openModal('page-loader-modal')
+}
+
+$(document).on('click', 'a', function(e) {
+    handleNavigationLoader(e, this)
+})
 
 // -----------------
 // Utilities
@@ -155,7 +175,7 @@ export function getCurrentDateTime() {
 }
 
 export function capitalizeWord(word) {
-  return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+  return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
 }
 
 export function showNotification(title, message, type = 'success') {

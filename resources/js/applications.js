@@ -1,4 +1,4 @@
-import { closeModal, formatDate, href, openModal, setErrorState, showLoading, showNotification, formatDateTime } from './utils/utils.js'
+import { closeModal, formatDate, href, openModal, setErrorState, showLoading, showNotification, formatDateTime, handleNavigationLoader } from './utils/utils.js'
 import { useAjax } from './hooks/use-ajax.js'
 import { setErrorMessage, validateExportDateForm } from './utils/validation.js'
 
@@ -612,9 +612,11 @@ $(document).ready(function () {
     // Edit Application
     // ---------------------
 
-    $(document).on('click', '.edit-application-btn', async function () {
+    $(document).on('click', '.edit-application-btn', async function (e) {
         const row = CURRENT_EDIT_TR
         const data = row.data()
+
+        handleNavigationLoader(e, this)
 
         // Check if the application is still valid for edit
         try {

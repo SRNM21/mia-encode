@@ -1,5 +1,4 @@
-*
-{
+* {
     padding: 0;
     margin: 0;
     box-sizing: border-box;
@@ -277,20 +276,20 @@
     --color-error: var(--color-red-600);
     --color-danger: var(--color-red-600);
     --color-success: var(--color-green-600);
-    
+
     --foreground: var(--color-neutral-950);
     --background: var(--color-neutral-50);
 
     /* components */
     --header-bg: var(--color-neutral-200);
     --sidebar-bg: var(--color-neutral-100);
-    
+
     --input-bg: var(--color-neutral-100);
     --input-color: var(--foreground);
     --input-border: var(--color-neutral-400);
 
     --btn-outline-bg: var(--color-neutral-200);
-    
+
     --card-bg: var(--color-neutral-100);
 
     --text-hint-color: var(--color-neutral-600);
@@ -302,7 +301,7 @@
 
     --border-color: var(--color-neutral-300);
     --btn-outline-border: var(--color-neutral-400);
-    
+
     --table-header-bg: var(--color-neutral-200);
 
     /* state */
@@ -312,17 +311,17 @@
     --hover-outline-btn: var(--color-neutral-300);
     --hover-link-btn: var(--color-neutral-100);
     --active-link-btn: var(--color-neutral-200);
-    
+
     --hover-scrollbar-thumb: var(--color-neutral-500);
 }
 
 .dark {
-    
+
     /* colors */
     --color-error: var(--color-red-500);
     --color-danger: var(--color-red-400);
     --color-success: var(--color-green-400);
-    
+
     --foreground: var(--color-neutral-50);
     --background: var(--color-neutral-950);
 
@@ -333,7 +332,7 @@
     --input-bg: var(--color-neutral-900);
     --input-color: var(--foreground);
     --input-border: var(--color-neutral-600);
-    
+
     --btn-outline-bg: var(--color-neutral-900);
 
     --card-bg: var(--color-neutral-900);
@@ -347,7 +346,7 @@
 
     --border-color: var(--color-neutral-700);
     --btn-outline-border: var(--color-neutral-600);
-    
+
     --table-header-bg: var(--color-neutral-800);
 
     /* state */
@@ -357,7 +356,7 @@
     --hover-outline-btn: var(--color-neutral-800);
     --hover-link-btn: var(--color-neutral-900);
     --active-link-btn: var(--color-neutral-800);
-    
+
     --hover-scrollbar-thumb: var(--color-neutral-500);
 }
 
@@ -409,35 +408,40 @@
 =============================
 */
 
-input, select {
+input,
+select {
     font-size: 16px;
     padding: 8px 16px;
     outline: none;
     border-radius: 8px;
-    
+
     border: 1px solid var(--input-border);
     background-color: var(--input-bg);
     color: var(--input-color);
-    
+
     &:focus-visible {
         box-shadow: 0 0 1px 2px var(--color-neutral-700);
         border: 1px solid var(--color-neutral-500);
     }
 
-    transition: border-color 0.2s, box-shadow 0.2s;
+    transition: border-color 0.2s,
+    box-shadow 0.2s;
 }
 
-input.size-sm, select.size-sm {
+input.size-sm,
+select.size-sm {
     font-size: 14px;
     padding: 4px 8px;
 }
 
-input.size-lg, select.size-lg {
+input.size-lg,
+select.size-lg {
     font-size: 16px;
     padding: 8px 16px;
 }
 
-button, button.primary {
+button,
+button.primary {
     font-size: 16px;
     padding: 8px 16px;
     border-radius: 8px;
@@ -451,7 +455,7 @@ button, button.primary {
     border: none;
     background-color: var(--foreground);
     color: var(--background);
-    
+
     white-space: nowrap;
 
     &:hover {
@@ -460,7 +464,7 @@ button, button.primary {
 }
 
 /* Handle with loaders */
-button > p {
+button>p {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -471,7 +475,7 @@ button.outline {
     background-color: var(--btn-outline-bg);
     color: var(--foreground);
     border: 1px solid var(--btn-outline-border);
-    
+
     &:hover {
         background-color: var(--hover-outline-btn);
     }
@@ -480,7 +484,7 @@ button.outline {
 button.ghost {
     background-color: var(--btn-outline-bg);
     color: var(--foreground);
-    
+
     &:hover {
         background-color: var(--hover-outline-btn);
     }
@@ -540,7 +544,7 @@ button svg {
     margin-right: 4px;
 }
 
-.status-card svg{
+.status-card svg {
     height: 20px;
     width: 20px;
 }
@@ -562,8 +566,13 @@ button svg {
 }
 
 @keyframes rotate {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 input[type=number]::-webkit-inner-spin-button,
@@ -576,13 +585,105 @@ input[type=number] {
     appearance: textfield;
 }
 
+.page-loader-box {
+    height: 100%;
+    width: 100%;
+    position: relative;
+    padding: 24px;
+    border-radius: 4px;
+    margin-top: 24px;
+    border: 2px solid var(--btn-outline-border);
+    color: var(--btn-outline-border);
+    font-weight: 600;
+    font-size: 16px;
+    user-select: none;
+}
+
+.page-loader-box svg {
+    height: 56px;
+    width: 56px;
+    fill: currentColor;
+}
+
+.page-loader-box.load {
+    border-color: transparent;
+}
+
+.page-loader-box.load::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    background: linear-gradient(45deg,
+            transparent 30%,
+            var(--btn-outline-border) 45%,
+            var(--btn-outline-border) 55%,
+            transparent 70%);
+
+    background-size: 300% 300%;
+    animation: cardLoading 2s linear infinite;
+
+    padding: 1px;
+    -webkit-mask:
+        linear-gradient(var(--background) 0 0) content-box,
+        linear-gradient(var(--background) 0 0);
+    mask:
+        linear-gradient(var(--background) 0 0) content-box,
+        linear-gradient(var(--background) 0 0);
+
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+}
+
+.page-loader-box.load {
+    background: linear-gradient(45deg,
+            transparent 30%,
+            var(--btn-outline-border) 45%,
+            var(--btn-outline-border) 55%,
+            transparent 70%);
+    background-size: 300% 300%;
+    animation: cardLoading 1.5s linear infinite;
+
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.page-loader-box.load svg {
+    color: var(--btn-outline-border);
+    animation: svgPulse 1.5s linear infinite;
+}
+
+@keyframes cardLoading {
+    from {
+        background-position: 0% 100%;
+    }
+
+    to {
+        background-position: 100% 0%;
+    }
+}
+
+@keyframes svgPulse {
+
+    0%,
+    100% {
+        opacity: 0.5;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
 /* 
 =============================
     State
 =============================
 */
 
-input.error, select.error {
+input.error,
+select.error {
     box-shadow: 0 0 1px 2px var(--color-danger);
     border: 1px solid var(--color-error);
 }
@@ -591,7 +692,7 @@ input.error, select.error {
     color: var(--color-error);
 }
 
-input[read-only], 
+input[read-only],
 select[read-only] {
     background-color: var(--color-neutral-950);
     border-color: var(--color-neutral-800);
@@ -618,12 +719,12 @@ input:disabled {
 */
 
 html {
-    scrollbar-color: var(--scrollbar-thumb-color) var(--scrollbar-track-color); 
+    scrollbar-color: var(--scrollbar-thumb-color) var(--scrollbar-track-color);
     scrollbar-width: thin;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--hover-scrollbar-thumb);
+    background: var(--hover-scrollbar-thumb);
 }
 
 body {

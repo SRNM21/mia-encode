@@ -14,15 +14,15 @@
         <?php
             $lastName = trim($client->last_name ?? 'Client');
             $possessive = preg_match('/s$/i', $lastName)
-                ? $lastName . "'"
-                : $lastName . "'s";
+                ? "{$lastName}'"
+                : "{$lastName}'s";
         ?>
 
         <?= get_component('header', [
             'user' => $user,
             'breadcrumbs' => [
                 ['label' => 'Bank Applications', 'url' => 'bank-applications'],
-                ['label' => 'Edit ' . $possessive . ' application']
+                ['label' => "Edit {$possessive} application"]
             ]
         ]) ?>
 
