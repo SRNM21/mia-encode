@@ -546,3 +546,19 @@ html.dark .export-excel:hover {
 .dropdown-menu.drop-up.show {
     transform: translateY(0);
 }
+
+.export-or-divider {
+    margin: 16px 0;
+    opacity: 0.5;
+}
+
+.export-or-divider .divider-line {
+    flex: 1;
+    height: 1px;
+    background-color: currentColor;
+}
+
+.export-or-divider .divider-text {
+    font-size: 14px;
+    font-weight: 500;
+}

@@ -21,6 +21,16 @@
                 </div>
             </div>
             
+            <div class="flex-center gap-8 export-or-divider">
+                <div class="divider-line"></div>
+                <span class="divider-text">or</span>
+                <div class="divider-line"></div>
+            </div>
+            
+            <div class="flex-center">
+                <button id="export-today-btn" class="primary">Export Today's Encoding (<?= formatDate(date('Y-m-d')) ?>)</button>
+            </div>
+
             <?php get_component('error-card', [
                 'class' => 'range-date-error-card',
             ]) ?>

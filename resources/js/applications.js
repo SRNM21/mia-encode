@@ -47,6 +47,7 @@ const confirmAddFilterBtn = $('#add-filter-confirm')
 // export
 const exportExcel = $('#export-excel')
 const confirmExportBtn = $('.confirm-export-btn')
+const exportTodayBtn = $('#export-today-btn')
 
 const rangeDateErrorCard = $('.range-date-error-card')
 const rangeDateInfoCard = $('.range-date-info-card')
@@ -555,7 +556,53 @@ $(document).ready(function () {
             closeModal(SELECT_DATE_MODAL)
             await executeExport(data, result)
         } catch (error) {
-            const response = xhr.responseJSON
+            const response = error?.responseJSON ?? error
+            console.log(response)
+            IS_LOADING = false
+        }
+    })
+
+    exportTodayBtn.on('click', async function () {
+        hideCards()
+
+        if (IS_LOADING) return
+        IS_LOADING = true
+
+        const today = new Date();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        const yy = today.getFullYear();
+        const dateStr = mm + '/' + dd + '/' + yy;
+
+        const data = {
+            start_date: dateStr,
+            end_date: dateStr,
+        }
+
+        try {
+            const response = await post({
+                url: 'bank-applications/pre-export',
+                data: data
+            })
+            
+            IS_LOADING = false
+
+            const result = response.data
+
+            // Prevent export if no data
+            if (result.total <= 0) {
+                showInfo(
+                    'No data found', 
+                    `${result.total} data found for today's encoding.`
+                )
+
+                return
+            }
+
+            closeModal(SELECT_DATE_MODAL)
+            await executeExport(data, result)
+        } catch (error) {
+            const response = error?.responseJSON ?? error
             console.log(response)
             IS_LOADING = false
         }
