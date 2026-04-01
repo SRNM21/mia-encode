@@ -60,6 +60,7 @@ Route::middleware(AuthMiddleware::class)->group(function () {
         Route::get('/banks', [BankController::class, 'show']);
         Route::post('/banks', [BankController::class, 'store']);
         Route::patch('/banks', [BankController::class, 'update']);
+        Route::post('/banks/table', [BankController::class, 'table']);
         
         Route::get('/requests', [RequestEditController::class, 'show']);
         Route::patch('/requests/read', [RequestEditController::class, 'read']);

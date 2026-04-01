@@ -74,7 +74,12 @@
         <hr>
         <div class='modal-actions'>
             <button id="add-bank-cancel" class="outline sm modal-cancel-btn" data-modal='add-bank-modal'>Cancel</button>
-            <button id="add-bank-confirm" class="primary sm">Add Bank</button>
+            <button id="add-bank-confirm" class="primary sm">
+                <p>Add Bank</p>
+                <?php get_component('loader', [
+                    'size' => 'sm',
+                ]) ?>
+            </button>
         </div>
     </div>
 </div>

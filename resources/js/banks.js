@@ -1,5 +1,5 @@
 import { useAjax } from './hooks/use-ajax.js'
-import { closeModal, formatDate, href, openModal, showNotification } from "./utils/utils.js";
+import { closeModal, formatDate, href, openModal, showLoading, showNotification, handleNavigationLoader } from "./utils/utils.js";
 import { validateBankDetails } from "./utils/validation.js";
 
 const { post, patch } = useAjax()
@@ -57,11 +57,11 @@ function clearAddBankModal() {
 function showAddModal(editMode) {
     if (editMode) {
         addModalTitle.html('Edit Bank Details')
-        confirmAddBank.html('Save')
+        confirmAddBank.find('p').html('Save')
         lastUpdateNoteContainer.removeClass('hidden')
     } else {
         addModalTitle.html('Bank Details')
-        confirmAddBank.html('Add Bank')
+        confirmAddBank.find('p').html('Add Bank')
         lastUpdateNoteContainer.addClass('hidden')
     }
 
@@ -97,35 +97,7 @@ expiryMonthInput.on('input', updateButtons)
 
 updateButtons()
 
-function createBankRow(bank) {
-    console.log(bank);
-    
-    return `
-        <tr 
-            data-id="${bank.id}"
-            data-name=${bank.name}"
-            data-short-name="${bank.short_name}"
-            data-expiry-months="${bank.expiry_months}"
-            data-is-active="${bank.is_active}"
-            data-total="0"
-            data-last-update="${bank.updated_at}"
-        >
-            <td>${bank.name}</td>
-            <td>${bank.short_name}</td>
-            <td>${bank.expiry_months}</td>
-            <td>${bank.is_active ? 'Active' : 'Inactive'}</td>
-            <td>0</td>
-            <td>${formatDate(bank.created_at)}</td>
-            <td>${formatDate(bank.updated_at)}</td>
-            <td>
-                <button data-row-id='${bank.id}' class="edit-bank-btn outline sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil-icon lucide-pencil"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path><path d="m15 5 4 4"></path></svg>
-                    Edit
-                </button>
-            </td>
-        </tr>
-    `
-}
+
 
 function showBankAddNotification(response) {
     if (response === null || response === undefined) return
@@ -134,11 +106,32 @@ function showBankAddNotification(response) {
     showNotification(notifData.title, notifData.message)
 }
 
+async function refereshTable() {
+    try {
+        const url = new URL(window.location.href)
+        const params = new URLSearchParams(url.search)
+        
+        const response = await post({
+            url: 'banks/table?' + params.toString(),
+        })
+        
+        const result = response.data
+        console.log(result);
+        
+        $('.table-wrapper').html(result.html)
+        renderPaginationState()
+    } catch (error) {
+        const response = error?.responseJSON ?? error
+        console.error(response)
+    }
+}
+
 confirmAddBank.on('click', async function (e) {  
     e.preventDefault()
 
     if (IS_LOADING) return
     IS_LOADING = true
+    showLoading(confirmAddBank, true)
 
     const [data, errors] = validateBankDetails(bankErrorCard, {
         bank_name: bankNameInput,
@@ -150,9 +143,10 @@ confirmAddBank.on('click', async function (e) {
         bank_status: bankStatus
     })
 
-    if (errors.length > 0) return
-
-    await new Promise(resolve => setTimeout(resolve, 4000))
+    if (errors.length > 0) {
+        showLoading(confirmAddBank, false)
+        return
+    }
 
     try {
         let response = null
@@ -166,25 +160,29 @@ confirmAddBank.on('click', async function (e) {
             response = await patch(payload)
         } else {
             response = await post(payload)
-            bankTableBody.append(createBankRow(response.data.bank))
         }
+
+        await refereshTable()
 
         console.log(response);
         
+        showLoading(confirmAddBank, false)
         showBankAddNotification(response)
     } catch (error) {
         const response = error.responseJSON
         console.log(response);
         
+        showLoading(confirmAddBank, false)
         showBankAddNotification(response)
     }
 
     IS_LOADING = false
+    showLoading(confirmAddBank, IS_LOADING)
     closeModal(ADD_BANK_MODAL)
 })
 
 // Re-use the ADD_BANK_MODAL and sets the value of the bank
-bankTableBody.on('click', '.edit-bank-btn', function () {
+$(document).on('click', '.edit-bank-btn', function () {
     const row = $(this).closest('tr')
     const data = row.data()
 
@@ -215,7 +213,7 @@ if (sort) {
 
 renderPaginationState()
 
-$('.sortable').on('click', function () {
+$(document).on('click', '.sortable', function (e) {
     const column = $(this).data('key')
 
     const url = new URL(window.location.href)
@@ -232,6 +230,7 @@ $('.sortable').on('click', function () {
     url.searchParams.set('order', newOrder)
     url.searchParams.set('page', '1')
 
+    handleNavigationLoader(e, this)
     window.location.href = url.toString()
 })
 

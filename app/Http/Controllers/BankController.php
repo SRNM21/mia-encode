@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Core\Controllers\Controller;
 use App\Http\Request\Request;
-use App\Services\BankApplicationService;
 use App\Services\BankService;
 use Exception;
 
@@ -21,6 +20,19 @@ class BankController extends Controller
         $this->view('banks', [
             'banks' => $data['banks'],
             'meta' => $data['meta']
+        ]);
+    }
+
+    public function table(Request $request) 
+    {
+        $data = $this->bankService->getPaginatedBanks($request);
+
+        $html = render_component('banks-table', [
+            'banks' => $data['banks'],
+        ]);
+
+        return $this->responseJson([
+            'html' => $html
         ]);
     }
 
