@@ -159,6 +159,12 @@ export function validateStoreClientForm(errorContainer, input) {
             el: input.agent,
             message: 'Agent is required.'
         })
+    } else if (/\d/.test(agent)) {
+        errors.push({
+            field: 'agent',
+            el: input.agent,
+            message: 'Agent name must not contain numbers.'
+        })
     }
 
     // Banks
@@ -197,6 +203,12 @@ export function validateEditClientForm(errorContainer, input) {
             field: 'agent',
             el: input.agent,
             message: 'Agent is required.'
+        })
+    } else if (/\d/.test(agent)) {
+        errors.push({
+            field: 'agent',
+            el: input.agent,
+            message: 'Agent name must not contain numbers.'
         })
     }
 
