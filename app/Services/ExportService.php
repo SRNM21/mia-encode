@@ -29,7 +29,7 @@ class ExportService
         );
 
         $bankCount = \count($banks_short_name);
-        $bankTemplate = array_fill(0, $bankCount, '');
+        $bankTemplate = array_fill(0, $bankCount, null);
         $bankIdMap = [];
 
         foreach ($banks as $index => $bank) 
