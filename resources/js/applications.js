@@ -434,6 +434,12 @@ $(document).ready(function () {
         filterValue.val('')
     })
 
+    filterValue.on('keypress', function (e) {
+        if (e.key === 'Enter') {
+            confirmAddFilterBtn.click()
+        }
+    })
+
     filterColumns.on('change', function (e) {
         const column = $(e.currentTarget).val()
 
