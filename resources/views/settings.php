@@ -122,13 +122,13 @@
                                     </div>
                                     <div class="section-content">
                                         <div class="flex-row gap-16 themes-selection-container">
-                                            <div class="card flex-col flex-center gap-8 active" data-theme="dark">
+                                            <div class="card flex-col flex-center gap-8 <?= $theme === 'dark' ? 'active' : '' ?>" data-theme="dark">
                                                 <p>Dark Mode</p>
                                             </div>
-                                            <div class="card flex-col flex-center gap-8" data-theme="light">
+                                            <div class="card flex-col flex-center gap-8 <?= $theme === 'light' ? 'active' : '' ?>" data-theme="light">
                                                 <p>Light Mode</p>
                                             </div>
-                                            <div class="card flex-col flex-center gap-8" data-theme="system">
+                                            <div class="card flex-col flex-center gap-8 <?= $theme === 'system' ? 'active' : '' ?>" data-theme="system">
                                                 <p>System</p>
                                             </div>
                                         </div>

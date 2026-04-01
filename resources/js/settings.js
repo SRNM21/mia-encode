@@ -278,11 +278,8 @@ $(document).ready(function() {
 
     $('.themes-selection-container .card').on('click', function() {
         const selectedTheme = $(this).data('theme');
-        const currentTheme = localStorage.getItem('user-theme');
 
-        if (selectedTheme !== currentTheme) {
-            applyTheme(selectedTheme);
-            saveTheme(selectedTheme);
-        }
+        applyTheme(selectedTheme);
+        saveTheme(selectedTheme);
     });
 })
