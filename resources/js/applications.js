@@ -98,9 +98,11 @@ function totalPages() {
     return last > 0 ? last : 1
 }
 
-function setPage(page) {
+function setPage(e, page) {
     const url = new URL(window.location.href)
     url.searchParams.set('page', page)
+    
+    handleNavigationLoader(e, this)
     href(url.toString())
 }
 
@@ -178,7 +180,7 @@ function restoreOption(value) {
 
 }
 
-function applyFilters() {
+function applyFilters(e) {
     const params = new URLSearchParams('page=1')
 
     Object.keys(FILTER_COLUMNS).forEach(k => params.delete(k))
@@ -187,6 +189,8 @@ function applyFilters() {
         params.set(k, v)
     })
 
+    
+    handleNavigationLoader(e, this)
     window.location.search = params.toString()
 }
 
@@ -371,7 +375,7 @@ $(document).ready(function () {
         jqTh.addClass(order === 'asc' ? 'sort-asc' : 'sort-desc')
     }
 
-    perPageSelect.on('change', function () {
+    perPageSelect.on('change', function (e) {
         perPage = parseInt(perPageSelect.val() || '25', 10)
         currentPage = 1
 
@@ -380,28 +384,29 @@ $(document).ready(function () {
         url.searchParams.set('per_page', String(perPage))
         url.searchParams.set('page', '1')
 
+        handleNavigationLoader(e, this)
         href(url.toString())
     })
 
-    startBtn.on('click', () => setPage('1'))
+    startBtn.on('click', (e) => setPage(e, '1'))
 
-    prevBtn.on('click', () =>
-        setPage(String(Math.max(1, currentPage - 1)))
+    prevBtn.on('click', (e) =>
+        setPage(e, String(Math.max(1, currentPage - 1)))
     )
 
-    nextBtn.on('click', () =>
-        setPage(String(Math.min(totalPages(), currentPage + 1)))
+    nextBtn.on('click', (e) =>
+        setPage(e, String(Math.min(totalPages(), currentPage + 1)))
     )
 
-    lastBtn.on('click', () =>
-        setPage(String(totalPages()))
+    lastBtn.on('click', (e) =>
+        setPage(e, String(totalPages()))
     )
 
     addFilterBtn.on('click', function () {
         openModal(ADD_FILTER_MODAL)
     })
 
-    confirmAddFilterBtn.on('click', function () {
+    confirmAddFilterBtn.on('click', function (e) {
         const column = filterColumns.val()
         let value = filterValue.val().trim()
 
@@ -428,7 +433,7 @@ $(document).ready(function () {
         closeModal(ADD_FILTER_MODAL)
 
         renderFilters()
-        applyFilters()
+        applyFilters(e)
 
         filterColumns.val('')
         filterValue.val('')
@@ -496,7 +501,7 @@ $(document).ready(function () {
         applyFilters()
     })
 
-    $('.sortable').on('click', function () {
+    $('.sortable').on('click', function (e) {
         const column = $(this).data('key')
 
         const url = new URL(window.location.href)
@@ -514,6 +519,7 @@ $(document).ready(function () {
         url.searchParams.set('order', newOrder)
         url.searchParams.set('page', '1')
 
+        handleNavigationLoader(e, this)
         window.location.href = url.toString()
     })
 

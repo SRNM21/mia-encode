@@ -129,6 +129,7 @@ $(document).on('click', '.request-container', async function () {
         CURRENT_EDIT_REQUEST_CONTAINER = $container
         CURRENT_EDIT_REQUEST_ID = data.requestEditId
         CURRENT_EDIT_REQUEST_DATA = data
+        CURRENT_EDIT_REQUEST_DATA.requestStatus = $container.attr('data-request-status')
 
         if ($container.attr('data-request-is-read') == '0') {
             $container.attr('data-request-is-read', '1')
