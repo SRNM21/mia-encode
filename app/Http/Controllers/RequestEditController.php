@@ -20,12 +20,12 @@ class RequestEditController extends Controller
         $order = strtolower($request->get('order') ?? 'desc');
         $filter = strtolower($request->get('filter') ?? 'all');
 
-        if (!in_array($order, ['asc', 'desc'], true)) 
+        if (!\in_array($order, ['asc', 'desc'], true)) 
         {
             $order = 'desc';
         }
 
-        if (!in_array($filter, ['all', 'pending', 'approved', 'rejected'], true)) 
+        if (!\in_array($filter, ['all', 'pending', 'approved', 'rejected'], true)) 
         {
             $filter = 'all';
         }

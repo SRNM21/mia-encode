@@ -1,6 +1,7 @@
 @import url('home.css');
 
-.submissions-card, .bank-type-leaderboard-card{
+.submissions-card,
+.bank-type-leaderboard-card {
     margin-top: 24px;
 }
 
@@ -54,27 +55,21 @@
 }
 
 .podium-container-first {
-    background: linear-gradient(
-        to top,
-        var(--color-amber-500),
-        transparent
-    );
+    background: linear-gradient(to top,
+            var(--color-amber-500),
+            transparent);
 }
 
 .podium-container-second {
-    background: linear-gradient(
-        to top,
-        var(--color-neutral-500),
-        transparent
-    );
+    background: linear-gradient(to top,
+            var(--color-neutral-500),
+            transparent);
 }
 
 .podium-container-third {
-    background: linear-gradient(
-        to top,
-        var(--color-orange-800),
-        transparent
-    );
+    background: linear-gradient(to top,
+            var(--color-orange-800),
+            transparent);
 }
 
 .podium-first {
@@ -100,7 +95,8 @@
     border-collapse: collapse;
 }
 
-.leaderboard-table th, .leaderboard-table td {
+.leaderboard-table th,
+.leaderboard-table td {
     text-align: center;
     height: 50px;
 }
@@ -116,6 +112,14 @@
 
 .leaderboard-table tr:not(:first-child) {
     border-top: 1px solid var(--border-color);
+}
+
+.leaderboard-table tbody tr {
+    transition: background-color 0.10s ease-in-out;
+}
+
+.leaderboard-table tbody tr:hover {
+    background-color: var(--hover-sidebar-nav);
 }
 
 .empty-leaderboards {
@@ -144,11 +148,11 @@
     display: flex;
     position: relative;
     padding: 4px;
-    border-radius: 32px; 
+    border-radius: 32px;
     border: 1px solid var(--input-border);
     background-color: transparent;
     width: max-content;
-    gap: 8px; 
+    gap: 8px;
 }
 
 .tab-indicator {
@@ -160,7 +164,7 @@
     background-color: var(--header-bg);
     border: 1px solid var(--input-border);
     z-index: 0;
-    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1); 
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .tabs {
@@ -168,7 +172,7 @@
     z-index: 1;
     font-size: 14px;
     padding: 8px 16px;
-    border-radius: 28px; 
+    border-radius: 28px;
     cursor: pointer;
     text-decoration: none;
     display: inline-block;

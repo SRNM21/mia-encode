@@ -10,7 +10,7 @@
     overflow: hidden;
 }
 
-.content > div {
+.content>div {
     height: 100%;
 }
 
@@ -53,7 +53,8 @@
     margin-top: 24px;
 }
 
-.pagination-left, .pagination-right {
+.pagination-left,
+.pagination-right {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
@@ -89,7 +90,8 @@
     box-sizing: border-box;
 }
 
-.banks-table th, .banks-table td  {
+.banks-table th,
+.banks-table td {
     border: none;
     padding: 8px;
     font-weight: 400;
@@ -140,6 +142,14 @@
     padding: 8px;
 }
 
+.banks-table tr {
+    transition: background-color 0.10s ease-in-out;
+}
+
+.banks-table tr:hover {
+    background-color: var(--hover-sidebar-nav);
+}
+
 .no-results td {
     text-align: center;
     color: var(--text-subtle-color);
@@ -171,7 +181,8 @@ html.dark .edit-bank-btn:hover {
     border: 1px solid var(--color-blue-600) !important;
 }
 
-.bank-name, .bank-short-name {
+.bank-name,
+.bank-short-name {
     text-transform: uppercase;
 }
 

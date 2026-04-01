@@ -150,6 +150,14 @@
     padding: 8px;
 }
 
+.applications-table tr {
+    transition: background-color 0.10s ease-in-out;
+}
+
+.applications-table tr:hover {
+    background-color: var(--hover-sidebar-nav);
+}
+
 .bank-check {
     min-width: 50px !important;
     width: fit-content !important;
