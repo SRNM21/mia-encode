@@ -118,7 +118,7 @@
                                 <div class="section">
                                     <div class="flex-col gap-4">
                                         <p class="section-title">Appearance</p>
-                                        <p class="section-desc">Choose how MIA looks to you. This affects your local session only.</p>
+                                        <p class="section-desc">Choose how MIA Encode System looks to you.</p>
                                     </div>
                                     <div class="section-content">
                                         <div class="flex-row gap-16 themes-selection-container">

@@ -7,51 +7,51 @@
     <ul class='sidebar-nav'>
 
         <?php if ($user->isAdmin() || $user->isSupAdmin()): ?>
-            <a href='<?= base_url('dashboard')?>'>
+            <a href='<?= base_url('dashboard')?>' title='Dashboard'>
                 <span class='icon'><?= get_icon('chart-bar-big') ?></span>
                 <span class='label'>Dashboard</span>
             </a>
         <?php endif ?>
 
         <?php if ($user->isAdmin() || $user->isSupAdmin()): ?>
-            <a href='leaderboards'>
+            <a href='leaderboards' title='Leaderboards'>
                 <span class='icon'><?= get_icon('chart-no-axes-column') ?></span>
                 <span class='label'>Leaderboards</span>
             </a>
         <?php endif ?>
 
         <?php if ($user->isEncoder()): ?>
-            <a href='<?= base_url('/encode')?>'>
+            <a href='<?= base_url('/encode')?>' title='Encode'>
                 <span class='icon'><?= get_icon('file-user') ?></span>
                 <span class='label'>Encode</span>
             </a>
         <?php endif ?>
 
-        <a href='<?= base_url('/bank-applications')?>'>
+        <a href='<?= base_url('/bank-applications')?>' title='Bank Applications'>
             <span class='icon'><?= get_icon('file-text') ?></span>
             <span class='label'>Bank Applications</span>
         </a>
 
         <?php if ($user->isAdmin() || $user->isSupAdmin()): ?>
-            <a href='<?= base_url('banks')?>'>
+            <a href='<?= base_url('banks')?>' title='Banks'>
                 <span class='icon'><?= get_icon('landmark') ?></span>
                 <span class='label'>Banks</span>
             </a>
         <?php endif ?>
 
         <?php if ($user->isAdmin() || $user->isSupAdmin()): ?>
-            <a href='<?= base_url('requests')?>'>
+            <a href='<?= base_url('requests')?>' title='Requests'>
                 <span class='icon'><?= get_icon('file-pen-line') ?></span>
                 <span class='label'>Requests</span>
             </a>
         <?php endif ?>
 
-        <a href='<?= base_url('settings')?>'>
+        <a href='<?= base_url('settings')?>' title='Settings'>
             <span class='icon'><?= get_icon('settings') ?></span>
             <span class='label'>Settings</span>
         </a>
 
-        <button id='logout-btn' class='ghost logout-btn'>
+        <button id='logout-btn' class='ghost logout-btn' title='Logout'>
             <span class='icon'><?= get_icon('log-out') ?></span>
             <span class='label'>Logout</span>
         </button>
