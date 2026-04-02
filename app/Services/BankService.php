@@ -70,9 +70,10 @@ class BankService
         $allowed = [25, 50, 100, 500];
         if (!\in_array($perPage, $allowed, true)) $perPage = 25;
 
-        $sort = $request->get('sort') ?? 'name';
-        $order = strtolower($request->get('order') ?? 'desc');
+        $sort = $request->get('sort') ?? 'id';
+        $order = strtolower($request->get('order') ?? 'asc');
         $allowedSort = [
+            'id',
             'name',
             'short_name',
             'expiry_months',
@@ -84,12 +85,12 @@ class BankService
 
         if (!\in_array($sort, $allowedSort, true)) 
         {
-            $sort = 'name';
+            $sort = 'id';
         }
 
         if (!\in_array($order, ['asc','desc'], true)) 
         {
-            $order = 'desc';
+            $order = 'asc';
         }
 
         $result = $this->getBanksWithApplicationCount($page, $perPage, $sort, $order);
