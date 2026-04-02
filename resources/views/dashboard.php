@@ -117,13 +117,7 @@
                             <div class="chart-control flex-row">
                                 <p class="chart-title">Clients Trend</p>
                                 <div class="line-chart-range flex-row">
-                                    <select id="clients-type-filter" class="size-sm">
-                                        <option value="all" selected>All Types</option>
-                                        <option value="new">New Client</option>
-                                        <option value="old">Old Client</option>
-                                    </select>
                                     <select id="clients-series-select" class="size-sm">
-                                        <option value="daily">Daily</option>
                                         <option value="weekly">Weekly</option>
                                         <option value="monthly" selected>Monthly</option>
                                         <option value="yearly">Yearly</option>
@@ -144,11 +138,7 @@
                             <div class="chart-control flex-row">
                                 <p class="chart-title">Bank Applications Trend</p>
                                 <div class="line-chart-range flex-row">
-                                    <select id="bank-apps-type-filter" class="size-sm">
-                                        <option value="all" selected>All Banks</option>
-                                    </select>
                                     <select id="bank-apps-series-select" class="size-sm">
-                                        <option value="daily">Daily</option>
                                         <option value="weekly">Weekly</option>
                                         <option value="monthly" selected>Monthly</option>
                                         <option value="yearly">Yearly</option>

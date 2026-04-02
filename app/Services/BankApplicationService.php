@@ -434,18 +434,14 @@ class BankApplicationService
         sort($years);
 
         $selected_year = $year ?: (\count($years) ? max($years) : date('Y'));
-        $scope = $scope ?: 'daily';
+        $scope = $scope ?: 'monthly';
 
         $series = [];
-        if (\in_array($scope, ['daily', 'weekly', 'monthly'], true)) 
+        if (\in_array($scope, ['weekly', 'monthly'], true)) 
         {
             $countsByDay = $this->aggregateDailyCountsForYear($rows, $selected_year);
 
-            if ($scope === 'daily') 
-            {
-                $series['daily'] = $this->buildDailyBankSeries($countsByDay, $selected_year, $bank_map);
-            } 
-            elseif ($scope === 'weekly') 
+            if ($scope === 'weekly') 
             {
                 $series['weekly'] = $this->buildWeeklyBankSeries($countsByDay, $selected_year, $bank_map);
             } 
@@ -490,44 +486,6 @@ class BankApplicationService
 
         ksort($counts);
         return $counts;
-    }
-
-    private function buildDailyBankSeries(array $countsByDay, string $year, array $bankMap): array
-    {
-        $labels = [];
-        $keys = [];
-
-        $start = new DateTimeImmutable("{$year}-01-01");
-        $end = new DateTimeImmutable("{$year}-12-31");
-
-        for ($d = $start; $d <= $end; $d = $d->add(new DateInterval('P1D')))
-        {
-            $key = $d->format('Y-m-d');
-            $keys[] = $key;
-            $labels[] = $d->format('D, M j');
-        }
-
-        $bankIds = array_keys($bankMap);
-        sort($bankIds);
-
-        $datasets = [];
-
-        foreach ($bankIds as $bankId)
-        {
-            $data = [];
-
-            foreach ($keys as $k)
-            {
-                $data[] = $countsByDay[$k][$bankId] ?? 0;
-            }
-
-            $datasets[] = [
-                'label' => $bankMap[$bankId]->name,
-                'data' => $data
-            ];
-        }
-
-        return ['labels' => $labels, 'datasets' => $datasets];
     }
 
     private function buildWeeklyBankSeries(array $countsByDay, string $year, array $bankMap): array

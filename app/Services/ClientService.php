@@ -105,22 +105,18 @@ class ClientService
     {
         $applications = $this->getApplications();
         $availableYears = $this->getAvailableYearsFromApplications($applications);
-        $scope = $scope ?: 'daily';
+        $scope = $scope ?: 'monthly';
         $requestedYear = $year ?: (\count($availableYears) ? max($availableYears) : date('Y'));
         $year = (string) $requestedYear;
 
         $earliestByClient = $this->computeEarliestDayByClient($applications);
         $series = [];
 
-        if (\in_array($scope, ['daily', 'weekly', 'monthly'], true)) 
+        if (\in_array($scope, ['weekly', 'monthly'], true)) 
         {
             $countsByDay = $this->countClientTypesByDayForYear($applications, $year, $earliestByClient);
             
-            if ($scope === 'daily') 
-            {
-                $series['daily'] = $this->buildDailySeries($countsByDay, $year);
-            } 
-            elseif ($scope === 'weekly') 
+            if ($scope === 'weekly') 
             {
                 $series['weekly'] = $this->buildWeeklySeries($countsByDay, $year);
             } 
@@ -203,25 +199,6 @@ class ClientService
 
         ksort($counts);
         return $counts;
-    }
-
-    private function buildDailySeries(array $countsByDay, string $year): array
-    {
-        $out = [];
-        $start = new DateTimeImmutable("{$year}-01-01");
-        $end = new DateTimeImmutable("{$year}-12-31");
-
-        for ($d = $start; $d <= $end; $d = $d->add(new DateInterval('P1D'))) 
-        {
-            $key = $d->format('Y-m-d');
-            $out[] = [
-                'label' => $d->format('D, M j'),
-                'new' => $countsByDay[$key]['new'] ?? 0,
-                'old' => $countsByDay[$key]['old'] ?? 0,
-            ];
-        }
-
-        return $out;
     }
 
     private function buildWeeklySeries(array $countsByDay, string $year): array

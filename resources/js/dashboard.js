@@ -27,11 +27,9 @@ const emptyBanksSeries = $('.empty-banks-series')
 const emptyLeaderboards = $('.empty-leaderboards')
 const emptyBankCalendar = $('.empty-bank-calendar')
 
-const clientsTypeFilter = $('#clients-type-filter')
 const clientsYearSelect = $('#clients-year-select')
 const clientsRangeSelect = $('#clients-series-select')
 
-const banksTypeFilter = $('#bank-apps-type-filter')
 const banksYearSelect = $('#bank-apps-year-select')
 const banksRangeSelect = $('#bank-apps-series-select')
 
@@ -46,8 +44,6 @@ let bankSeriesCache = {}
 let currentClientScope = 'monthly'
 let currentBankScope = 'monthly'
 
-let clientTypeFilter = 'all'
-
 doc.ready(initDashboard)
 
 function initDashboard() {
@@ -56,13 +52,11 @@ function initDashboard() {
     loadBankToday()
 
     // Client Series
-    bindSelect(clientsTypeFilter, handleClientTypeFilter)
     bindSelect(clientsRangeSelect, handleClientScope)
     bindSelect(clientsYearSelect, loadClientSeries)
     loadClientSeries()
 
     // Banks Series
-    bindSelect(banksTypeFilter, handleBankTypeFilter)
     bindSelect(banksRangeSelect, handleBankScope)
     bindSelect(banksYearSelect, loadBankSeries)
     loadBankSeries()
@@ -76,19 +70,10 @@ function initDashboard() {
 }
 
 // Filters
-function handleClientTypeFilter() {
-    clientTypeFilter = clientsTypeFilter.val() || 'all'
-    renderClientSeriesFromCache()
-}
-
 function handleClientScope() {
     currentClientScope = clientsRangeSelect.val()
     clientsYearSelect.attr('disabled', currentClientScope === 'yearly')
     loadClientSeries()
-}
-
-function handleBankTypeFilter() {
-    renderBankSeriesFromCache()
 }
 
 function handleBankScope() {
@@ -123,16 +108,10 @@ function renderClientSeriesFromCache() {
         tension:0.3
     }
 
-    let datasets
-
-    if (clientTypeFilter === 'new') datasets = [newDataset]
-    else if (clientTypeFilter === 'old') datasets = [oldDataset]
-    else datasets = [newDataset, oldDataset]
-
     renderClientSeries(
         clientSeriesCanvas,
         labels,
-        datasets
+        [newDataset, oldDataset]
     )
 }
 
@@ -144,20 +123,10 @@ function renderBankSeriesFromCache() {
         return
     }
 
-    const selected = (banksTypeFilter.val() || 'all banks').toLowerCase()
-
-    let datasets = series.datasets
-
-    if (selected !== 'all banks') {
-        datasets = datasets.filter(
-            ds => ds.label.toLowerCase() === selected
-        )
-    }
-
     renderBankSeries(
         bankSeriesCanvas,
         series.labels,
-        datasets
+        series.datasets
     )
 }
 
@@ -269,17 +238,6 @@ async function loadBankSeries() {
         bankSeriesCache = normalizeBankSeries(data.series || {})
 
         const series = bankSeriesCache[currentBankScope] || {}
-
-        if (banksTypeFilter.children().length <= 1) {
-            const banks = (series.datasets || []).map(ds => ds.label)
-            banks.unshift('All Banks')
-
-            populateSelect(
-                banksTypeFilter,
-                banks,
-                'All Banks'
-            )
-        }
 
         if (!series.labels?.length) {
             showEmpty(emptyBanksSeries,'No banks found.')
@@ -439,7 +397,7 @@ function renderWeek(weekIndex) {
         `${formatDate(weekData.range.start)} — ${formatDate(weekData.range.end)}`
     );
 
-    renderTable(weekData.data);
+    renderTable(weekData.data, weekData.range);
 }
 
 bankCalendarWeekFilter.on('change', function () {
@@ -464,18 +422,56 @@ function updateWeekUI() {
     renderWeek(state.selectedWeek);
 }
 
-function renderTable(data) {
+function renderTable(data, range) {
+    const $thead = bankCalendarTable.find('thead');
     const $tbody = bankCalendarTable.find('tbody');
+    
+    $thead.empty();
     $tbody.empty();
 
-    let totals = {
-        mon: 0,
-        tue: 0,
-        wed: 0,
-        thu: 0,
-        fri: 0,
-        total: 0
-    };
+    function parseDateString(dateStr) {
+        const [year, month, day] = dateStr.split('-');
+        return new Date(year, month - 1, day);
+    }
+
+    const startDate = parseDateString(range.start);
+    const endDate = parseDateString(range.end);
+
+    const startDayOfWeek = startDate.getDay() || 7; 
+    const mondayDate = new Date(startDate);
+    mondayDate.setDate(startDate.getDate() - (startDayOfWeek - 1));
+
+    const weekDates = {};
+    const days = ['mon', 'tue', 'wed', 'thu', 'fri'];
+    
+    days.forEach((day, index) => {
+        const date = new Date(mondayDate);
+        date.setDate(mondayDate.getDate() + index);
+        weekDates[day] = date;
+    });
+
+    const startTimestamp = startDate.getTime();
+    const endTimestamp = endDate.getTime();
+    const isActive = {};
+
+    days.forEach(day => {
+        const dayTime = weekDates[day].getTime();
+        isActive[day] = dayTime >= startTimestamp && dayTime <= endTimestamp;
+    });
+
+    $thead.append(`
+        <tr>
+            <th>Bank</th>
+            <th>Mon (${weekDates.mon.getDate()})</th>
+            <th>Tue (${weekDates.tue.getDate()})</th>
+            <th>Wed (${weekDates.wed.getDate()})</th>
+            <th>Thu (${weekDates.thu.getDate()})</th>
+            <th>Fri (${weekDates.fri.getDate()})</th>
+            <th>Total</th>
+        </tr>
+    `);
+
+    let totals = { mon: 0, tue: 0, wed: 0, thu: 0, fri: 0, total: 0 };
 
     data.forEach(row => {
         totals.mon += Number(row.mon) || 0;
@@ -488,25 +484,24 @@ function renderTable(data) {
         $tbody.append(`
             <tr>
                 <td>${row.bank}</td>
-                <td class="bank-calendar-td ${row.mon <= 0 ? 'zero' : ''}">${row.mon}</td>
-                <td class="bank-calendar-td ${row.tue <= 0 ? 'zero' : ''}">${row.tue}</td>
-                <td class="bank-calendar-td ${row.wed <= 0 ? 'zero' : ''}">${row.wed}</td>
-                <td class="bank-calendar-td ${row.thu <= 0 ? 'zero' : ''}">${row.thu}</td>
-                <td class="bank-calendar-td ${row.fri <= 0 ? 'zero' : ''}">${row.fri}</td>
+                <td class="bank-calendar-td ${!isActive.mon ? 'disabled' : ''} ${row.mon <= 0 ? 'zero' : ''}">${row.mon}</td>
+                <td class="bank-calendar-td ${!isActive.tue ? 'disabled' : ''} ${row.tue <= 0 ? 'zero' : ''}">${row.tue}</td>
+                <td class="bank-calendar-td ${!isActive.wed ? 'disabled' : ''} ${row.wed <= 0 ? 'zero' : ''}">${row.wed}</td>
+                <td class="bank-calendar-td ${!isActive.thu ? 'disabled' : ''} ${row.thu <= 0 ? 'zero' : ''}">${row.thu}</td>
+                <td class="bank-calendar-td ${!isActive.fri ? 'disabled' : ''} ${row.fri <= 0 ? 'zero' : ''}">${row.fri}</td>
                 <td class="bank-calendar-td ${row.total <= 0 ? 'zero' : ''}"><strong>${row.total}</strong></td>
             </tr>
         `);
     });
 
-    // totals row
     $tbody.append(`
         <tr>
-            <td></td>
-            <td class="bank-calendar-td ${totals.mon <= 0 ? 'zero' : ''}">${totals.mon}</td>
-            <td class="bank-calendar-td ${totals.tue <= 0 ? 'zero' : ''}">${totals.tue}</td>
-            <td class="bank-calendar-td ${totals.wed <= 0 ? 'zero' : ''}">${totals.wed}</td>
-            <td class="bank-calendar-td ${totals.thu <= 0 ? 'zero' : ''}">${totals.thu}</td>
-            <td class="bank-calendar-td ${totals.fri <= 0 ? 'zero' : ''}">${totals.fri}</td>
+            <td><strong>Total</strong></td>
+            <td class="bank-calendar-td ${!isActive.mon ? 'disabled' : ''} ${totals.mon <= 0 ? 'zero' : ''}">${totals.mon}</td>
+            <td class="bank-calendar-td ${!isActive.tue ? 'disabled' : ''} ${totals.tue <= 0 ? 'zero' : ''}">${totals.tue}</td>
+            <td class="bank-calendar-td ${!isActive.wed ? 'disabled' : ''} ${totals.wed <= 0 ? 'zero' : ''}">${totals.wed}</td>
+            <td class="bank-calendar-td ${!isActive.thu ? 'disabled' : ''} ${totals.thu <= 0 ? 'zero' : ''}">${totals.thu}</td>
+            <td class="bank-calendar-td ${!isActive.fri ? 'disabled' : ''} ${totals.fri <= 0 ? 'zero' : ''}">${totals.fri}</td>
             <td class="bank-calendar-td ${totals.total <= 0 ? 'zero' : ''}">${totals.total}</td>
         </tr>
     `);
