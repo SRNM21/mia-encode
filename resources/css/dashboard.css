@@ -252,50 +252,55 @@
     align-items: center;
 }
 
-.bank-calendar-table-content {
+.dashboard-table-content {
     position: relative;
     min-height: 300px;
     margin-top: 24px;
 }
 
-.bank-calendar-table {
+.dashboard-table {
     width: 100%;
     font-family: inherit;
     border-collapse: separate;
     border-spacing: 0;
     border-radius: 8px;
     overflow: hidden;
+    background-color: var(--background);
     border: 1px solid var(--btn-outline-border);
 }
 
-.bank-calendar-table thead {
+.dashboard-table thead {
     background-color: var(--table-header-bg);
 }
 
-.bank-calendar-table th,
-.bank-calendar-table td {
+.dashboard-table th,
+.dashboard-table td {
     padding: 10px;
     font-weight: 400;
     text-align: start;
 }
 
-.bank-calendar-table td {
+.dashboard-table th:not(:first-child) {
+    text-align: center;
+}
+
+.dashboard-table td {
     border: 1px solid var(--btn-outline-border);
 }
 
-.bank-calendar-table thead th:first-child {
+.dashboard-table thead th:first-child {
     border-top-left-radius: 8px;
 }
 
-.bank-calendar-table thead th:last-child {
+.dashboard-table thead th:last-child {
     border-top-right-radius: 8px;
 }
 
-.bank-calendar-table tbody tr:last-child td:first-child {
+.dashboard-table tbody tr:last-child td:first-child {
     border-bottom-left-radius: 8px;
 }
 
-.bank-calendar-table tbody tr:last-child td:last-child {
+.dashboard-table tbody tr:last-child td:last-child {
     border-bottom-right-radius: 8px;
 }
 
@@ -304,8 +309,8 @@
     text-align: center !important;
 }
 
-.bank-calendar-td.zero {
-    color: var(--color-danger);
+.zero {
+    color: var(--color-error);
 }
 
 .bank-calendar-td.disabled {
@@ -313,4 +318,116 @@
     color: var(--text-hint-color);
     pointer-events: none;
     opacity: 0.6;
+}
+
+.tabs-container {
+    display: flex;
+    position: relative;
+    padding: 4px;
+    border-radius: 32px;
+    border: 1px solid var(--input-border);
+    background-color: transparent;
+    width: max-content;
+    gap: 8px;
+}
+
+.tab-indicator {
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    left: 0;
+    border-radius: 28px;
+    background-color: var(--header-bg);
+    border: 1px solid var(--input-border);
+    z-index: 0;
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.tabs {
+    position: relative;
+    z-index: 1;
+    font-size: 14px;
+    padding: 4px 8px;
+    border-radius: 28px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    color: var(--text-hint-color);
+    user-select: none;
+    transition: color 0.3s ease;
+}
+
+.tabs:hover {
+    color: var(--hover-primary-btn);
+}
+
+.tabs.active {
+    color: var(--foreground);
+}
+
+.chart-header-flex {
+    justify-content: space-between;
+}
+
+.title-tabs-group {
+    align-items: center;
+    gap: 1rem;
+}
+
+.clients-chart-wrapper {
+    width: 100%;
+}
+
+.clients-table-wrapper {
+    height: 500px;
+    width: 100%;
+    overflow: auto;
+    display: none;
+    border-radius: 8px;
+    border: 1px solid var(--btn-outline-border);
+}
+
+.clients-data-table {
+    border: none;
+    overflow: auto;
+}
+
+.clients-data-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: var(--table-header-bg);
+    border-bottom: 2px solid var(--btn-outline-border);
+}
+
+.clients-data-table th:not(:first-child),
+.clients-data-table td:not(:first-child) {
+    text-align: center;
+}
+
+.clients-data-table th,
+.clients-data-table td {
+    white-space: nowrap;
+}
+
+.clients-data-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: var(--table-header-bg);
+    border-bottom: 2px solid var(--btn-outline-border);
+}
+
+.clients-data-table th:first-child,
+.clients-data-table td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 5;
+    background-color: var(--hover-link-btn);
+    border-right: 1px solid var(--btn-outline-border);
+}
+
+.clients-data-table thead th:first-child {
+    z-index: 20;
+    background-color: var(--table-header-bg);
 }

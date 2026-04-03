@@ -91,12 +91,12 @@
                                 </div>
                             </div>
 
-                            <div class="bank-calendar-table-content">
+                            <div class="dashboard-table-content">
                                 <?= get_component('empty-chart', [
                                     'class' => 'empty-bank-calendar load',
                                     'text' => 'No submissions as of now.'
                                 ]) ?>
-                                <table class="bank-calendar-table">
+                                <table id="bank-calendar-table" class="dashboard-table">
                                     <thead>
                                         <tr>
                                             <th>Bank</th>
@@ -114,8 +114,16 @@
 
                         </div>
                         <div class="card line-chart-card flex-col">
-                            <div class="chart-control flex-row">
-                                <p class="chart-title">Clients Trend</p>
+                            <div class="chart-control flex-row chart-header-flex">
+                                <div class="flex-row title-tabs-group">
+                                    <p class="chart-title">Clients Trend</p>
+                                    <div class="tabs-container">
+                                        <div class="tab-indicator"></div>
+                                        <a href="#chart" class="tabs active" data-target="clients-chart-wrapper">Chart</a>
+                                        <a href="#table" class="tabs" data-target="clients-table-wrapper">Table</a>
+                                    </div>
+                                </div>
+                                
                                 <div class="line-chart-range flex-row">
                                     <select id="clients-series-select" class="size-sm">
                                         <option value="weekly">Weekly</option>
@@ -125,18 +133,38 @@
                                     <select id="clients-year-select" class="size-sm"></select>
                                 </div>
                             </div>
+                            
                             <div class="line-chart-container clients-series-container">
                                 <?= get_component('empty-chart', [
                                     'class' => 'empty-clients-series load',
                                     'text' => 'No clients found.'
                                 ]) ?>
-                                <canvas id="clients-type-line"></canvas>
+                                
+                                <div id="clients-chart-wrapper" class="clients-chart-wrapper">
+                                    <canvas id="clients-type-line"></canvas>
+                                </div>
+                                
+                                <div id="clients-table-wrapper" class="clients-table-wrapper">
+                                    <table id="clients-data-table" class="clients-data-table dashboard-table">
+                                        <thead id="clients-table-head">
+                                        </thead>
+                                        <tbody id="clients-table-body">
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
 
                         <div class="card line-chart-card flex-col">
                             <div class="chart-control flex-row">
-                                <p class="chart-title">Bank Applications Trend</p>
+                                <div class="flex-row title-tabs-group">
+                                    <p class="chart-title">Bank Applications Trend</p>
+                                    <div class="tabs-container">
+                                        <div class="tab-indicator"></div>
+                                        <a href="#chart" class="tabs active" data-target="banks-chart-wrapper">Chart</a>
+                                        <a href="#table" class="tabs" data-target="banks-table-wrapper">Table</a>
+                                    </div>
+                                </div>
                                 <div class="line-chart-range flex-row">
                                     <select id="bank-apps-series-select" class="size-sm">
                                         <option value="weekly">Weekly</option>
@@ -151,7 +179,16 @@
                                     'class' => 'empty-banks-series load',
                                     'text' => 'No bank applications found.'
                                 ]) ?>
-                                <canvas id="bank-applications-type-line"></canvas>
+                                <div id="banks-chart-wrapper" class="clients-chart-wrapper">
+                                    <canvas id="bank-applications-type-line"></canvas>
+                                </div>
+                                
+                                <div id="banks-table-wrapper" class="clients-table-wrapper">
+                                    <table id="banks-data-table" class="clients-data-table dashboard-table">
+                                        <thead id="banks-table-head"></thead>
+                                        <tbody id="banks-table-body"></tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>

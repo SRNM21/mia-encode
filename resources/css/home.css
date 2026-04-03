@@ -1,6 +1,6 @@
 @import url('root.css');
 
-.home-page > header {
+.home-page>header {
     background-color: var(--header-bg);
     border-bottom: 1px solid var(--border-color);
     align-items: center;
@@ -17,6 +17,7 @@
 .header-content {
     width: 100%;
     justify-content: space-between;
+    align-items: center;
 }
 
 .breadcrumbs a {
@@ -31,7 +32,7 @@
 .sidebar {
     width: 250px;
     background-color: var(--sidebar-bg);
-    transition: width 0.3s ease; 
+    transition: width 0.3s ease;
     display: flex;
     flex-direction: column;
     border-right: 1px solid var(--border-color);
@@ -51,7 +52,7 @@
     justify-content: space-between;
 }
 
-.sidebar-nav > :where(a, button) {
+.sidebar-nav> :where(a, button) {
     color: var(--foreground);
     display: flex;
     align-items: center;
@@ -64,27 +65,53 @@
     width: 100%;
 }
 
-.sidebar-nav > :where(a, button):hover {
+.sidebar-nav> :where(a, button):hover {
     background-color: var(--hover-sidebar-nav);
 }
 
-.sidebar-nav > :where(a, button) > .icon {
+.sidebar-nav> :where(a, button)>.icon {
     display: flex;
     align-items: center;
     padding: 8px;
 }
 
-.sidebar-nav > :where(a, button) > .label {
+.sidebar-nav> :where(a, button)>.label {
     opacity: 1;
     visibility: visible;
     margin-left: 16px;
-    transition: opacity 0.1s ease 0.2s; 
+    transition: opacity 0.1s ease 0.2s;
 }
 
-.sidebar.collapsed > .sidebar-nav > :where(a, button) > .label {
+.sidebar.collapsed>.sidebar-nav> :where(a, button)>.label {
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.1s ease 0.2s;
+}
+
+.user-role {
+    border: 1px solid var(--color-neutral-700);
+    padding: 4px 8px;
+    border-radius: 50px;
+    font-size: 14px;
+    text-transform: capitalize;
+}
+
+.user-role.admin {
+    border-color: var(--color-success);
+    color: var(--color-success);
+    background-color: rgb(from var(--color-success) r g b / 10%);
+}
+
+.user-role.encoder {
+    border-color: var(--color-danger);
+    color: var(--color-danger);
+    background-color: rgb(from var(--color-danger) r g b / 10%);
+}
+
+.user-role.super_admin {
+    border-color: var(--color-info);
+    color: var(--color-info);
+    background-color: rgb(from var(--color-info) r g b / 10%);
 }
 
 .toggle-btn {
@@ -101,7 +128,7 @@
     background-color: var(--hover-ghost-btn) !important;
 }
 
-.toggle-btn > svg {
+.toggle-btn>svg {
     color: var(--foreground);
 }
 
@@ -110,7 +137,7 @@ main {
     width: 100%;
 }
 
-hr {    
+hr {
     margin-top: 32px;
     margin-bottom: 32px;
 }
@@ -129,7 +156,7 @@ hr {
     white-space: nowrap;
     border-radius: 8px;
     margin-top: auto;
-    color: var(--color-danger) !important;
+    color: var(--color-error) !important;
     background-color: transparent !important;
 }
 
@@ -156,7 +183,7 @@ hr {
 
     opacity: 0;
     visibility: hidden;
-    transition: 
+    transition:
         opacity 0.25s ease,
         visibility 0.25s ease,
         backdrop-filter 0.25s ease;
@@ -193,7 +220,7 @@ hr {
     opacity: 0;
 }
 
-.modal-content > hr {
+.modal-content>hr {
     margin: 0;
 }
 
@@ -252,11 +279,12 @@ hr {
     border: 1px solid var(--border-color);
     border-radius: 6px;
     padding: 14px 16px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
     overflow: hidden;
 }
 
-.notification-progress, .notification-progress.success {
+.notification-progress,
+.notification-progress.success {
     position: absolute;
     top: 0;
     left: 0;

@@ -25,9 +25,10 @@
             </nav>
         <?php endif; ?>
 
-        <p class='user-name'>
-            <?= $user->username ?? 'Anonymous' ?> | <?= $user->role->value ?? 'Guest' ?>
-        </p>
+        <span class='user-name flex-center flex-row gap-8'>
+            <p><?= $user->username ?? 'Anonymous' ?></p> 
+            <span class="user-role <?= $user->role->value ?>"><?= $user->role->value ?? 'Guest' ?></span>
+        </span>
     </div>
 </header>
 

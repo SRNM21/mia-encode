@@ -14,11 +14,14 @@ const doc = $(document)
 const clientTodayCanvas = $('#clients-type-chart')
 const banksTodayCanvas = $('#bank-apps-type-chart')
 
-const clientSeriesCanvas = $('#clients-type-line')
+const clientSeriesCanvas = $('#clients-chart-wrapper')
+const clientSeriesTable = $('#clients-table-wrapper')
+
 const bankSeriesCanvas = $('#bank-applications-type-line')
+const bankSeriesTable = $('#banks-table-wrapper')
 
 const leaderboardsContent = $('.leaderboards-table-content')
-const bankCalendarTable = $('.bank-calendar-table')
+const bankCalendarTable = $('#bank-calendar-table')
 
 const emptyClientsToday = $('.empty-clients-today')
 const emptyBanksToday = $('.empty-banks-today')
@@ -109,7 +112,7 @@ function renderClientSeriesFromCache() {
     }
 
     renderClientSeries(
-        clientSeriesCanvas,
+        clientSeriesCanvas.find('canvas'),
         labels,
         [newDataset, oldDataset]
     )
@@ -128,6 +131,63 @@ function renderBankSeriesFromCache() {
         series.labels,
         series.datasets
     )
+}
+
+function renderBankTableFromCache() {
+    const $tableHead = $('#banks-table-head');
+    const $tableBody = $('#banks-table-body');
+    const series = bankSeriesCache[currentBankScope] || {};
+
+    $tableHead.empty();
+    $tableBody.empty();
+
+    if (!series.labels?.length) {
+        $tableBody.append('<tr><td class="text-center p-15">No bank applications found.</td></tr>');
+        return;
+    }
+
+    let headRow = '<tr><th>Bank</th>';
+    
+    series.labels.forEach(label => {
+        headRow += `<th>${label}</th>`;
+    });
+    headRow += '<th>Total</th></tr>'; 
+    $tableHead.append(headRow);
+
+    let periodTotals = new Array(series.labels.length).fill(0);
+    let grandTotal = 0;
+
+    series.datasets.forEach(dataset => {
+        const $row = $('<tr>');
+        $row.append($('<td>').text(dataset.label));
+
+        let bankTotal = 0;
+
+        series.labels.forEach((_, index) => {
+            const val = dataset.data[index] || 0;
+            
+            bankTotal += val;
+            periodTotals[index] += val;
+
+            $row.append($('<td>').addClass(val === 0 ? 'zero' : '').text(val));
+        });
+
+        grandTotal += bankTotal;
+
+        $row.append($('<td>').addClass(bankTotal === 0 ? 'zero' : '').html(`<strong>${bankTotal}</strong>`));
+        
+        $tableBody.append($row);
+    });
+
+    const $totalRow = $('<tr>').append($('<td>').html('<strong>Total</strong>'));
+    
+    periodTotals.forEach(total => {
+        $totalRow.append($('<td>').addClass(total === 0 ? 'zero' : '').html(`<strong>${total}</strong>`));
+    });
+    
+    $totalRow.append($('<td>').addClass(grandTotal === 0 ? 'zero' : '').html(`<strong>${grandTotal}</strong>`));
+
+    $tableBody.append($totalRow);
 }
 
 // Clients charts
@@ -159,6 +219,7 @@ async function loadClientToday() {
 
 async function loadClientSeries() {
     showLoading(emptyClientsSeries, clientSeriesCanvas)
+    showLoading(emptyClientsSeries, clientSeriesTable)
 
     try {
         const response = await fetchClientTypeSeries({
@@ -167,6 +228,8 @@ async function loadClientSeries() {
         })
 
         const data = response.data || {}
+        console.log(data);
+        
 
         populateSelect(
             clientsYearSelect,
@@ -184,8 +247,10 @@ async function loadClientSeries() {
         }
 
         showContent(emptyClientsSeries, clientSeriesCanvas)
+        showContent(emptyClientsSeries, clientSeriesTable)
 
         renderClientSeriesFromCache()
+        renderClientTableFromCache()
     } catch (error) {
         showEmpty(emptyClientsSeries, 'Error Occured.')
         console.error(error)
@@ -220,6 +285,7 @@ async function loadBankToday() {
 
 async function loadBankSeries() {
     showLoading(emptyBanksSeries, bankSeriesCanvas)
+    showLoading(emptyBanksSeries, bankSeriesTable)
 
     try {
         const response = await fetchBankAppsSeries({
@@ -245,8 +311,10 @@ async function loadBankSeries() {
         }
 
         showContent(emptyBanksSeries, bankSeriesCanvas)
+        showContent(emptyBanksSeries, bankSeriesTable)
 
         renderBankSeriesFromCache()
+        renderBankTableFromCache()
     } catch (error) {
         showEmpty(emptyBanksToday, 'Error Occured.')
         console.error(error)
@@ -513,4 +581,121 @@ function isMonthEmpty(week) {
     week.forEach(w => w.data.forEach(d => total += d.total))
     
     return total <= 0
+}
+
+$(document).ready(function() {
+    const $tabGroups = $('.title-tabs-group');
+
+    function setChartTabActive($clickedTab, $container, isInitial = false) {
+        if (!$clickedTab.length) return;
+
+        const $tabs = $container.find('.tabs');
+        const $indicator = $container.find('.tab-indicator');
+
+        $tabs.removeClass('active');
+        $clickedTab.addClass('active');
+
+        const tabWidth = $clickedTab.outerWidth();
+        const tabLeftPosition = $clickedTab.position().left;
+
+        if (isInitial) {
+            $indicator.css('transition', 'none');
+            $indicator.css({
+                'width': tabWidth + 'px',
+                'left': tabLeftPosition + 'px'
+            });
+            $indicator[0].offsetHeight;
+            $indicator.css('transition', '');
+        } else {
+            $indicator.css({
+                'width': tabWidth + 'px',
+                'left': tabLeftPosition + 'px'
+            });
+        }
+
+        const targetView = $clickedTab.data('target');
+        const $targetEl = $('#' + targetView);
+        
+        const $siblings = $targetEl.siblings('.clients-chart-wrapper, .clients-table-wrapper');
+
+        if (isInitial) {
+            $siblings.hide();
+            $targetEl.show();
+        } else {
+            $siblings.hide();
+            $targetEl.fadeIn(200);
+        }
+    }
+
+    $tabGroups.each(function() {
+        const $group = $(this);
+        const $activeTab = $group.find('.tabs.active');
+        setChartTabActive($activeTab, $group, true);
+    });
+
+    $('.title-tabs-group').on('click', '.tabs', function(e) {
+        e.preventDefault();
+        const $clickedTab = $(this);
+        
+        if ($clickedTab.hasClass('active')) return; 
+        
+        const $container = $clickedTab.closest('.title-tabs-group');
+        setChartTabActive($clickedTab, $container, false);
+    });
+
+    $(window).on('resize', function() {
+        $('.title-tabs-group').each(function() {
+            const $group = $(this);
+            const $activeTab = $group.find('.tabs.active');
+            setChartTabActive($activeTab, $group, true);
+        });
+    });
+});
+
+function renderClientTableFromCache() {
+    const $tableHead = $('#clients-table-head');
+    const $tableBody = $('#clients-table-body');
+    const items = clientSeriesCache[currentClientScope] || [];
+
+    $tableHead.empty();
+    $tableBody.empty();
+
+    if (!items.length) {
+        $tableBody.append('<tr><td class="text-center p-15">No clients found.</td></tr>');
+        return;
+    }
+
+    let headRow = '<tr><th>Client Type</th>'; 
+    
+    items.forEach(item => {
+        headRow += `<th>${item.label}</th>`;
+    });
+    headRow += '<th>Total</th></tr>';
+    $tableHead.append(headRow);
+
+    let totalNew = 0;
+    let totalOld = 0;
+    let grandTotal = 0;
+
+    const $newRow = $('<tr>').append($('<td>').text('New Clients'));
+    const $oldRow = $('<tr>').append($('<td>').text('Old Clients'));
+    const $totalRow = $('<tr>').append($('<td>').html('<strong>Total</strong>'));
+
+    items.forEach(item => {
+        const periodTotal = item.new + item.old; 
+        
+        totalNew += item.new;
+        totalOld += item.old;
+        grandTotal += periodTotal;
+        
+        $newRow.append($('<td>').addClass(item.new == 0 ? 'zero' : '').text(item.new));
+        $oldRow.append($('<td>').addClass(item.old == 0 ? 'zero' : '').text(item.old));
+        $totalRow.append($('<td>').addClass(periodTotal == 0 ? 'zero' : '').html(`<strong>${periodTotal}</strong>`));
+    });
+
+    $newRow.append($('<td>').addClass(totalNew == 0 ? 'zero' : '').html(`<strong>${totalNew}</strong>`));
+    $oldRow.append($('<td>').addClass(totalOld == 0 ? 'zero' : '').html(`<strong>${totalOld}</strong>`));
+    $totalRow.append($('<td>').addClass(grandTotal == 0 ? 'zero' : '').html(`<strong>${grandTotal}</strong>`));
+
+    $tableBody.append($newRow, $oldRow, $totalRow);
 }

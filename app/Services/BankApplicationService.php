@@ -27,10 +27,11 @@ class BankApplicationService
         $allowed = [25, 50, 100, 500];
         if (!\in_array($perPage, $allowed, true)) $perPage = 25;
 
-        $sort = $request->get('sort') ?? 'date_submitted';
+        $sort = $request->get('sort') ?? 'id';
         $order = strtolower($request->get('order') ?? 'desc');
 
         $allowedSort = [
+            'id',
             'date_submitted',
             'last_name',
             'first_name',
@@ -40,7 +41,7 @@ class BankApplicationService
 
         if (!\in_array($sort, $allowedSort, true)) 
         {
-            $sort = 'date_submitted';
+            $sort = 'id';
         }
 
         if (!\in_array($order, ['asc','desc'], true)) 
@@ -256,7 +257,7 @@ class BankApplicationService
         ]);
     }
 
-    public function getClientApplications(int $client_id)
+    public function getClientApplications(int $client_id): array
     {
         return $this->bankApplicationRepository->getClientApplications($client_id);
     }
@@ -498,33 +499,51 @@ class BankApplicationService
             $monthStr = \sprintf('%02d', $m);
             $monthNameShort = date('M', strtotime("{$year}-{$monthStr}-01"));
 
-            $first = new DateTimeImmutable("{$year}-{$monthStr}-01");
-            $last = $first->modify('last day of this month');
+            $currentDay = new DateTimeImmutable("{$year}-{$monthStr}-01");
+            $lastOfMonth = $currentDay->modify('last day of this month');
 
-            $firstMonday = $first;
-            if ((int)$firstMonday->format('N') !== 1)
+            while ($currentDay <= $lastOfMonth) 
             {
-                $firstMonday = $firstMonday->modify('next monday');
-            }
-
-            $idx = 1;
-
-            for ($ws = $firstMonday; $ws <= $last; $ws = $ws->add(new DateInterval('P7D')))
-            {
-                $we = $ws->add(new DateInterval('P6D'));
-                if ((int)$ws->format('m') !== $m) break;
-
-                $labels[] = "{$monthNameShort} W{$idx}";
-
-                $range = [];
-                for ($cur = $ws; $cur <= $we; $cur = $cur->add(new DateInterval('P1D')))
-                {
-                    if ((int)$cur->format('m') !== $m) continue;
-                    $range[] = $cur->format('Y-m-d');
+                // skip weekends (6 = Saturday, 7 = Sunday)
+                $dayOfWeek = (int)$currentDay->format('N');
+                if ($dayOfWeek > 5) {
+                    $daysToMonday = 8 - $dayOfWeek;
+                    $currentDay = $currentDay->add(new DateInterval("P{$daysToMonday}D"));
                 }
 
+                // stop if skipping the weekend pushed us into the next month
+                if ($currentDay > $lastOfMonth) break;
+
+                $ws = $currentDay;
+
+                // find Friday (day 5) of the current week
+                $daysToFriday = 5 - (int)$ws->format('N');
+                $we = $ws->add(new DateInterval("P{$daysToFriday}D"));
+
+                // cap the week to the last day of the month if it spills over
+                if ($we > $lastOfMonth) $we = $lastOfMonth;
+
+                // format the label (e.g., Jan 5-9)
+                $startDay = $ws->format('j'); 
+                $endDay = $we->format('j');
+                
+                $label = $startDay === $endDay
+                    ? "{$monthNameShort} {$startDay}"
+                    : "{$monthNameShort} {$startDay}-{$endDay}";
+
+                $labels[] = $label;
+
+                // collect the valid Monday-Friday dates for this week
+                $range = [];
+                for ($cur = $ws; $cur <= $we; $cur = $cur->add(new DateInterval('P1D'))) 
+                {
+                    $range[] = $cur->format('Y-m-d');
+                }
+                
                 $weekRanges[] = $range;
-                $idx++;
+
+                // move to the day after this workweek ends (usually Saturday)
+                $currentDay = $we->add(new DateInterval('P1D'));
             }
         }
 

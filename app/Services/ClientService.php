@@ -209,31 +209,58 @@ class ClientService
         {
             $monthStr = \sprintf('%02d', $m);
             $monthNameShort = date('M', strtotime("{$year}-{$monthStr}-01"));
-            $firstOfMonth = new DateTimeImmutable("{$year}-{$monthStr}-01");
-            $lastOfMonth = (new DateTimeImmutable("{$year}-{$monthStr}-01"))->modify('last day of this month');
-            $firstMonday = $firstOfMonth;
             
-            if ((int)$firstMonday->format('N') !== 1) $firstMonday = $firstMonday->modify('next monday');
+            $currentDay = new DateTimeImmutable("{$year}-{$monthStr}-01");
+            $lastOfMonth = $currentDay->modify('last day of this month');
 
-            $weekIndex = 1;
-            for ($ws = $firstMonday; $ws <= $lastOfMonth; $ws = $ws->add(new DateInterval('P7D'))) 
+            while ($currentDay <= $lastOfMonth) 
             {
-                $we = $ws->add(new DateInterval('P6D'));
-                if ((int) $ws->format('m') !== $m) break;
+                // skip weekends (N returns 6 for Saturday, 7 for Sunday)
+                $dayOfWeek = (int)$currentDay->format('N');
+                if ($dayOfWeek > 5) {
+                    $daysToMonday = 8 - $dayOfWeek;
+                    $currentDay = $currentDay->add(new DateInterval("P{$daysToMonday}D"));
+                }
+
+                // if skipping the weekend pushed us into the next month, stop the loop
+                if ($currentDay > $lastOfMonth) break;
+
+                $ws = $currentDay;
+
+                // find Friday (day 5) of the current week
+                $daysToFriday = 5 - (int)$ws->format('N');
+                $we = $ws->add(new DateInterval("P{$daysToFriday}D"));
+
+                // cap the week to the last day of the month if it spills over
+                if ($we > $lastOfMonth) $we = $lastOfMonth;
 
                 $sumNew = 0;
                 $sumOld = 0;
 
+                // loop through Monday-Friday to sum the counts
                 for ($cur = $ws; $cur <= $we; $cur = $cur->add(new DateInterval('P1D'))) 
                 {
-                    if ((int) $cur->format('m') !== $m) continue;
                     $key = $cur->format('Y-m-d');
                     $sumNew += $countsByDay[$key]['new'] ?? 0;
                     $sumOld += $countsByDay[$key]['old'] ?? 0;
                 }
 
-                $weekly[] = ['label' => "{$monthNameShort} W{$weekIndex}", 'new' => $sumNew, 'old' => $sumOld];
-                $weekIndex++;
+                // format the label (e.g., Jan 5-9)
+                $startDay = $ws->format('j'); 
+                $endDay = $we->format('j');
+                
+                $label = $startDay === $endDay
+                    ? "{$monthNameShort} {$startDay}"
+                    : "{$monthNameShort} {$startDay}-{$endDay}";
+
+                $weekly[] = [
+                    'label' => $label, 
+                    'new' => $sumNew, 
+                    'old' => $sumOld
+                ];
+
+                // move to the day after this workweek ends (this will typically be Saturday)
+                $currentDay = $we->add(new DateInterval('P1D'));
             }
         }
 

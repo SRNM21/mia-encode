@@ -273,9 +273,10 @@
     --color-stone-950: oklch(0.147 0.004 49.25);
 
     /* colors */
-    --color-error: var(--color-red-600);
-    --color-danger: var(--color-red-600);
-    --color-success: var(--color-green-600);
+    --color-info: var(--color-blue-800);
+    --color-error: var(--color-red-800);
+    --color-danger: var(--color-orange-800);
+    --color-success: var(--color-green-800);
 
     --foreground: var(--color-neutral-950);
     --background: var(--color-neutral-50);
@@ -318,8 +319,9 @@
 .dark {
 
     /* colors */
-    --color-error: var(--color-red-500);
-    --color-danger: var(--color-red-400);
+    --color-info: var(--color-blue-400);
+    --color-error: var(--color-red-400);
+    --color-danger: var(--color-orange-400);
     --color-success: var(--color-green-400);
 
     --foreground: var(--color-neutral-50);
