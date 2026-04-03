@@ -174,8 +174,8 @@
                                                         </tr>
                                                     <?php endforeach; ?>
                                                 <?php else: ?>
-                                                    <tr>
-                                                        <td colspan="<?= count($banks) + 3 ?>" style="text-align:center;" class="no-data">No bank data available.</td>
+                                                    <tr class="no-data">
+                                                        <td colspan="<?= count($banks) + 3 ?>" style="text-align:center;">No bank data available.</td>
                                                     </tr>
                                                 <?php endif; ?>
                                             </tbody>
