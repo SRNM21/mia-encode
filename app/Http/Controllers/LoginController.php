@@ -13,6 +13,11 @@ class LoginController extends Controller
     {
         $user = Auth::user();
 
+        if (!$user) 
+        {
+            $this->redirect('/login');
+        }
+
         if ($user->isAdmin()) 
         {
             $this->redirect('/dashboard');
