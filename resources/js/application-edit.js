@@ -97,8 +97,6 @@ doc.ready(function () {
                 }
             })
 
-            console.log(response);
-            
             href('/mia_encode/bank-applications?edit=success')
         } catch (error) {
             const response = error?.responseJSON ?? error

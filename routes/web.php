@@ -11,10 +11,10 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EncodeController;
 use App\Http\Controllers\BankApplicationController;
 use App\Http\Controllers\BankController;
-use App\Http\Controllers\Development\HealthController;
 use App\Http\Controllers\LeaderboardsController;
 use App\Http\Controllers\RequestEditController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\Development\HealthController;
 
 // ! DEVELOPMENT Routes
 Route::get('/up', HealthController::class);

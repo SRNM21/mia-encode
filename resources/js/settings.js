@@ -94,7 +94,6 @@ async function saveProfile(section) {
         })
 
         const result = response.data
-        console.log(result)
 
         showLoading(profileSaveBtn, false)
         showNotification(
@@ -141,7 +140,6 @@ async function savePassword(section) {
         })
 
         const result = response.data
-        console.log(result)
 
         showLoading(securitySaveBtn, false)
         showNotification(

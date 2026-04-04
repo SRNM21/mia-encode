@@ -317,7 +317,6 @@ async function refereshTable() {
         })
         
         const result = response.data
-        console.log(result);
         
         tableWrapper.html(result.html)
         renderPaginationState()
@@ -409,9 +408,6 @@ $(document).ready(function () {
     confirmAddFilterBtn.on('click', function (e) {
         const column = filterColumns.val()
         let value = filterValue.val().trim()
-
-        console.log(column);
-        
 
         setErrorState(filterColumns, !column)
         setErrorState(filterValue, !value)
@@ -662,7 +658,6 @@ $(document).ready(function () {
     $(document).on('click', '.edit-agent-btn', function () {
         const row = CURRENT_EDIT_TR
         const data = row.data()
-        console.log(data);
         
         EDIT_APP_ORIG_DATA = data
         agent.val(EDIT_APP_ORIG_DATA.agent)
@@ -711,7 +706,6 @@ $(document).ready(function () {
             })
             
             const result = response.data
-            console.log(result);
             
             await refereshTable()
 
@@ -746,7 +740,6 @@ $(document).ready(function () {
             })
             
             const result = response.data
-            console.log(result);
             await refereshTable()
             
             showNotification(result.title, result.message)
@@ -783,15 +776,12 @@ $(document).ready(function () {
         } catch (e) {
             showNotification('Failed to View', 'Something went wrong, please try again later.', 'error')
             console.log(e);
-            
         }
     })
 
 })
 
 function createDropdownContent(app) {
-    console.log(app);
-    
     return `
         <div class="dropdown-menu show">
             <button class="dropdown-item edit-application-btn">
@@ -854,10 +844,7 @@ $(document).on('click', '.dropdown-trigger', function (e) {
 
     closeAllMenus();
 
-    if (isSameTrigger) {
-        console.log('closed by clicking trigger again');
-        return;
-    }
+    if (isSameTrigger) return;
 
     CURRENT_EDIT_TR = $trigger.closest('tr')
     activeTrigger = $trigger;

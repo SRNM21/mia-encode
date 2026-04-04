@@ -124,8 +124,6 @@ $(document).on('click', '.request-container', async function () {
         const $container = $(this)
         const data = $container.data()
 
-        console.log(data);
-
         CURRENT_EDIT_REQUEST_CONTAINER = $container
         CURRENT_EDIT_REQUEST_ID = data.requestEditId
         CURRENT_EDIT_REQUEST_DATA = data

@@ -228,8 +228,6 @@ async function loadClientSeries() {
         })
 
         const data = response.data || {}
-        console.log(data);
-        
 
         populateSelect(
             clientsYearSelect,

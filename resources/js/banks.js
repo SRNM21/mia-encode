@@ -116,7 +116,6 @@ async function refereshTable() {
         })
         
         const result = response.data
-        console.log(result);
         
         $('.table-wrapper').html(result.html)
         renderPaginationState()
@@ -163,8 +162,6 @@ confirmAddBank.on('click', async function (e) {
         }
 
         await refereshTable()
-
-        console.log(response);
         
         showLoading(confirmAddBank, false)
         showBankAddNotification(response)
@@ -196,8 +193,6 @@ $(document).on('click', '.edit-bank-btn', function () {
     bankStatus.val(data.isActive ? 'active' : 'inactive')
     lastUpdateNote.html(formatDate(data.lastUpdate))
     updateButtons()
-
-    console.log(data)
 })
 
 const params = new URLSearchParams(window.location.search)

@@ -90,7 +90,6 @@ doc.ready(function () {
 
         client_id = null
         tbody.empty()
-        console.log(data);
         
         try {
             const response = await post({
@@ -101,9 +100,7 @@ doc.ready(function () {
             renderClientBankApplication(response.data)
         } catch (error) {
             const response = error.responseJSON
-
             console.log(error);
-            
 
             setErrorMessage(
                 checkClientErrorCard,
@@ -113,8 +110,6 @@ doc.ready(function () {
     })
 
     submitBtn.on('click', async (e) => {
-        console.log('submit');
-        
         e.preventDefault()
 
         const selectedBanks = $('td.bank-select-cell.selected').map((_, cell) => $(cell).attr('data-bank-id')).get() || []
@@ -215,8 +210,6 @@ function isExpired(dateSubmitted, expirationMonths) {
 }
 
 function renderClientBankApplication(data) {
-    console.log(data);
-    
     const client = data.client
     const banks = Array.isArray(data.banks) ? data.banks : []
     const applications = Array.isArray(data.applications)
@@ -280,9 +273,6 @@ function renderClientBankApplication(data) {
             ? isExpired(app.date_submitted, bank.expiry_months) 
             : false
 
-        console.log(app);
-        
-
         const row = $('<tr></tr>')
 
         const date = app ? formatDate(app.date_submitted) : '—'
@@ -322,8 +312,6 @@ function renderClientBankApplication(data) {
             });
             
             actionCell.on('keydown', function(event) {
-                console.log(event);
-
                 if (event.key === 'Enter' || event.key === ' ') {
                     event.preventDefault();
                     $(this).trigger('click');

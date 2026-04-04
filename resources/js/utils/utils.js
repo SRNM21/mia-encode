@@ -55,8 +55,6 @@ confirmLogoutBtn.on('click', async () => {
             url: 'logout',
         })
         
-        console.log(response)
-        
         closeModal('logout-confirm-modal')
         window.location.href = response.data.redirect
     } catch (error) {
