@@ -1,5 +1,5 @@
 import { useAjax } from './hooks/use-ajax.js'
-import { capitalizeWord, formatDate, normalizedServerErrors, scrollToBottom, setErrorState, showNotification } from './utils/utils.js'
+import { capitalizeWord, formatDate, normalizedServerErrors, scrollToBottom, setErrorState, showLoading, showNotification } from './utils/utils.js'
 import { setErrorMessage, validateCheckClientForm, validateStoreClientForm } from './utils/validation.js'
 
 const doc = $(document)
@@ -37,6 +37,8 @@ const clientDetails = [
     mobile
 ]
 
+let IS_LOADING = false
+
 doc.ready(function () {
     birthdate.datepicker({
         changeMonth: true,
@@ -73,6 +75,8 @@ doc.ready(function () {
     checkClientBtn.on('click', async (e) => {        
         e.preventDefault()
 
+        if (IS_LOADING) return
+
         const [data, errors] = validateCheckClientForm(checkClientErrorCard, {
             firstname: firstname,
             middlename: middlename,
@@ -88,6 +92,9 @@ doc.ready(function () {
             return
         }
 
+        IS_LOADING = true
+        showLoading(checkClientBtn, true)
+
         client_id = null
         tbody.empty()
         
@@ -96,8 +103,10 @@ doc.ready(function () {
                 url: 'encode-check',
                 data: data,
             })
-            
+
             renderClientBankApplication(response.data)
+            IS_LOADING = false
+            showLoading(checkClientBtn, false)
         } catch (error) {
             const response = error.responseJSON
             console.log(error);
@@ -106,11 +115,15 @@ doc.ready(function () {
                 checkClientErrorCard,
                 normalizedServerErrors(response?.data?.errors ?? [])
             )
+            IS_LOADING = false
+            showLoading(checkClientBtn, false)
         }
     })
 
     submitBtn.on('click', async (e) => {
         e.preventDefault()
+
+        if (IS_LOADING) return
 
         const selectedBanks = $('td.bank-select-cell.selected').map((_, cell) => $(cell).attr('data-bank-id')).get() || []
 
@@ -129,6 +142,10 @@ doc.ready(function () {
             return
         }
 
+        IS_LOADING = true
+        showLoading(submitBtn, true)
+
+
         try {
             const response = await post({
                 url: 'encode',
@@ -138,6 +155,8 @@ doc.ready(function () {
             clear()
             showNotification('Saved Successfully', 'Client\'s bank application successfully submitted.')
             lastname.focus()
+            IS_LOADING = false
+            showLoading(submitBtn, false)
         } catch (error) {
             const response = error.responseJSON
 
@@ -147,6 +166,8 @@ doc.ready(function () {
             )
 
             scrollToBottom('.content')
+            IS_LOADING = false
+            showLoading(submitBtn, false)
         }
     })
 

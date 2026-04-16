@@ -76,9 +76,7 @@
             <button id="add-bank-cancel" class="outline sm modal-cancel-btn" data-modal='add-bank-modal'>Cancel</button>
             <button id="add-bank-confirm" class="primary sm">
                 <p>Add Bank</p>
-                <?php get_component('loader', [
-                    'size' => 'sm',
-                ]) ?>
+                <?php get_component('loader')?>
             </button>
         </div>
     </div>

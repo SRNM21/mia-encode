@@ -25,10 +25,15 @@
             </nav>
         <?php endif; ?>
 
-        <span class='user-name flex-center flex-row gap-8'>
-            <p><?= $user->username ?? 'Anonymous' ?></p> 
-            <span class="user-role <?= $user->role->value ?>"><?= $user->role->value ?? 'Guest' ?></span>
-        </span>
+        <div class="flex-center flex-row gap-8">
+            <div id="wifi-indicator" class="wifi-indicator flex-center" title="Checking connection status...">
+                
+            </div>
+            <span class='user-name flex-center flex-row gap-8'>
+                <p><?= $user->username ?? 'Anonymous' ?></p> 
+                <span class="user-role <?= $user->role->value ?>"><?= $user->role->value ?? 'Guest' ?></span>
+            </span>
+        </div>
     </div>
 </header>
 

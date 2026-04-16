@@ -14,10 +14,8 @@
         <div class='modal-actions'>
             <button id='close-edit-request-btn' class='outline sm modal-cancel-btn' data-modal='cancel-edit-request-modal'>Close</button>
             <button id='confirm-edit-request-btn' class='primary sm confirm-edit-request-btn'>
-                <p>Yes, Cancel Request</p>
-                <?php get_component('loader', [
-                    'size' => 'sm',
-                ]) ?>
+                <div>Yes, Cancel Request</div>
+                <?php get_component('loader')?>
             </button>
         </div>
     </div>

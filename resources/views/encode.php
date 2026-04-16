@@ -32,8 +32,11 @@
                                         Clear
                                     </button>
                                     <button type="button" id="check-client-button" class="outline check-client-button" tabindex="8">
-                                        <?= get_icon('file-search-corner') ?>
-                                        Check Client
+                                        <div class="flex-row gap-8">
+                                            <?= get_icon('file-search-corner') ?>
+                                            Check Client
+                                        </div>
+                                        <?php get_component('loader') ?>
                                     </button>
                                 </div>
                             </div>
@@ -107,7 +110,11 @@
                         <div class='hidden container submit-content'>
                             <p class="submit-notes">Please select at least one bank and assign an agent to proceed.</p>
                             <button type="button" class="submit-button">
-                                Submit
+                                <div>Submit</div>
+                                
+                                <?php get_component('loader', [
+                                    'size' => 16
+                                ]) ?>
                             </button>
                         </div>
 

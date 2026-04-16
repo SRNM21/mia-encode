@@ -29,10 +29,8 @@
         <div class='modal-actions'>
             <button id="edit-agent-cancel" class="outline sm modal-cancel-btn" data-modal='edit-agent-modal'>Cancel</button>
             <button id="edit-agent-confirm" class="primary sm">
-                <p>Send an edit request</p>
-                <?php get_component('loader', [
-                    'size' => 'sm',
-                ]) ?>
+                <div>Send an edit request</div>
+                <?php get_component('loader')?>
             </button>
         </div>
     </div>

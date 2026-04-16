@@ -331,3 +331,13 @@ hr {
 .notification-message {
     font-size: 14px;
 }
+
+.wifi-indicator {
+    height: 20px;
+    width: 20px;
+}
+
+.wifi-indicator svg {
+    height: 20px;
+    width: 20px;
+}

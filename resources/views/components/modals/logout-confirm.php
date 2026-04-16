@@ -14,10 +14,8 @@
         <div class='modal-actions'>
             <button id='cancel-logout-btn' class='outline sm modal-cancel-btn' data-modal='logout-confirm-modal'>Cancel</button>
             <button id='confirm-logout-btn' class='primary sm confirm-logout-btn'>
-                <p>Logout</p>
-                <?php get_component('loader', [
-                    'size' => 'sm',
-                ]) ?>
+                <div>Logout</div>
+                <?php get_component('loader')?>
             </button>
         </div>
     </div>

@@ -38,10 +38,8 @@
                                             <div class="action-buttons flex-row gap-8 hidden">
                                                 <button class="outline sm profile-cancel-btn" type="button">Cancel</button>
                                                 <button class="primary sm profile-save-btn" type="button">
-                                                    <p>Save Changes</p>
-                                                    <?php get_component('loader', [
-                                                        'size' => 'sm',
-                                                    ]) ?>
+                                                    <div>Save Changes</div>
+                                                    <?php get_component('loader') ?>
                                                 </button>
                                             </div>
                                         </div>
@@ -74,10 +72,8 @@
                                             <div class="action-buttons flex-row gap-8 hidden">
                                                 <button class="outline sm security-cancel-btn" type="button">Cancel</button>
                                                 <button class="primary sm security-save-btn" type="button">
-                                                    <p>Update Password</p>
-                                                    <?php get_component('loader', [
-                                                        'size' => 'sm',
-                                                    ]) ?>
+                                                    <div>Update Password</div>
+                                                    <?php get_component('loader') ?>
                                                 </button>
                                             </div>
                                         </div>

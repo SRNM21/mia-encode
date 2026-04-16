@@ -160,10 +160,8 @@
                         <div class='flex-row container submit-content'>
                             <p class="submit-notes">You can edit any available application submitted on or after <?= formatDate($application->date_submitted) ?>.Past applications are locked for processing.</p>
                             <button type="button" class="save-button">
-                                <p>Save</p>
-                                <?php get_component('loader', [
-                                    'size' => 'sm',
-                                ]) ?>
+                                <div>Save</div>
+                                <?php get_component('loader') ?>
                             </button>
                         </div>
                     </div>

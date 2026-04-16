@@ -73,22 +73,18 @@
             <?php if (isset($user) && $user->isAdmin()): ?>
                 <div class="request-choice flex-row gap-16">
                     <button id='reject-edit-request-btn' class='outline reject-edit-request-btn'>
-                        <p>
+                        <div>
                             <?php get_icon('x') ?>
                             Reject
-                        </p>
-                        <?php get_component('loader', [
-                            'size' => 'sm',
-                        ]) ?>
+                        </div>
+                        <?php get_component('loader') ?>
                     </button>
                     <button id='approve-edit-request-btn' class='outline approve-edit-request-btn'>
-                        <p>
+                        <div>
                             <?php get_icon('check') ?>
                             Approve
-                        </p>
-                        <?php get_component('loader', [
-                            'size' => 'sm',
-                        ]) ?>
+                        </div>
+                        <?php get_component('loader') ?>
                     </button>
                 </div>
             <?php endif ?>

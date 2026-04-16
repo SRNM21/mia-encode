@@ -66,10 +66,8 @@
         <div class='modal-actions'>
             <button id="edit-application-cancel" class="outline sm modal-cancel-btn" data-modal='edit-application-modal'>Cancel</button>
             <button id="edit-application-confirm" class="primary sm">
-                <p>Save</p>
-                <?php get_component('loader', [
-                    'size' => 'sm',
-                ]) ?>
+                <div>Save</div>
+                <?php get_component('loader')?>
             </button>
         </div>
     </div>
