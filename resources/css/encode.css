@@ -5,7 +5,7 @@
     font-weight: 400;
 }
 
-.content > div {
+.content>div {
     width: 100%;
     max-width: 800px;
 }
@@ -46,7 +46,8 @@
     margin-bottom: 20px;
 }
 
-.check-client-button, .clear-client-button {
+.check-client-button,
+.clear-client-button {
     font-size: 14px;
     height: fit-content;
 }
@@ -70,7 +71,8 @@
     background-color: var(--header-bg);
 }
 
-.bank-table th, .bank-table td  {
+.bank-table th,
+.bank-table td {
     padding: 0 10px;
     height: 50px;
     font-weight: 400;
@@ -126,7 +128,7 @@
 }
 
 .bank-select-cell.unavailable {
-    color: var(--color-danger);
+    color: var(--color-error);
     font-weight: 600;
 }
 
@@ -141,7 +143,7 @@
 }
 
 .icon-unavailable {
-    color: var(--color-danger);
+    color: var(--color-error);
 }
 
 .form-grid {
@@ -173,7 +175,7 @@
 }
 
 .status-unavailable {
-    color: var(--color-danger);
+    color: var(--color-error);
 }
 
 .status-available {
@@ -203,5 +205,3 @@
         grid-template-columns: 1fr;
     }
 }
-
-

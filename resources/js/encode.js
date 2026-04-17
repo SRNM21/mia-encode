@@ -76,7 +76,7 @@ doc.ready(function () {
         e.preventDefault()
 
         if (IS_LOADING) return
-
+        
         const [data, errors] = validateCheckClientForm(checkClientErrorCard, {
             firstname: firstname,
             middlename: middlename,
@@ -297,7 +297,7 @@ function renderClientBankApplication(data) {
         const row = $('<tr></tr>')
 
         const date = app ? formatDate(app.date_submitted) : '—'
-        const statusText = app && !isExpiredApplication ? 'Unavailable' : 'Available'
+        const statusText = app && !isExpiredApplication ? 'Duplicate' : 'Available'
         const statusClass = app && !isExpiredApplication 
             ? 'status-unavailable' 
             : 'status-available'
@@ -318,27 +318,20 @@ function renderClientBankApplication(data) {
             .attr('tabindex', `${tabIndex++}`)
             .text('')
 
+        // for future cases
         const isDisabled = app && !isExpiredApplication;
-
-        if (isDisabled) {
-            row.addClass('row-disabled');
-            actionCell.addClass('disabled unavailable').html(ICON_UNAVAILABLE);
-            actionCell.removeAttr('tabindex'); 
-            actionCell.off('click keydown'); 
-
-        } else {
-            actionCell.attr('tabindex', `${tabIndex++}`);
-            actionCell.on('click', function() {
-                checkBank(this); 
-            });
-            
-            actionCell.on('keydown', function(event) {
-                if (event.key === 'Enter' || event.key === ' ') {
-                    event.preventDefault();
-                    $(this).trigger('click');
-                }
-            });
-        }
+        
+        actionCell.attr('tabindex', `${tabIndex++}`);
+        actionCell.on('click', function() {
+            checkBank(this); 
+        });
+        
+        actionCell.on('keydown', function(event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                $(this).trigger('click');
+            }
+        });
 
         row.append(bankCell, dateCell, agentCell, statusCell, actionCell)
         tbody.append(row)
