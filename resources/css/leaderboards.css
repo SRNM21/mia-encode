@@ -251,3 +251,15 @@
     font-weight: 400 !important;
     color: var(--text-subtle-color) !important;
 }
+
+.error-card {
+    margin-top: 18px;
+}
+
+.custom-date-display {
+    font-size: 14px;
+    font-weight: 500;
+    margin-left: 8px;
+    color: var(--foreground-secondary);
+    cursor: pointer;
+}

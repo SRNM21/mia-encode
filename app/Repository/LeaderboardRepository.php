@@ -8,7 +8,7 @@ use App\Models\BankApplication;
 
 class LeaderboardRepository
 {
-    public function getTopAgents(string $filter = 'today'): array
+    public function getTopAgents(string $filter = 'today', ?string $searchAgent = null, ?string $fromDate = null, ?string $toDate = null): array
     {
         $normalizedAgent = "
             TRIM(
@@ -24,9 +24,11 @@ class LeaderboardRepository
                 "$normalizedAgent AS agent",
                 "SUM(JSON_LENGTH(bank_submitted_id)) AS submissions"
             )
-            ->whereNotNull('bank_submitted_id')
-            ->groupBy($normalizedAgent)
-            ->orderBy('submissions', 'DESC');
+            ->whereNotNull('bank_submitted_id');
+
+        if (!empty($searchAgent)) {
+            $query->where('agent', 'LIKE', "%{$searchAgent}%");
+        }
 
         switch ($filter) 
         {
@@ -36,11 +38,15 @@ class LeaderboardRepository
                 break;
 
             case 'week':
-                $yearWeek = DB::getPDO()
-                    ->query("SELECT YEARWEEK(CURDATE(),1)")
-                    ->fetchColumn();
+                $now = new \DateTimeImmutable('now');
+                $monday = (int) $now->format('N') === 1 ? $now : $now->modify('monday this week');
+                $friday = $monday->modify('+4 days');
 
-                $query->where('YEARWEEK(date_submitted,1)', '=', $yearWeek);
+                $start = $monday->format('Y-m-d') . ' 00:00:00';
+                $end = $friday->format('Y-m-d') . ' 23:59:59';
+
+                $query->where('date_submitted', '>=', $start)
+                      ->where('date_submitted', '<=', $end);
                 break;
 
             case 'month':
@@ -54,6 +60,12 @@ class LeaderboardRepository
 
             case 'all':
                 break;
+            case 'custom':
+                if ($fromDate && $toDate) {
+                    $query->where('date_submitted', '>=', $fromDate . ' 00:00:00')
+                          ->where('date_submitted', '<=', $toDate . ' 23:59:59');
+                }
+                break;
             default:
                 // Default today
                 $query->where('date_submitted', '>=', date('Y-m-d 00:00:00'))
@@ -61,13 +73,27 @@ class LeaderboardRepository
                 break;
         }
 
+        $query->groupBy($normalizedAgent)
+              ->orderBy('submissions', 'DESC');
+
         $results = $query->getArray();
 
-        return $this->formatLeaderboard($results);
+        return $this->formatLeaderboard($results, !empty($searchAgent));
     }
 
-    private function formatLeaderboard(array $agents): array
+    private function formatLeaderboard(array $agents, bool $isSearch = false): array
     {
+        if ($isSearch) {
+            return [
+                'podium' => [
+                    'first' => null,
+                    'second' => null,
+                    'third' => null,
+                ],
+                'rankings' => $agents
+            ];
+        }
+
         $podium = array_slice($agents, 0, 3);
         $table = array_slice($agents, 3);
 
@@ -81,7 +107,7 @@ class LeaderboardRepository
         ];
     }
 
-    public function getBankLeaderboard(string $filter = 'today') 
+    public function getBankLeaderboard(string $filter = 'today', ?string $searchAgent = null, ?string $fromDate = null, ?string $toDate = null) 
     {
         $normalizedAgent = "
             TRIM(
@@ -101,6 +127,10 @@ class LeaderboardRepository
         $query = BankApplication::query()
             ->select("id, bank_submitted_id, $normalizedAgent AS agent");
         
+        if (!empty($searchAgent)) {
+            $query->where('agent', 'LIKE', "%{$searchAgent}%");
+        }
+
         switch ($filter) 
         {
             case 'today':
@@ -109,11 +139,15 @@ class LeaderboardRepository
                 break;
 
             case 'week':
-                $yearWeek = DB::getPDO()
-                    ->query("SELECT YEARWEEK(CURDATE(),1)")
-                    ->fetchColumn();
+                $now = new \DateTimeImmutable('now');
+                $monday = (int) $now->format('N') === 1 ? $now : $now->modify('monday this week');
+                $friday = $monday->modify('+4 days');
 
-                $query->where('YEARWEEK(date_submitted,1)', '=', $yearWeek);
+                $start = $monday->format('Y-m-d') . ' 00:00:00';
+                $end = $friday->format('Y-m-d') . ' 23:59:59';
+
+                $query->where('date_submitted', '>=', $start)
+                      ->where('date_submitted', '<=', $end);
                 break;
 
             case 'month':
@@ -126,6 +160,12 @@ class LeaderboardRepository
                 break;
 
             case 'all':
+                break;
+            case 'custom':
+                if ($fromDate && $toDate) {
+                    $query->where('date_submitted', '>=', $fromDate . ' 00:00:00')
+                          ->where('date_submitted', '<=', $toDate . ' 23:59:59');
+                }
                 break;
             default:
                 // Default today

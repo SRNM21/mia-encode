@@ -23,11 +23,31 @@
 
                 <div class='content flex-col'>
                     <div class='flex-col'>
-                        <div class="flex-row">
+                        <div class="leaderboard-header flex-row">
                             <div class="tabs-container">
                                 <div class="tab-indicator"></div>
                                 <a href="#submissions" class="tabs" data-tab="submissions-card">Submissions</a>
                                 <a href="#bank-types" class="tabs" data-tab="bank-type-leaderboard-card">Bank Types</a>
+                            </div>
+                            
+                            <div class="flex-row gap-8">
+                                <div class="flex-col field-group">
+                                    <input type="text" id="search-agent" name="search-agent" class="client-details-input size-lg" placeholder="Search Agent..." value="<?= htmlspecialchars($search_agent ?? '') ?>" tabindex="1">
+                                </div>
+                                <button type="button" id="clear-agent-button" class="outline clear-agent-button" tabindex="2">
+                                    <div class="flex-row gap-8 align-center">
+                                        <?= get_icon('eraser') ?>
+                                        Clear
+                                    </div>
+                                    <?php get_component('loader', ['size' => '16px']) ?>
+                                </button>
+                                <button type="button" id="search-agent-button" class="outline search-agent-button" tabindex="3">
+                                    <div class="flex-row gap-8 align-center">
+                                        <?= get_icon('search') ?>
+                                        Search
+                                    </div>
+                                    <?php get_component('loader', ['size' => '16px']) ?>
+                                </button>
                             </div>
                         </div>
                         <div class="tab-content">
@@ -35,17 +55,25 @@
                                 <!-- Header -->
                                 <div class="leaderboard-header flex-row">
                                     <p>Top Agents</p>
-                                    <select id="leaderboards-filter" class="size-sm">
-                                        <option <?= $filter_sub == 'today' ? 'selected' : '' ?> value="today">Today</option>
-                                        <option <?= $filter_sub == 'week' ? 'selected' : '' ?> value="week">Weekly</option>
-                                        <option <?= $filter_sub == 'month' ? 'selected' : '' ?> value="month">Monthly</option>
-                                        <option <?= $filter_sub == 'year' ? 'selected' : '' ?> value="year">Yearly</option>
-                                        <option <?= $filter_sub == 'all' ? 'selected' : '' ?> value="all">All Time</option>
-                                    </select>
+                                    <div class="flex-row align-center gap-16">
+                                        <?php if (!empty($filter_sub_display)): ?>
+                                            <span class="custom-date-display flex-center <?= $filter_sub == 'custom' ? 'edit-custom-date' : '' ?>" data-filter="filter-submission">
+                                                <?= $filter_sub_display ?>
+                                            </span>
+                                        <?php endif; ?>
+                                        <select id="leaderboards-filter" class="size-sm">
+                                            <option <?= $filter_sub == 'today' ? 'selected' : '' ?> value="today">Today</option>
+                                            <option <?= $filter_sub == 'week' ? 'selected' : '' ?> value="week">Weekly</option>
+                                            <option <?= $filter_sub == 'month' ? 'selected' : '' ?> value="month">Monthly</option>
+                                            <option <?= $filter_sub == 'year' ? 'selected' : '' ?> value="year">Yearly</option>
+                                            <option <?= $filter_sub == 'all' ? 'selected' : '' ?> value="all">All Time</option>
+                                            <option <?= $filter_sub == 'custom' ? 'selected' : '' ?> value="custom">Custom</option>
+                                        </select>
+                                    </div>
                                 </div>
 
                                 <!-- Podium -->
-                                <div class="leaderboard-podium flex-row">
+                                <div class="leaderboard-podium flex-row <?= !empty($search_agent) ? 'hidden' : '' ?>">
                                     <?php if ($podium['first'] == null): ?>
                                         <div class="empty-leaderboards flex-center flex-col">
                                             <?= get_icon('mia_icon') ?>
@@ -107,7 +135,7 @@
                                                 </thead>
                                                 <tbody>
                                                     <?php
-                                                        $rank = 4;
+                                                        $rank = empty($search_agent) ? 4 : 1;
                                                         foreach ($rankings as $row):
                                                     ?>
 
@@ -122,19 +150,32 @@
                                             </table>
                                         </div>
                                     </div>
+                                <?php elseif (!empty($search_agent)): ?>
+                                    <div class="empty-leaderboards flex-center flex-col">
+                                        <?= get_icon('mia_icon') ?>
+                                        <p>No agents found for "<?= htmlspecialchars($search_agent) ?>".</p>
+                                    </div>
                                 <?php endif ?>
                             </div>
                             <div class="card bank-type-leaderboard-card">
                                 <div class="leaderboard-header flex-row">
                                     <p>Bank Applications per Agent</p>
                                     
-                                    <select id="bank-type-leaderboard-filter" class="size-sm">
-                                        <option <?= $filter_bank == 'today' ? 'selected' : '' ?> value="today">Today</option>
-                                        <option <?= $filter_bank == 'week' ? 'selected' : '' ?> value="week">Weekly</option>
-                                        <option <?= $filter_bank == 'month' ? 'selected' : '' ?> value="month">Monthly</option>
-                                        <option <?= $filter_bank == 'year' ? 'selected' : '' ?> value="year">Yearly</option>
-                                        <option <?= $filter_bank == 'all' ? 'selected' : '' ?> value="all">All Time</option>
-                                    </select>
+                                    <div class="flex-row align-center gap-16">
+                                        <?php if (!empty($filter_bank_display)): ?>
+                                            <span class="custom-date-display flex-center <?= $filter_bank == 'custom' ? 'edit-custom-date' : '' ?>" data-filter="filter-banks">
+                                                <?= $filter_bank_display ?>
+                                            </span>
+                                        <?php endif; ?>
+                                        <select id="bank-type-leaderboard-filter" class="size-sm">
+                                            <option <?= $filter_bank == 'today' ? 'selected' : '' ?> value="today">Today</option>
+                                            <option <?= $filter_bank == 'week' ? 'selected' : '' ?> value="week">Weekly</option>
+                                            <option <?= $filter_bank == 'month' ? 'selected' : '' ?> value="month">Monthly</option>
+                                            <option <?= $filter_bank == 'year' ? 'selected' : '' ?> value="year">Yearly</option>
+                                            <option <?= $filter_bank == 'all' ? 'selected' : '' ?> value="all">All Time</option>
+                                            <option <?= $filter_bank == 'custom' ? 'selected' : '' ?> value="custom">Custom</option>
+                                        </select>
+                                    </div>
                                 </div>
 
                                 <div class="leaderboard-table-wrapper">
@@ -188,6 +229,7 @@
                 </div>
             </main>
         </div>
+        <?php get_component('modals/select-date-range-leaderboards') ?>
         <?= js_jq('leaderboards') ?>
     </body>
 </html>

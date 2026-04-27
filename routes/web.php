@@ -11,7 +11,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EncodeController;
 use App\Http\Controllers\BankApplicationController;
 use App\Http\Controllers\BankController;
-use App\Http\Controllers\LeaderboardsController;
+use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\RequestEditController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\Development\HealthController;
@@ -55,7 +55,7 @@ Route::middleware(AuthMiddleware::class)->group(function () {
             Route::post('/dashboard/chart/weekly-bank-table', 'weeklyCalendar');
         });
         
-        Route::get('/leaderboards', [LeaderboardsController::class, 'show']);
+        Route::get('/leaderboards', [LeaderboardController::class, 'show']);
 
         Route::get('/banks', [BankController::class, 'show']);
         Route::post('/banks', [BankController::class, 'store']);

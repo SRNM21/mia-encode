@@ -689,8 +689,14 @@ select.error {
     border: 1px solid var(--color-error);
 }
 
+.date-range-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    margin-top: 32px;
+}
+
 .field-group:has(input.error) label {
-    color: var(--color-error);
+    color: var(--color-danger);
 }
 
 input[read-only],
