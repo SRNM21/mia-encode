@@ -55,6 +55,7 @@ class BankApplicationService
             'middle_name',
             'birthdate',
             'mobile_num',
+            'agent',
             'start_date',
             'end_date',
         ];

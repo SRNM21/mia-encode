@@ -19,6 +19,7 @@ const FILTER_COLUMNS = {
     middle_name: "Middlename",
     birthdate: "Birthdate",
     mobile_num: "Mobile Number",
+    agent: "Agent",
     start_date: "Start Date",
     end_date: "End Date"
 }
@@ -101,7 +102,7 @@ function totalPages() {
 function setPage(e, page) {
     const url = new URL(window.location.href)
     url.searchParams.set('page', page)
-    
+
     handleNavigationLoader(e, this)
     href(url.toString())
 }
@@ -189,7 +190,7 @@ function applyFilters(e) {
         params.set(k, v)
     })
 
-    
+
     handleNavigationLoader(e, this)
     window.location.search = params.toString()
 }
@@ -315,9 +316,9 @@ async function refereshTable() {
         const response = await post({
             url: 'bank-applications/table',
         })
-        
+
         const result = response.data
-        
+
         tableWrapper.html(result.html)
         renderPaginationState()
     } catch (error) {
@@ -415,8 +416,8 @@ $(document).ready(function () {
         if (!column || !value) return
 
         if (
-            column !== 'birthdate' && 
-            column !== 'start_date' && 
+            column !== 'birthdate' &&
+            column !== 'start_date' &&
             column !== 'end_date'
         ) {
             value = value.toUpperCase()
@@ -546,7 +547,7 @@ $(document).ready(function () {
                 url: 'bank-applications/pre-export',
                 data: data
             })
-            
+
             IS_LOADING = false
 
             const result = response.data
@@ -554,7 +555,7 @@ $(document).ready(function () {
             // Prevent export if no data
             if (result.total <= 0) {
                 showInfo(
-                    'No data found', 
+                    'No data found',
                     `${result.total} data found within ${data.start_date} and ${data.end_date}`
                 )
 
@@ -592,7 +593,7 @@ $(document).ready(function () {
                 url: 'bank-applications/pre-export',
                 data: data
             })
-            
+
             IS_LOADING = false
 
             const result = response.data
@@ -600,7 +601,7 @@ $(document).ready(function () {
             // Prevent export if no data
             if (result.total <= 0) {
                 showInfo(
-                    'No data found', 
+                    'No data found',
                     `${result.total} data found for today's encoding.`
                 )
 
@@ -615,7 +616,7 @@ $(document).ready(function () {
             IS_LOADING = false
         }
     })
-    
+
     // ---------------------
     // Edit Application
     // ---------------------
@@ -630,9 +631,9 @@ $(document).ready(function () {
         try {
             const response = await post({
                 url: 'bank-applications/check-edit',
-                data: {app_id: data.id,}
+                data: { app_id: data.id, }
             })
-            
+
             const canEdit = response.data
 
             if (canEdit) {
@@ -643,7 +644,7 @@ $(document).ready(function () {
                 href(url.toString())
             } else {
                 showNotification(
-                    'Edit Restricted', 
+                    'Edit Restricted',
                     'This bank application is past due of bank application valid months.',
                     'error'
                 )
@@ -658,16 +659,16 @@ $(document).ready(function () {
     $(document).on('click', '.edit-agent-btn', function () {
         const row = CURRENT_EDIT_TR
         const data = row.data()
-        
+
         EDIT_APP_ORIG_DATA = data
         agent.val(EDIT_APP_ORIG_DATA.agent)
         openModal(EDIT_AGENT_MODAL)
     })
 
-    confirmEditAgentBtn.on('click', async function() {
+    confirmEditAgentBtn.on('click', async function () {
         if (IS_LOADING) return
         IS_LOADING = true
-        
+
         showLoading(confirmEditAgentBtn, true)
 
         const agentVal = agent.val().trim().toUpperCase()
@@ -683,7 +684,7 @@ $(document).ready(function () {
         }
 
         const eq = agentVal === EDIT_APP_ORIG_DATA.agent
-        
+
         if (eq) {
             applicationEditInfoCard.removeClass('hidden')
             applicationEditInfoCard.find('.status-title').html('Nothing to edit')
@@ -704,13 +705,13 @@ $(document).ready(function () {
                     new_agent: agentVal
                 }
             })
-            
+
             const result = response.data
-            
+
             await refereshTable()
 
             showNotification(
-                'Request Sent', 
+                'Request Sent',
                 'Edit agent request was successfully sent.'
             )
         } catch (error) {
@@ -727,30 +728,30 @@ $(document).ready(function () {
         openModal(CANCEL_EDIT_REQUEST_MODAL)
     })
 
-    confirmCancelEditRequestBtn.on('click', async function () {  
+    confirmCancelEditRequestBtn.on('click', async function () {
         if (IS_LOADING) return
-        IS_LOADING = true 
+        IS_LOADING = true
 
         showLoading(confirmCancelEditRequestBtn, true)
 
         try {
             const response = await del({
                 url: 'request-edit',
-                data: {id: CURRENT_EDIT_TR.attr('data-request-edit-id')}
+                data: { id: CURRENT_EDIT_TR.attr('data-request-edit-id') }
             })
-            
+
             const result = response.data
             await refereshTable()
-            
+
             showNotification(result.title, result.message)
         } catch (error) {
             const response = error.responseJSON
             console.log(response)
         }
-        
+
         closeModal(CANCEL_EDIT_REQUEST_MODAL)
         showLoading(confirmCancelEditRequestBtn, false)
-        IS_LOADING = false 
+        IS_LOADING = false
     })
 
     $(document).on('click', '.view-edit-application-btn', function () {
@@ -764,14 +765,14 @@ $(document).ready(function () {
             requestUpdateContent.birthdate = formatDate(requestUpdateContent.birthdate)
 
             $('.edit-request-datetime').html(`Edit requested at: ${formatDateTime(requestDatetime)}`)
-            
+
             setField('#original-firstname', '#edit-firstname', data.firstname, requestUpdateContent.first_name);
             setField('#original-middlename', '#edit-middlename', data.middlename, requestUpdateContent.middle_name);
             setField('#original-lastname', '#edit-lastname', data.lastname, requestUpdateContent.last_name);
             setField('#original-birthdate', '#edit-birthdate', data.birthdate, requestUpdateContent.birthdate);
             setField('#original-mobile', '#edit-mobile', data.mobile, requestUpdateContent.mobile);
             setField('#original-agent', '#edit-agent', data.agent, requestUpdateContent.agent);
-                    
+
             openModal(VIEW_EDIT_REQUEST_MODAL)
         } catch (e) {
             showNotification('Failed to View', 'Something went wrong, please try again later.', 'error')
@@ -789,17 +790,16 @@ function createDropdownContent(app) {
                 Edit Application
             </button>
 
-            ${
-                app.request_edit_id && app.request_status === 'pending'
-                ? `<button class="dropdown-item cancel-edit-application-btn">
+            ${app.request_edit_id && app.request_status === 'pending'
+            ? `<button class="dropdown-item cancel-edit-application-btn">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x-icon lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                         Cancel Edit Agent
                    </button>`
-                : `<button class="dropdown-item edit-agent-btn">
+            : `<button class="dropdown-item edit-agent-btn">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil-icon lucide-pencil"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg>
                         Edit Agent
                    </button>`
-            }
+        }
         </div>
     `
 }
@@ -839,7 +839,7 @@ $(document).on('click', '.dropdown-trigger', function (e) {
     e.stopPropagation();
 
     const $trigger = $(this);
-    
+
     const isSameTrigger = activeTrigger && activeTrigger[0] === $trigger[0];
 
     closeAllMenus();
@@ -896,7 +896,7 @@ $(document).on('click', '.dropdown-trigger', function (e) {
 
 $(document).on('click', function (e) {
     if (activeDropdown) {
-        if (!$(e.target).closest('.dropdown-menu').length && 
+        if (!$(e.target).closest('.dropdown-menu').length &&
             !$(e.target).closest('.dropdown-trigger').length) {
             closeAllMenus();
         }

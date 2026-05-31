@@ -97,7 +97,7 @@ function hydrateModal() {
 
     $('.edit-request-datetime')
         .html(`Edit requested at: ${formatDateTime(CURRENT_EDIT_REQUEST_DATA.requestDatetime)} by ${CURRENT_EDIT_REQUEST_DATA.requestEncoder}`)
-    
+
     const banks = CURRENT_EDIT_REQUEST_DATA.banks
 
     oldDataLabel.text(CURRENT_EDIT_REQUEST_DATA.requestOld)

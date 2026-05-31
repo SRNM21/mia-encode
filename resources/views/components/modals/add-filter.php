@@ -16,6 +16,7 @@
                     <option value="middle_name">Middlename</option> 
                     <option value="birthdate">Birthdate</option>
                     <option value="mobile_num">Mobile Number</option>
+                    <option value="agent">Agent</option>
                     <option value="start_date">Start Date</option>
                     <option value="end_date">End Date</option>
                 </select>
